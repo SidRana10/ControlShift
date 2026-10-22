@@ -6,6 +6,10 @@ from __future__ import annotations
 from .judge import DIMENSIONS, RUBRIC, RUBRIC_VERSION, numeric_scores
 
 
+def _tok(t):
+    return "n/a" if not t else f"{t['prompt_tokens']} / {t['output_tokens']} (reasoning {t['reasoning_tokens']})"
+
+
 def _f(x, nd=2):
     return "-" if x is None else f"{x:.{nd}f}"
 
@@ -88,6 +92,11 @@ def render_judge_report(retrieval: dict | None, offline: dict | None, live: dict
         L += ["End-to-end latency (seconds; evidence assembly + generation [+ judging]):", ""]
         L += _table(["Stage", "n", "Mean", "Median", "Max"], [
             [k, v["n"], _f(v.get("mean_s")), _f(v.get("median_s")), _f(v.get("max_s"))] for k, v in lat.items()])
+        rows = [[q, *(_tok((r.get("tokens") or {}).get(k)) for k in ("generation", "judge"))]
+                for q, r in live["per_question"].items() if r.get("tokens")]
+        if rows:
+            L += ["", "Token usage as reported by the providers (prompt / output, of which reasoning):", ""]
+            L += _table(["Question", "Generator tokens", "Judge tokens"], rows)
     L += ["## 4. LLM judge results (an opinion, not ground truth)", ""]
     if not judged_live:
         L += ["**Not run.** No live judge scores exist; none are shown.", ""]

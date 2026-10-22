@@ -1,0 +1,44 @@
+{
+  "label": "PROVIDER SMOKE TEST - one /ask request; not an accuracy benchmark; semantic faithfulness NOT verified",
+  "date": "2026-10-22",
+  "question": "How does GV.SC-03 map to CSF 1.1?",
+  "generator": {
+    "provider": "mistral",
+    "configured_model": "mistral-small-latest",
+    "resolved_model": null
+  },
+  "settings": {
+    "llm_timeout_s": 60,
+    "request_timeout_s": 60,
+    "max_llm_attempts": 1
+  },
+  "provider_http_requests": [
+    {
+      "status": 429,
+      "seconds": 0.364
+    }
+  ],
+  "provider_hosts": [
+    "api.mistral.ai"
+  ],
+  "gemini_requests": 0,
+  "groq_requests": 0,
+  "api_http_status": 502,
+  "end_to_end_latency_s": 0.39,
+  "token_usage": null,
+  "response_status": null,
+  "attempts": null,
+  "rejection": null,
+  "warnings": null,
+  "answer": null,
+  "verification": null,
+  "evidence_summary": null,
+  "deterministic_checks": null,
+  "error_body": {
+    "error": {
+      "code": "provider_error",
+      "message": "Mistral returned HTTP 429 (rate_limited)",
+      "details": null
+    }
+  }
+}

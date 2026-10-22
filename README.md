@@ -61,7 +61,7 @@ controlshift-evidence "What changed for supply chain risk management?" --retriev
 ## Grounded answers and API (Phase 4B)
 
 ```bash
-cp .env.example .env              # add GEMINI_API_KEY and GEMINI_MODEL to enable generation
+cp .env.example .env              # set LLM_PROVIDER (gemini|mistral) and that provider's API key and model to enable generation
 controlshift-serve                # or: uvicorn controlshift.api.app:app_factory --factory
 curl -s localhost:8000/health
 curl -s localhost:8000/ask -H 'content-type: application/json' \
@@ -75,6 +75,7 @@ mapping-conflict question; see `PROGRESS.md`). That is not an accuracy evaluatio
 HTTP, and other question types are untested live. Without Gemini credentials the API still works and returns `status: "evidence_only"` with the full evidence bundle. Answers are
 validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows) but citation checks are
 structural: they do not prove the answer is faithful to the cited text, and no model confidence is reported.
+The generator is chosen by `LLM_PROVIDER` (`gemini`, the default and primary; or `mistral`, an optional backup that has had no successful live request yet). The judge is configured separately (`JUDGE_PROVIDER`/`JUDGE_MODEL`, currently Groq `openai/gpt-oss-120b`) and never falls back to the generator.
 A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.
 
 ## Evaluation

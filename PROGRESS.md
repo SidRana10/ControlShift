@@ -501,6 +501,21 @@ supported is still the judge's opinion; judge and generator share a vendor unles
 labels are AI-curated and not human-reviewed; samples of 6 or 19 questions cannot support accuracy claims.
 Remaining work: run the live subset; human review of gold labels, answers and judge scores; decide on a judge from a different provider; larger samples.
 
+### Phase 5B, step 4 — Provider stabilization and live-evaluation readiness  (offline; live evaluation NOT yet completed)
+- **Configuration:** primary generator Gemini `gemini-3.8-flash` (`LLM_TIMEOUT_SECONDS=90`, `LLM_MAX_ATTEMPTS=1`), judge Groq `openai/gpt-oss-120b`
+  (`JUDGE_MAX_ATTEMPTS=1`). `LLM_PROVIDER` selects the generator (`gemini` default | `mistral`); the judge never falls back to it.
+- **Mistral (optional backup, `MistralProvider`, `mistral-small-latest`):** OpenAI-style chat completions, JSON mode, controlled errors with no key/URL
+  in messages. Verified offline only. ONE live `/ask` attempt returned HTTP 429 `rate_limited` (record in `eval/failed_runs/`); it has never produced
+  an answer, so its behaviour with ControlShift's schema is unverified. Not selected.
+- **Kept fixes:** provider timeouts are recorded like any provider failure and stop the run (a Gemini read timeout used to crash the runner);
+  per-call token usage (`prompt/output/reasoning/total`, counts only) and the model id the API reports (`resolved_models`) are saved per run;
+  `evidence_supplied` stores, per question, the exact evidence texts shown to the generator and judge; the report has a token table.
+- **Live attempts so far (all failed at the first Gemini request; none produced answers or scores):** HTTP 503 (record kept), a 30 s read timeout
+  (crashed the runner before saving anything; fixed), and one Mistral 429. Sanitized records live in `eval/failed_runs/` (see its README); nothing in
+  `src/` or `eval/*.py` reads them. The live runner overwrites `eval/judge_results_live.json`, which is the runtime artifact.
+- **Still true:** the single Groq judge smoke test (see above) and the single Gemini `/ask` smoke test are the only successful live calls. No
+  six-question result, judge calibration or human review exists.
+
 ### Phase 5B — open items
 - [ ] Re-run the live `/ask` check once Gemini capacity recovers
 

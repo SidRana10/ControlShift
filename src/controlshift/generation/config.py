@@ -26,9 +26,11 @@ class Settings:
     db_path: Path = Path("data/processed/controlshift.db")
     index_dir: Path = Path("data/indexes")
     retrieval_mode: str = "hybrid"  # none|bm25|dense|hybrid|hybrid_rerank
-    llm_provider: str = "gemini"
+    llm_provider: str = "gemini"  # generator: gemini | mistral
     gemini_api_key: str | None = field(default=None, repr=False)  # never printed
     gemini_model: str | None = None
+    mistral_api_key: str | None = field(default=None, repr=False)  # never printed
+    mistral_model: str | None = None
     llm_timeout_seconds: float = 30.0
     request_timeout_seconds: float = 90.0
     context_chars: int = 12000  # evidence-context budget for the prompt
@@ -45,6 +47,8 @@ class Settings:
             llm_provider=e.get("LLM_PROVIDER", "gemini").lower(),
             gemini_api_key=e.get("GEMINI_API_KEY") or None,
             gemini_model=e.get("GEMINI_MODEL") or None,
+            mistral_api_key=e.get("MISTRAL_API_KEY") or None,
+            mistral_model=e.get("MISTRAL_MODEL") or None,
             llm_timeout_seconds=_float(e, "LLM_TIMEOUT_SECONDS", 30.0),
             request_timeout_seconds=_float(e, "REQUEST_TIMEOUT_SECONDS", 90.0),
             context_chars=_int(e, "GENERATION_CONTEXT_CHARS", 12000),

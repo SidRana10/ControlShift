@@ -90,10 +90,13 @@ def main() -> int:
         settings = Settings.from_env()
         gen = provider_from_settings(settings)
         if gen is None:
-            print("refusing: generator not configured (GEMINI_API_KEY / GEMINI_MODEL)", file=sys.stderr)
+            print("refusing: generator not configured (set LLM_PROVIDER plus GEMINI_API_KEY/GEMINI_MODEL or MISTRAL_API_KEY/MISTRAL_MODEL)", file=sys.stderr)
             return 2
         jset = JudgeSettings.from_env()
         if args.judge_same_as_generator:
+            if gen.name != "gemini":
+                print("refusing: --judge-same-as-generator is only implemented for a Gemini generator", file=sys.stderr)
+                return 2
             jset = dataclasses.replace(jset, provider="gemini", model=gen.model, api_key=settings.gemini_api_key)
         judge = judge_provider(jset)
         if judge is None:

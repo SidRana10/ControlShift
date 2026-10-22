@@ -14,7 +14,7 @@ from ..evidence.assemble import EvidenceAssembler
 from ..generation.config import Settings
 from ..generation.context import build_context
 from ..generation.generate import GroundedGenerator
-from ..generation.provider import LLMProvider, ProviderFailure
+from ..generation.provider import LLMProvider, ProviderError, ProviderFailure
 from .answers import SEMANTIC, aggregate, check_answer
 from .judge import (
     RUBRIC_VERSION,
@@ -25,7 +25,7 @@ from .judge import (
 )
 
 SUBSET_SIX = ["A01", "B01", "C01", "F01", "E01", "H02"]  # one per required question type
-LIVE_PROVIDERS = {"gemini", "groq"}
+LIVE_PROVIDERS = {"gemini", "groq", "mistral"}
 
 
 class BudgetExhausted(ProviderFailure):
@@ -39,12 +39,24 @@ class Budgeted:
         self.provider, self.budget, self.made = provider, budget, 0
         self.name = getattr(provider, "name", None)
         self.model = getattr(provider, "model", None)
+        self.resolved_models: list[str] = []  # model ids the API actually reported (distinct, in order)
+        self.usage_log: list[dict] = []  # token counts per successful response
+
+    def tokens_since(self, n: int) -> dict | None:
+        rows = self.usage_log[n:]
+        return {k: sum(r.get(k) or 0 for r in rows) for k in ("prompt_tokens", "output_tokens", "reasoning_tokens", "total_tokens")} if rows else None
 
     def generate(self, system: str, prompt: str) -> str:
         if self.provider is None or self.made >= self.budget:
             raise BudgetExhausted("request budget exhausted; no request was sent")
         self.made += 1
-        return self.provider.generate(system, prompt)
+        text = self.provider.generate(system, prompt)
+        served = getattr(self.provider, "last_model", None)
+        if served and served not in self.resolved_models:
+            self.resolved_models.append(served)
+        if getattr(self.provider, "last_usage", None):
+            self.usage_log.append(dict(self.provider.last_usage))
+        return text
 
 
 def select_questions(gold: list[dict], subset: str) -> list[dict]:
@@ -98,18 +110,21 @@ def run_judged_evaluation(questions: list[dict], assembler: EvidenceAssembler, s
                 "status": "not_attempted", "reason": stopped}, "deterministic": None, "judgment": None}
             continue
         t0 = clock()
+        g_n, j_n = len(gen.usage_log), len(jdg.usage_log)
         bundle = assembler.assemble(g["question"])
         ctx = build_context(bundle, settings.context_chars, settings.max_passage_chars)
-        rec = {"category": g["category"], "question": g["question"], "judgment": None, "deterministic": None}
+        rec = {"category": g["category"], "question": g["question"], "judgment": None, "deterministic": None,
+               "evidence_supplied": _evidence_texts(bundle, ctx)}  # exactly what the generator and judge were shown
         try:
             res = GroundedGenerator(gen, settings).generate(bundle, store)
-        except ProviderFailure as exc:
+        except ProviderError as exc:  # timeouts as well as HTTP failures: record and stop, never crash
             stopped = f"provider error on {qid}: {exc.code}"
             rec["generation"] = {"status": "provider_error", "error": f"{exc.code}: {exc}"}
             rec["latency_s"] = {"generation": round(clock() - t0, 3)}
             records[qid] = rec
             continue
         gen_s = clock() - t0
+        rec["tokens"] = {"generation": gen.tokens_since(g_n)}
         rec["generation"] = {"status": res.status, "attempts": res.attempts, "rejection": res.rejection,
                              "warnings": res.warnings, "system_uncertainties": res.system_uncertainties,
                              "abstention_reason": res.abstention_reason, "answer": res.answer}
@@ -126,6 +141,7 @@ def run_judged_evaluation(questions: list[dict], assembler: EvidenceAssembler, s
                                _evidence_texts(bundle, ctx), judge_settings.max_attempts)
             j_s = clock() - tj
             rec["judgment"] = jud.to_dict()
+            rec["tokens"]["judge"] = jdg.tokens_since(j_n)
             if jud.status == "provider_error":
                 stopped = f"judge provider error on {qid}"
         rec["latency_s"] = {"generation": round(gen_s, 3), "judge": round(j_s, 3),
@@ -138,7 +154,8 @@ def run_judged_evaluation(questions: list[dict], assembler: EvidenceAssembler, s
     return {
         "kind": "real_generator" if is_live else "mocked_or_missing_generator",
         "judge_kind": "live_llm_judge" if judge_live else "mocked_or_missing_judge",
-        "generator": gen_meta, "judge": jdg_meta, "rubric_version": RUBRIC_VERSION,
+        "generator": {**gen_meta, "resolved_models": gen.resolved_models},
+        "judge": {**jdg_meta, "resolved_models": jdg.resolved_models}, "rubric_version": RUBRIC_VERSION,
         "independence_note": independence_note(gen_meta, jdg_meta) if gen.name and jdg.name else
         "No judge configured; no judge scores exist.",
         "status": "stopped_on_provider_error" if stopped else "complete", "stopped_reason": stopped,

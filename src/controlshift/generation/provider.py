@@ -10,6 +10,7 @@ from .config import Settings
 
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+MISTRAL_BASE_URL = "https://api.mistral.ai/v1"
 
 
 class ProviderError(Exception):
@@ -47,6 +48,8 @@ class GeminiProvider:
             raise ProviderNotConfigured("GEMINI_API_KEY and GEMINI_MODEL must both be set")
         self._key, self.model, self.timeout, self.base_url = api_key, model, timeout, base_url
         self._client = client  # injectable for tests (httpx.MockTransport)
+        self.last_usage: dict | None = None  # token counts of the latest response (no other metadata)
+        self.last_model: str | None = None  # model id the API reports having served
 
     @classmethod
     def from_settings(cls, s: Settings, client: httpx.Client | None = None) -> GeminiProvider:
@@ -79,6 +82,10 @@ class GeminiProvider:
             data = resp.json()
             candidate = data["candidates"][0]
             text = "".join(p.get("text", "") for p in candidate["content"]["parts"])
+            self.last_model = data.get("modelVersion") if isinstance(data.get("modelVersion"), str) else None
+            m = data.get("usageMetadata") or {}
+            self.last_usage = {"prompt_tokens": m.get("promptTokenCount"), "output_tokens": m.get("candidatesTokenCount"),
+                               "reasoning_tokens": m.get("thoughtsTokenCount"), "total_tokens": m.get("totalTokenCount")}
         except (ValueError, KeyError, IndexError, TypeError) as exc:
             reason = "no candidates (blocked or empty response)"
             raise ProviderFailure(f"Gemini response was unusable: {reason}") from exc
@@ -108,6 +115,8 @@ class GroqProvider:
             raise ProviderNotConfigured("a Groq API key and model must both be set")
         self._key, self.model, self.timeout, self.base_url = api_key, model, timeout, base_url
         self._client = client  # injectable for tests (httpx.MockTransport)
+        self.last_usage: dict | None = None  # token counts of the latest response (no other metadata)
+        self.last_model: str | None = None
 
     def generate(self, system: str, prompt: str) -> str:
         body = {"model": self.model, "temperature": 0,
@@ -130,6 +139,11 @@ class GroqProvider:
         try:
             choice = resp.json()["choices"][0]
             text = choice["message"]["content"]
+            self.last_model = resp.json().get("model") if isinstance(resp.json().get("model"), str) else None
+            u = resp.json().get("usage") or {}
+            self.last_usage = {"prompt_tokens": u.get("prompt_tokens"), "output_tokens": u.get("completion_tokens"),
+                               "reasoning_tokens": (u.get("completion_tokens_details") or {}).get("reasoning_tokens"),
+                               "total_tokens": u.get("total_tokens")}
         except (ValueError, KeyError, IndexError, TypeError) as exc:
             raise ProviderFailure("Groq response was unusable: no choices or message content") from exc
         if not isinstance(text, str) or not text.strip():
@@ -149,9 +163,79 @@ def _groq_error_token(resp: httpx.Response) -> str:
     return f" ({token})" if isinstance(token, str) and re.fullmatch(r"[a-z0-9_]{1,40}", token) else ""
 
 
-def provider_from_settings(s: Settings) -> LLMProvider | None:
-    """The configured provider, or None when credentials are absent (evidence-only mode)."""
+class MistralProvider:
+    """Mistral's chat-completions API (the answer generator when LLM_PROVIDER=mistral)."""
+
+    name = "mistral"
+
+    def __init__(self, api_key: str, model: str, timeout: float = 30.0,
+                 base_url: str = MISTRAL_BASE_URL, client: httpx.Client | None = None):
+        if not api_key or not model:
+            raise ProviderNotConfigured("MISTRAL_API_KEY and MISTRAL_MODEL must both be set")
+        self._key, self.model, self.timeout, self.base_url = api_key, model, timeout, base_url
+        self._client = client  # injectable for tests (httpx.MockTransport)
+        self.last_usage: dict | None = None  # token counts of the latest response (no other metadata)
+        self.last_model: str | None = None  # model id the API reports having served (e.g. behind a -latest alias)
+
+    @classmethod
+    def from_settings(cls, s: Settings, client: httpx.Client | None = None) -> MistralProvider:
+        if s.llm_provider != "mistral":
+            raise ProviderNotConfigured(f"LLM_PROVIDER is {s.llm_provider!r}, not 'mistral'")
+        return cls(s.mistral_api_key or "", s.mistral_model or "", s.llm_timeout_seconds, client=client)
+
+    def generate(self, system: str, prompt: str) -> str:
+        body = {"model": self.model, "temperature": 0, "response_format": {"type": "json_object"},
+                "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]}
+        url = f"{self.base_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {self._key}", "Accept": "application/json"}
+        try:
+            if self._client is not None:
+                resp = self._client.post(url, json=body, headers=headers, timeout=self.timeout)
+            else:
+                with httpx.Client(timeout=self.timeout) as client:
+                    resp = client.post(url, json=body, headers=headers)
+        except httpx.TimeoutException as exc:
+            raise ProviderTimeout(f"Mistral request timed out after {self.timeout:g}s") from exc
+        except httpx.HTTPError as exc:  # type name only: no URL, headers or body
+            raise ProviderFailure(f"Mistral request failed ({type(exc).__name__})") from exc
+        if resp.status_code != 200:
+            raise ProviderFailure(f"Mistral returned HTTP {resp.status_code}{_mistral_error_token(resp)}")
+        try:
+            data = resp.json()
+            choice = data["choices"][0]
+            text = choice["message"]["content"]
+        except (ValueError, KeyError, IndexError, TypeError) as exc:
+            raise ProviderFailure("Mistral response was unusable: no choices or message content") from exc
+        if isinstance(text, list):  # content may arrive as typed chunks
+            text = "".join(c.get("text", "") for c in text if isinstance(c, dict) and c.get("type", "text") == "text")
+        if not isinstance(text, str) or not text.strip():
+            raise ProviderFailure("Mistral returned empty text")
+        if choice.get("finish_reason") == "length":
+            raise ProviderFailure("Mistral output was cut off (finish_reason=length); the JSON would be incomplete")
+        u = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+        self.last_model = data.get("model") if isinstance(data.get("model"), str) else None
+        self.last_usage = {"prompt_tokens": u.get("prompt_tokens"), "output_tokens": u.get("completion_tokens"),
+                           "reasoning_tokens": None, "total_tokens": u.get("total_tokens")}
+        return text
+
+
+def _mistral_error_token(resp: httpx.Response) -> str:
+    """' (invalid_request_error)'-style short token from the error body; the message text is never copied."""
     try:
+        body = resp.json()
+        err = body.get("error") if isinstance(body.get("error"), dict) else body
+        token = err.get("type") or err.get("code")
+    except (ValueError, AttributeError, TypeError):
+        return ""
+    return f" ({token})" if isinstance(token, str) and re.fullmatch(r"[A-Za-z0-9_]{1,40}", token) else ""
+
+
+def provider_from_settings(s: Settings) -> LLMProvider | None:
+    """The generator selected by LLM_PROVIDER (gemini | mistral), or None when it is unsupported or its
+    credentials are absent (evidence-only mode)."""
+    try:
+        if s.llm_provider == "mistral":
+            return MistralProvider.from_settings(s)
         return GeminiProvider.from_settings(s)
     except ProviderNotConfigured:
         return None

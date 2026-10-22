@@ -1,0 +1,176 @@
+{
+  "budgets": {
+    "automatic_retries": false,
+    "generation_requests_made": 1,
+    "judge_requests_made": 0,
+    "max_generation_requests": 6,
+    "max_judge_requests": 6
+  },
+  "deterministic_aggregate": null,
+  "generator": {
+    "model": "gemini-3.8-flash",
+    "name": "gemini"
+  },
+  "independence_note": "Judge and generator come from different providers, which reduces but does not remove correlated errors. The judge's opinion is still not ground truth; calibrate with human review.",
+  "judge": {
+    "model": "openai/gpt-oss-120b",
+    "name": "groq"
+  },
+  "judge_aggregate": {
+    "citation_verdicts": {},
+    "claims": {
+      "supported": 0,
+      "supported_rate": null,
+      "total": 0,
+      "unclear": 0,
+      "unsupported": 0
+    },
+    "dimensions": {
+      "answer_relevance": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "citation_support": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "completeness": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "factual_correctness": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "faithfulness": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      }
+    },
+    "judged": 0,
+    "not_applicable": {
+      "answer_relevance": 0,
+      "citation_support": 0,
+      "completeness": 0,
+      "factual_correctness": 0,
+      "faithfulness": 0
+    },
+    "questions": 6,
+    "status_counts": {
+      "absent": 6
+    },
+    "units": {
+      "factual_units": 0,
+      "supported": 0,
+      "supported_rate": null,
+      "unclear": 0,
+      "unsupported": 0
+    }
+  },
+  "judge_kind": "live_llm_judge",
+  "kind": "real_generator",
+  "latency": {
+    "end_to_end": {
+      "n": 0
+    },
+    "generation": {
+      "n": 0
+    },
+    "judge": {
+      "n": 0
+    }
+  },
+  "per_question": {
+    "A01": {
+      "category": "exact_control",
+      "deterministic": null,
+      "evidence_supplied": {
+        "chunk:csf2.0:subcategory:GV.SC-01": "GV.SC-01: A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders",
+        "chunk:csf2.0:subcategory:GV.SC-02": "GV.SC-02: Cybersecurity roles and responsibilities for suppliers, customers, and partners are established, communicated, and coordinated internally and externally",
+        "chunk:csf2.0:subcategory:GV.SC-03": "GV.SC-03: Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes",
+        "chunk:csf2.0:subcategory:GV.SC-08": "GV.SC-08: Relevant suppliers and other third parties are included in incident planning, response, and recovery activities",
+        "chunk:csf2.0:subcategory:GV.SC-10": "GV.SC-10: Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement"
+      },
+      "generation": {
+        "error": "provider_error: Gemini returned HTTP 503 UNAVAILABLE",
+        "status": "provider_error"
+      },
+      "judgment": null,
+      "latency_s": {
+        "generation": 3.862
+      },
+      "question": "What does GV.SC-03 require?"
+    },
+    "B01": {
+      "category": "comparison",
+      "deterministic": null,
+      "generation": {
+        "reason": "provider error on A01: provider_error",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "What are the differences between CSF 1.1 and 2.0 for supply chain risk management?"
+    },
+    "C01": {
+      "category": "official_mapping",
+      "deterministic": null,
+      "generation": {
+        "reason": "provider error on A01: provider_error",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "How does GV.OC-01 map to CSF 1.1?"
+    },
+    "E01": {
+      "category": "conceptually_new",
+      "deterministic": null,
+      "generation": {
+        "reason": "provider error on A01: provider_error",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "How does GV.OV-01 map to CSF 1.1?"
+    },
+    "F01": {
+      "category": "conflict",
+      "deterministic": null,
+      "generation": {
+        "reason": "provider error on A01: provider_error",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "How does GV.SC-03 map to CSF 1.1?"
+    },
+    "H02": {
+      "category": "abstention",
+      "deterministic": null,
+      "generation": {
+        "reason": "provider error on A01: provider_error",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "Which CSF control requires quantum-safe cryptography?"
+    }
+  },
+  "questions_requested": [
+    "A01",
+    "B01",
+    "C01",
+    "F01",
+    "E01",
+    "H02"
+  ],
+  "rubric_version": "1",
+  "semantic_faithfulness": "requires_human_review",
+  "status": "stopped_on_provider_error",
+  "stopped_reason": "provider error on A01: provider_error",
+  "subset": "six",
+  "warnings": [
+    "Sample too small to be a statistically meaningful accuracy benchmark."
+  ]
+}

@@ -398,7 +398,7 @@ def test_request_budgets_are_hard_limits(assembler, store, conn, by_id):
 
 def test_missing_judge_still_reports_deterministic_results(assembler, store, conn, by_id):
     res, _, _ = run_mock(assembler, store, conn, by_id, ["A01"], judge=None)
-    assert res["per_question"]["A01"]["judgment"]["status"] == "skipped" and res["judge"] == {"name": None, "model": None}
+    assert res["per_question"]["A01"]["judgment"]["status"] == "skipped" and res["judge"] == {"name": None, "model": None, "resolved_models": []}
     assert res["deterministic_aggregate"]["n_questions"] == 1 and "No judge configured" in res["independence_note"]
 
 
@@ -480,7 +480,8 @@ def test_cli_refuses_live_without_opt_in():
 
 
 def test_cli_refuses_live_without_generator_or_without_independent_judge():
-    blank = {"RUN_LIVE_LLM_EVAL": "1", "GEMINI_API_KEY": "", "GEMINI_MODEL": "", "JUDGE_MODEL": "", "JUDGE_API_KEY": ""}
+    blank = {"RUN_LIVE_LLM_EVAL": "1", "LLM_PROVIDER": "gemini", "GEMINI_API_KEY": "", "GEMINI_MODEL": "", "MISTRAL_API_KEY": "",
+             "MISTRAL_MODEL": "", "JUDGE_MODEL": "", "JUDGE_API_KEY": ""}      # hermetic: a local .env must not leak in
     r = cli("--live", env_extra=blank)
     assert r.returncode == 2 and "generator not configured" in r.stderr
     dummy = blank | {"GEMINI_API_KEY": "dummy-not-a-real-key", "GEMINI_MODEL": "dummy-model"}
@@ -664,8 +665,31 @@ def test_report_labels_same_model_and_same_family_and_shows_not_applicable(assem
     assert "independence:" in ws and "SAME model" in ws and "faithfulness units:" in ws
 
 
+SECRET_RE = r"AIza[0-9A-Za-z_\-]{20,}|gsk_[0-9A-Za-z]{20,}|x-goog-api-key|Bearer |[Aa]uthorization"
+
+
 def test_no_secrets_or_live_artifacts_in_the_repo_state():
-    assert not (EVAL / "judge_results_live.json").exists()                      # no live judge run has happened
+    # runtime artifacts (a real run's judge_results_live.json, if present) and preserved failure records
+    for f in [EVAL / "judge_results_live.json", *sorted((EVAL / "failed_runs").glob("*.json"))]:
+        if f.exists():
+            assert not re.search(SECRET_RE, f.read_text()), f.name
+
+
+def test_failed_run_records_are_preserved_sanitized_and_isolated():
+    d = EVAL / "failed_runs"
+    gem = json.loads((d / "2026-10-22_gemini_503_six_question_attempt.json").read_text())
+    assert gem["status"] == "stopped_on_provider_error" and gem["budgets"]["generation_requests_made"] == 1
+    assert gem["budgets"]["judge_requests_made"] == 0 and "503" in json.dumps(gem)
+    mis = json.loads((d / "2026-10-22_mistral_429_ask_smoke.json").read_text())
+    assert mis["api_http_status"] == 502 and mis["answer"] is None and "429" in json.dumps(mis)
+    assert mis["gemini_requests"] == 0 and mis["groq_requests"] == 0
+    # nothing that produces results or reports ever reads the failure records, so they cannot contaminate a run
+    src = Path(__file__).parent.parent
+    for f in [*(src / "src" / "controlshift").rglob("*.py"), *(src / "eval").glob("*.py")]:
+        assert "failed_runs" not in f.read_text(), f
+    assert (EVAL / "failed_runs" / "README.md").is_file()
+
+
     for f in ("judge_plan.json", "judge_report.md", "judge_review_worksheet.md", "judge_calibration.json"):
         text = (EVAL / f).read_text()
         assert not re.search(r"AIza[0-9A-Za-z_\-]{20,}|x-goog-api-key", text), f
@@ -679,7 +703,7 @@ def test_no_secrets_or_live_artifacts_in_the_repo_state():
 # ======================================================================================================================
 import httpx
 
-from controlshift.generation.provider import GroqProvider, ProviderNotConfigured
+from controlshift.generation.provider import GeminiProvider, GroqProvider, ProviderNotConfigured
 
 SECRET = "gsk_SECRET_TEST_KEY_123"
 
@@ -789,3 +813,91 @@ def test_groq_judge_works_end_to_end_through_the_unchanged_judging_logic():
     j3 = jg.judge_answer(groq(lambda r: httpx.Response(429, json={"error": {"code": "rate_limit_exceeded"}})), "q?",
                          {"expected_facts": []}, ANSWER, EVID, max_attempts=3)
     assert j3.status == "provider_error" and "rate_limit_exceeded" in j3.reason and j3.attempts == 1   # never retried
+
+
+# ======================================================================================================================
+# Token-usage logging and evidence preservation
+# ======================================================================================================================
+def test_gemini_and_groq_record_token_counts_only():
+    def g_handler(request):
+        body = ok_body_g('{"a": 1}')
+        body["usageMetadata"] = {"promptTokenCount": 11, "candidatesTokenCount": 5, "thoughtsTokenCount": 3,
+                                 "totalTokenCount": 19, "cachedContentTokenCount": 9}
+        return httpx.Response(200, json=body)
+
+    gp = GeminiProvider("k", "m", 5, client=httpx.Client(transport=httpx.MockTransport(g_handler)))
+    assert gp.last_usage is None
+    gp.generate("s", "p")
+    assert gp.last_usage == {"prompt_tokens": 11, "output_tokens": 5, "reasoning_tokens": 3, "total_tokens": 19}
+
+    def q_handler(request):
+        body = chat_ok('{"a": 1}')
+        body["usage"] = {"prompt_tokens": 20, "completion_tokens": 8, "total_tokens": 28, "queue_time": 0.2,
+                         "completion_tokens_details": {"reasoning_tokens": 4}}
+        return httpx.Response(200, json=body)
+
+    qp = groq(q_handler)
+    qp.generate("s", "p")
+    assert qp.last_usage == {"prompt_tokens": 20, "output_tokens": 8, "reasoning_tokens": 4, "total_tokens": 28}
+    assert groq(lambda r: httpx.Response(200, json=chat_ok("{}"))).last_usage is None  # no usage block: nothing invented
+
+
+def ok_body_g(text):
+    return {"candidates": [{"content": {"parts": [{"text": text}]}}]}
+
+
+class UsageFake(NamedFake):
+    """Fake provider that reports fixed token counts after every successful call."""
+
+    def __init__(self, name, model, usage, *responses):
+        super().__init__(name, model, *responses)
+        self._u, self.last_usage = usage, None
+        self.prompts = []
+
+    def generate(self, system, prompt):
+        self.prompts.append(prompt)
+        out = super().generate(system, prompt)
+        self.last_usage = dict(self._u)
+        return out
+
+
+def test_run_records_token_usage_and_exact_evidence_supplied(assembler, store, conn, by_id):
+    answers = [ans.reference_fixture(by_id["F01"], conn)[0]]
+    gen = UsageFake("fake", "g", {"prompt_tokens": 100, "output_tokens": 40, "reasoning_tokens": 10, "total_tokens": 150}, *answers)
+    jud = UsageFake("fake", "j", {"prompt_tokens": 300, "output_tokens": 90, "reasoning_tokens": 50, "total_tokens": 390},
+                    dynamic_judge())
+    res, _, _ = run_mock(assembler, store, conn, by_id, ["F01"], gen=gen, judge=jud)
+    rec = res["per_question"]["F01"]
+    assert rec["tokens"]["generation"] == {"prompt_tokens": 100, "output_tokens": 40, "reasoning_tokens": 10, "total_tokens": 150}
+    assert rec["tokens"]["judge"]["total_tokens"] == 390
+    ev = rec["evidence_supplied"]
+    assert ev and all(isinstance(t, str) and t for t in ev.values())
+    bundle = assembler.assemble(by_id["F01"]["question"])
+    assert set(ev) <= set(bundle.citations)
+    assert all(f'<evidence id="{cid}">' in jud.prompts[0] for cid in ev)       # the judge saw exactly this evidence
+    assert all(cid in gen.prompts[0] for cid in ev)                              # and so did the generator
+
+
+def test_run_without_provider_usage_records_none_not_zero(assembler, store, conn, by_id):
+    res, _, _ = run_mock(assembler, store, conn, by_id, ["F01"])
+    assert res["per_question"]["F01"]["tokens"] == {"generation": None, "judge": None}
+    txt = render_judge_report(None, None, real_like(res), {}, None)
+    assert "n/a" in txt
+
+
+def test_report_shows_token_table_when_usage_present(assembler, store, conn, by_id):
+    res, _, _ = run_mock(assembler, store, conn, by_id, ["F01"])
+    live = real_like(res)
+    live["per_question"]["F01"]["tokens"] = {"generation": {"prompt_tokens": 1, "output_tokens": 2, "reasoning_tokens": 0,
+                                                            "total_tokens": 3}, "judge": None}
+    assert "1 / 2 (reasoning 0)" in render_judge_report(None, None, live, {}, None)
+
+
+def test_generator_timeout_is_recorded_and_stops_the_run_instead_of_crashing(assembler, store, conn, by_id):
+    gen = NamedFake("fake", "g", ProviderTimeout("Gemini request timed out after 30s"))
+    res, _, _ = run_mock(assembler, store, conn, by_id, ["A01", "B01"], gen=gen)
+    assert res["status"] == "stopped_on_provider_error"
+    assert res["per_question"]["A01"]["generation"]["status"] == "provider_error"
+    assert "timed out" in res["per_question"]["A01"]["generation"]["error"]
+    assert res["per_question"]["B01"]["generation"]["status"] == "not_attempted"
+    assert res["budgets"]["generation_requests_made"] == 1 and res["budgets"]["judge_requests_made"] == 0
