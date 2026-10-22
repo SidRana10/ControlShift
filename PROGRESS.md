@@ -247,8 +247,49 @@ Known limitations:
 - Passage relevance is whatever the retriever returns (not yet benchmarked); structural validity does not imply faithful answers.
 - 1.1 vs 2.0 same-ID pairs (e.g. PR.AT-1 / PR.AT-01) are different statements; both are reported when the version is not named.
 
-### Phase 4B — remaining
-- [ ] LLM answer generation constrained to the bundle, with citations; semantic faithfulness checks; refusal when evidence is missing
+### Phase 4B — Grounded generation + FastAPI  ✅ (live provider NOT tested: no API key was available)
+Code: `src/controlshift/generation/` (`config`, `provider`, `schema`, `context`, `prompt`, `generate`) and `src/controlshift/api/`
+(`app`, `schemas`, `services`). Dependencies added to the core set: `httpx` (Gemini REST + TestClient); no vendor SDK.
+
+- Provider: `LLMProvider` protocol; `GeminiProvider` calls `generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent`
+  with the key in the `x-goog-api-key` header. Key and model come only from `GEMINI_API_KEY` / `GEMINI_MODEL` (no defaults in code);
+  timeout `LLM_TIMEOUT_SECONDS` (30). Without both set, `provider_from_settings` returns None, no HTTP client is created, and the
+  pipeline runs evidence-only. Errors map to `ProviderNotConfigured` / `ProviderTimeout` / `ProviderFailure` with messages that never
+  contain the key, URL or response body.
+- Context (`build_context`, budget `GENERATION_CONTEXT_CHARS`=12000): exact control records and official crosswalk rows are always
+  included (descriptions trimmed first if they alone exceed the budget); passages fill the rest, interleaved across versions so
+  comparisons keep both; identical text within one version is merged but the merged citation ids stay citable; omitted/truncated items
+  are reported. All evidence is HTML-escaped inside `<evidence id=... version=... page=... section=...>` blocks, treated as untrusted
+  data in the system prompt, and passages resembling instructions are flagged in `warnings`.
+- Output contract (Pydantic `LLMAnswer`): answer, key_changes[{statement,citations}], citations, mappings[{focal_id,reference_id,note,
+  citations}], uncertainties, unresolved_questions, abstained, abstention_reason. Unknown keys such as a self-reported `confidence` are dropped.
+- Deterministic validation before anything is returned: JSON/schema valid (one repair retry, `LLM_MAX_ATTEMPTS`); every cited id is in the
+  supplied context and passes the Phase 4A structural validators; non-abstaining answers need top-level citations and a citation on every
+  key change/mapping; every mapping must equal a cited official crosswalk row (focal=2.0 id, reference=1.1 id or null for `new_in_2_0`);
+  "removed/deleted/retired/dropped..." statements are rejected unless a cited item says so. Failures give `status: "rejected"` and withhold
+  the answer text. Crosswalk conflicts (GV.SC-03) are always surfaced via `system_uncertainties` if the model did not mention them.
+- Abstention: no evidence or an unsupported question abstains without calling the LLM; the model may also abstain explicitly.
+- Statuses: `answered`, `abstained`, `evidence_only` (no provider or `generate:false`), `rejected`. Every response carries a disclaimer that
+  validation is structural, semantic faithfulness is not verified, and no confidence is reported.
+- API: `GET /health`; `POST /ask {question, version?, retrieval_k, generate, include_evidence}`; `POST /compare {question, control_ids?}`
+  (prefixes "Compare CSF 1.1 and CSF 2.0 ..."). Models/indexes are loaded once in the app lifespan (`build_services`, including a warm-up
+  call); dense search keeps the NumPy backend on macOS; retrieval calls are serialised with a lock, DB connections are per request.
+  Errors use `{"error": {code, message, details}}`: 422 invalid_request, 502 provider_error, 504 provider_timeout / request_timeout
+  (`REQUEST_TIMEOUT_SECONDS`), 500 internal_error (no internals leaked).
+- Tests: 280 passed + 1 skipped = 281 collected (217 from Phase 4A + 64 new: 25 API, 38 generation, 1 opt-in live test; none removed): provider/HTTP mocks, flow, invalid output, fabricated/out-of-bundle citations, invented and
+  uncited mappings, removal claims, conflicts, abstention, version isolation, budget/dedupe, prompt injection with a poisoned DB copy,
+  API validation/errors/timeouts, service reuse). Ruff clean.
+- Real (non-LLM) smoke run: app with RETRIEVAL_MODE=hybrid_rerank started in 3.8 s (embedder + cross-encoder loaded once); /health ok;
+  /ask and /compare returned `evidence_only` with valid evidence (`/compare` for GV.OC-01 returned official rows 4 and 5); blank question -> 422.
+
+Not tested / limitations:
+- No live Gemini call was made (no GEMINI_API_KEY/GEMINI_MODEL in this environment); `tests/test_live_provider.py` is opt-in via
+  `RUN_LIVE_LLM_TESTS=1` and was skipped. Prompt quality and Gemini's JSON compliance are therefore unverified.
+- Validation is structural plus rule checks; it cannot detect a fluent but unfaithful paraphrase of a correctly cited chunk.
+- The removal-claim guard is a keyword heuristic (can reject benign wording, can miss synonyms).
+- Request timeouts return 504 but the worker thread keeps running until the provider timeout fires.
+- Context budget is in characters, not tokens; mandatory records may exceed it (reported as `mandatory_over_budget`).
+- Single process, no auth, rate limiting or caching; dense/rerank calls are serialised.
 
 ## Phase 5 — Evaluation
 - [ ] Hand-labeled question set in `eval/`

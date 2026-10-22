@@ -36,3 +36,32 @@ class KeywordScorer:
     def score(self, query, passages):
         self.calls += 1
         return [float(sum(k in p.lower() for k in self.keywords)) for p in passages]
+
+
+class FakeProvider:
+    """Scripted LLM: each call returns the next response (str | dict | Exception | callable)."""
+
+    name = "fake"
+    model = "fake-model-1"
+
+    def __init__(self, *responses):
+        self.responses = list(responses)
+        self.calls = []
+
+    def generate(self, system, prompt):
+        import json
+
+        self.calls.append((system, prompt))
+        r = self.responses.pop(0) if len(self.responses) > 1 else self.responses[0]
+        if callable(r):
+            r = r(system, prompt)
+        if isinstance(r, Exception):
+            raise r
+        return r if isinstance(r, str) else json.dumps(r)
+
+
+def answer(citations, text="Grounded answer.", **extra):
+    base = {"answer": text, "citations": list(citations), "key_changes": [], "mappings": [],
+            "uncertainties": [], "unresolved_questions": [], "abstained": False,
+            "abstention_reason": None}
+    return base | extra

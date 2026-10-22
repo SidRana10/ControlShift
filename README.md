@@ -4,7 +4,7 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phases 1-4A complete (ingestion, SQLite store, hybrid retrieval with reranking, evidence bundles). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phases 1-4B complete (ingestion, SQLite store, hybrid retrieval + reranking, evidence bundles, grounded generation, FastAPI). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
@@ -57,6 +57,24 @@ conflicting OpenMP runtimes); see `src/controlshift/retrieval/dense.py` and `--d
 controlshift-evidence "How does GV.SC-03 map to CSF 1.1?"            # JSON: records, official mappings, passages, citations
 controlshift-evidence "What changed for supply chain risk management?" --retrieval bm25
 ```
+
+## Grounded answers and API (Phase 4B)
+
+```bash
+cp .env.example .env              # add GEMINI_API_KEY and GEMINI_MODEL to enable generation
+controlshift-serve                # or: uvicorn controlshift.api.app:app_factory --factory
+curl -s localhost:8000/health
+curl -s localhost:8000/ask -H 'content-type: application/json' \
+  -d '{"question": "How does GV.SC-03 map to CSF 1.1?"}'
+curl -s localhost:8000/compare -H 'content-type: application/json' \
+  -d '{"question": "supplier risk", "control_ids": ["GV.OC-01"]}'
+```
+
+**Live Gemini generation has NOT been tested** (no API key was available during development); all generation tests use a fake
+provider and mocked HTTP. Without Gemini credentials the API still works and returns `status: "evidence_only"` with the full evidence bundle. Answers are
+validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows) but citation checks are
+structural: they do not prove the answer is faithful to the cited text, and no model confidence is reported.
+A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.
 
 ## Layout
 
