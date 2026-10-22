@@ -1,0 +1,54 @@
+{
+  "label": "PROVIDER SMOKE TEST - one /ask request; not an accuracy benchmark; semantic faithfulness NOT verified",
+  "date": "2026-10-22",
+  "question": "What does GV.SC-03 require?",
+  "gold_source": "eval/answer_questions.jsonl A01",
+  "generator": {
+    "provider": "gemini",
+    "configured_model": "gemini-3.8-flash",
+    "resolved_model": null
+  },
+  "settings": {
+    "llm_timeout_s": 90,
+    "request_timeout_s": 120,
+    "max_llm_attempts": 1
+  },
+  "provider_http_requests": [
+    {
+      "status": 503,
+      "seconds": 0.821
+    }
+  ],
+  "provider_hosts": [
+    "generativelanguage.googleapis.com"
+  ],
+  "gemini_requests": 1,
+  "groq_requests": 0,
+  "mistral_requests": 0,
+  "provider_timeout_applied": {
+    "connect": 90.0,
+    "read": 90.0,
+    "write": 90.0,
+    "pool": 90.0
+  },
+  "retrieval_mode": "hybrid",
+  "question_id": "A01",
+  "api_http_status": 502,
+  "end_to_end_latency_s": 0.839,
+  "token_usage": null,
+  "response_status": null,
+  "attempts": null,
+  "rejection": null,
+  "warnings": null,
+  "answer": null,
+  "verification": null,
+  "evidence_summary": null,
+  "deterministic_checks": null,
+  "error_body": {
+    "error": {
+      "code": "provider_error",
+      "message": "Gemini returned HTTP 503 UNAVAILABLE",
+      "details": null
+    }
+  }
+}

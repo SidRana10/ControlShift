@@ -105,23 +105,35 @@ def _error_status(resp: httpx.Response) -> str:
 
 
 class GroqProvider:
-    """Groq's OpenAI-compatible chat-completions API (used as the independent LLM judge)."""
+    """Groq's OpenAI-compatible chat-completions API (the LLM judge, or the generator when LLM_PROVIDER=groq)."""
 
     name = "groq"
 
     def __init__(self, api_key: str, model: str, timeout: float = 60.0,
-                 base_url: str = GROQ_BASE_URL, client: httpx.Client | None = None):
+                 base_url: str = GROQ_BASE_URL, client: httpx.Client | None = None,
+                 reasoning_format: str | None = None):
         if not api_key or not model:
             raise ProviderNotConfigured("a Groq API key and model must both be set")
         self._key, self.model, self.timeout, self.base_url = api_key, model, timeout, base_url
+        self.reasoning_format = reasoning_format  # sent only when set (e.g. 'hidden' for reasoning models)
         self._client = client  # injectable for tests (httpx.MockTransport)
         self.last_usage: dict | None = None  # token counts of the latest response (no other metadata)
         self.last_model: str | None = None
+
+    @classmethod
+    def from_settings(cls, s: Settings, client: httpx.Client | None = None) -> GroqProvider:
+        """The GENERATOR (LLM_PROVIDER=groq): its own model (GROQ_MODEL), separate from the judge's JUDGE_MODEL."""
+        if s.llm_provider != "groq":
+            raise ProviderNotConfigured(f"LLM_PROVIDER is {s.llm_provider!r}, not 'groq'")
+        return cls(s.groq_api_key or "", s.groq_model or "", s.llm_timeout_seconds, client=client,
+                   reasoning_format=s.groq_reasoning_format)
 
     def generate(self, system: str, prompt: str) -> str:
         body = {"model": self.model, "temperature": 0,
                 "response_format": {"type": "json_object"},
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]}
+        if self.reasoning_format:
+            body["reasoning_format"] = self.reasoning_format
         url = f"{self.base_url}/chat/completions"
         headers = {"Authorization": f"Bearer {self._key}"}
         try:
@@ -146,6 +158,8 @@ class GroqProvider:
                                "total_tokens": u.get("total_tokens")}
         except (ValueError, KeyError, IndexError, TypeError) as exc:
             raise ProviderFailure("Groq response was unusable: no choices or message content") from exc
+        if isinstance(text, str):  # reasoning models may inline their thinking; it is never part of the JSON answer
+            text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
         if not isinstance(text, str) or not text.strip():
             raise ProviderFailure("Groq returned empty text")
         if choice.get("finish_reason") == "length":
@@ -231,11 +245,13 @@ def _mistral_error_token(resp: httpx.Response) -> str:
 
 
 def provider_from_settings(s: Settings) -> LLMProvider | None:
-    """The generator selected by LLM_PROVIDER (gemini | mistral), or None when it is unsupported or its
+    """The generator selected by LLM_PROVIDER (gemini | mistral | groq), or None when it is unsupported or its
     credentials are absent (evidence-only mode)."""
     try:
         if s.llm_provider == "mistral":
             return MistralProvider.from_settings(s)
+        if s.llm_provider == "groq":
+            return GroqProvider.from_settings(s)
         return GeminiProvider.from_settings(s)
     except ProviderNotConfigured:
         return None

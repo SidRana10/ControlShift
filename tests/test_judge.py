@@ -901,3 +901,25 @@ def test_generator_timeout_is_recorded_and_stops_the_run_instead_of_crashing(ass
     assert "timed out" in res["per_question"]["A01"]["generation"]["error"]
     assert res["per_question"]["B01"]["generation"]["status"] == "not_attempted"
     assert res["budgets"]["generation_requests_made"] == 1 and res["budgets"]["judge_requests_made"] == 0
+
+
+def test_run_records_generator_and_judge_models_separately_and_paces_requests(assembler, store, conn, by_id):
+    sleeps = []
+    gen = NamedFake("groq", "qwen/qwen3.8-27b", *[ans.reference_fixture(by_id[q], conn)[0] for q in ("A01", "B01")])
+    jud = NamedFake("groq", "openai/gpt-oss-120b", dynamic_judge(), dynamic_judge())
+    res = run_judged_evaluation([by_id["A01"], by_id["B01"]], assembler, store, gen, jud, Settings(), jg.JudgeSettings(),
+                                2, 2, pause_seconds=7.5, sleep=sleeps.append)
+    assert res["generator"]["model"] == "qwen/qwen3.8-27b" and res["judge"]["model"] == "openai/gpt-oss-120b"
+    assert sleeps == [7.5]                                                  # between the two questions only
+    assert "different model families" in res["independence_note"] and "SAME provider infrastructure" in res["independence_note"]
+    assert res["budgets"]["generation_requests_made"] == 2 and res["budgets"]["judge_requests_made"] == 2
+
+
+def test_pacing_never_sleeps_after_a_provider_error_or_by_default(assembler, store, conn, by_id):
+    sleeps = []
+    res = run_judged_evaluation([by_id["A01"], by_id["B01"]], assembler, store,
+                                NamedFake("fake", "g", ProviderFailure("HTTP 503")), NamedFake("fake", "j", dynamic_judge()),
+                                Settings(), jg.JudgeSettings(), 2, 2, pause_seconds=30, sleep=sleeps.append)
+    assert res["status"] == "stopped_on_provider_error" and sleeps == []
+    res, _, _ = run_mock(assembler, store, conn, by_id, ["A01", "B01"])
+    assert res["status"] == "complete"                                      # default pause is 0: no waiting

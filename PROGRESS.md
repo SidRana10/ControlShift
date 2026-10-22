@@ -516,6 +516,28 @@ Remaining work: run the live subset; human review of gold labels, answers and ju
 - **Still true:** the single Groq judge smoke test (see above) and the single Gemini `/ask` smoke test are the only successful live calls. No
   six-question result, judge calibration or human review exists.
 
+### Phase 5B, step 5 — Groq (Qwen) as an alternative generator  (offline only; ZERO live calls)
+- **Why:** `gemini-3.8-flash` returned 503 on every live attempt (6 earlier + the 6-question run + the A01 `/ask` smoke test; records in
+  `eval/failed_runs/`) and Mistral returned 429. Gemini and Mistral stay implemented and selectable; nothing was removed.
+- **Selection:** `LLM_PROVIDER=groq` uses `GroqProvider.from_settings`: generator model `GROQ_MODEL` (target `qwen/qwen3.8-27b`), key `GROQ_API_KEY`
+  (defaults to `JUDGE_API_KEY` when `JUDGE_PROVIDER=groq`, i.e. the same Groq account; Gemini/Mistral keys are never reused). The judge keeps
+  `JUDGE_MODEL=openai/gpt-oss-120b`. Both are plain `GroqProvider` instances with separate models, request budgets (`Budgeted`) and recorded
+  `resolved_models`. Optional `GROQ_REASONING_FORMAT` is sent only when set; `<think>...</think>` text is stripped from replies regardless. Validation
+  of citations, official mappings, conflicts and abstention is unchanged (the output goes through the same `GroundedGenerator`).
+- **Independence disclosure:** generator and judge are different model families (Qwen vs OpenAI GPT-OSS) on the SAME Groq infrastructure/account/rate
+  limits, so correlated errors are reduced, not removed; the run's `independence_note` says this explicitly. Not independent of the platform.
+- **Token-per-minute planning:** one earlier Groq judge call used about 6.5k tokens (4.3k prompt + 2.3k completion incl. reasoning), and a generation
+  call adds a similar-sized prompt, so a six-question run could send tens of thousands of tokens in a minute. Groq's actual free-tier limits for these
+  models were NOT checked here (look them up in the Groq console). `--pause-seconds N` (default 0) waits between questions without adding requests;
+  suggest `--pause-seconds 60`. No automatic retry: a 429 stops the run.
+- **Live smoke test PASSED (2026-10-22, `eval/live_verification_groq_qwen_ask_gv_sc_03.json`):** ONE FastAPI `/ask` request ("How does GV.SC-03 map to
+  CSF 1.1?") to Groq `qwen/qwen3.8-27b` (reported model id identical), 90 s timeout, 1 attempt, no repair; 0 judge/Gemini/Mistral requests. HTTP 200,
+  status `answered`, 1.79 s end to end, 3,141 prompt + 572 output = 3,713 tokens. Schema, citation and all deterministic checks passed: it reported
+  GV.SC-03 -> ID.SC-2 (row 25) and the "new in 2.0, no reference" record (row 26), preserved the conflict, invented no mappings. Groq's rate-limit
+  headers for this model showed 8,000 tokens/min and 1,000 requests (4,547 tokens left after the call). This is a smoke test of ONE question: it
+  does not show semantic faithfulness (not verified) or general accuracy.
+- **Still unverified live:** behaviour on the other question types, and the judge's token limit (see above).
+
 ### Phase 5B — open items
 - [ ] Re-run the live `/ask` check once Gemini capacity recovers
 

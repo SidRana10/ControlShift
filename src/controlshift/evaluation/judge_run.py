@@ -97,14 +97,17 @@ def _lat(xs: list[float]) -> dict:
 def run_judged_evaluation(questions: list[dict], assembler: EvidenceAssembler, store, generator: LLMProvider | None,
                           judge: LLMProvider | None, settings: Settings, judge_settings: JudgeSettings,
                           max_generation_requests: int, max_judge_requests: int,
-                          clock: Callable[[], float] = time.perf_counter) -> dict:
+                          clock: Callable[[], float] = time.perf_counter, pause_seconds: float = 0.0,
+                          sleep: Callable[[float], None] = time.sleep) -> dict:
     gen, jdg = Budgeted(generator, max_generation_requests), Budgeted(judge, max_judge_requests)
     gen_meta = {"name": gen.name, "model": gen.model}
     jdg_meta = {"name": jdg.name, "model": jdg.model}
     records: dict[str, dict] = {}
     stopped = None
-    for g in questions:
+    for n, g in enumerate(questions):
         qid = g["question_id"]
+        if n and pause_seconds > 0 and not stopped:
+            sleep(pause_seconds)  # spreads requests out to respect per-minute token limits (no extra requests)
         if stopped:
             records[qid] = {"category": g["category"], "question": g["question"], "generation": {
                 "status": "not_attempted", "reason": stopped}, "deterministic": None, "judgment": None}

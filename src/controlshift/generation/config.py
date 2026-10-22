@@ -26,11 +26,14 @@ class Settings:
     db_path: Path = Path("data/processed/controlshift.db")
     index_dir: Path = Path("data/indexes")
     retrieval_mode: str = "hybrid"  # none|bm25|dense|hybrid|hybrid_rerank
-    llm_provider: str = "gemini"  # generator: gemini | mistral
+    llm_provider: str = "gemini"  # generator: gemini | mistral | groq
     gemini_api_key: str | None = field(default=None, repr=False)  # never printed
     gemini_model: str | None = None
     mistral_api_key: str | None = field(default=None, repr=False)  # never printed
     mistral_model: str | None = None
+    groq_api_key: str | None = field(default=None, repr=False)  # generator key (LLM_PROVIDER=groq); never printed
+    groq_model: str | None = None  # the GENERATOR model; the judge's model is JUDGE_MODEL
+    groq_reasoning_format: str | None = None
     llm_timeout_seconds: float = 30.0
     request_timeout_seconds: float = 90.0
     context_chars: int = 12000  # evidence-context budget for the prompt
@@ -49,6 +52,10 @@ class Settings:
             gemini_model=e.get("GEMINI_MODEL") or None,
             mistral_api_key=e.get("MISTRAL_API_KEY") or None,
             mistral_model=e.get("MISTRAL_MODEL") or None,
+            # the Groq generator key defaults to the judge's Groq key when the judge is on Groq (same account)
+            groq_api_key=e.get("GROQ_API_KEY") or (e.get("JUDGE_API_KEY") if e.get("JUDGE_PROVIDER", "").lower() == "groq" else None) or None,
+            groq_model=e.get("GROQ_MODEL") or None,
+            groq_reasoning_format=e.get("GROQ_REASONING_FORMAT") or None,
             llm_timeout_seconds=_float(e, "LLM_TIMEOUT_SECONDS", 30.0),
             request_timeout_seconds=_float(e, "REQUEST_TIMEOUT_SECONDS", 90.0),
             context_chars=_int(e, "GENERATION_CONTEXT_CHARS", 12000),

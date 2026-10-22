@@ -58,6 +58,8 @@ def main() -> int:
     ap.add_argument("--live", action="store_true")
     ap.add_argument("--max-generation-requests", type=int, default=6)
     ap.add_argument("--max-judge-requests", type=int, default=6)
+    ap.add_argument("--pause-seconds", type=float, default=0.0,
+                    help="wait between questions (e.g. 60) to stay under per-minute token limits; adds no requests")
     ap.add_argument("--retrieval", choices=["bm25", "hybrid", "hybrid_rerank"], default="hybrid")
     ap.add_argument("--judge-same-as-generator", action="store_true",
                     help="use the generator's model as judge (self-evaluation; labelled as not independent)")
@@ -113,7 +115,8 @@ def main() -> int:
             live = run_judged_evaluation(
                 questions, EvidenceAssembler(store, retriever, label), store, gen, judge, settings, jset,
                 min(args.max_generation_requests, run_plan["max_generation_requests"]),
-                min(args.max_judge_requests, run_plan["max_judge_requests"]))
+                min(args.max_judge_requests, run_plan["max_judge_requests"]),
+                pause_seconds=args.pause_seconds)
         live["subset"] = args.subset
         (args.out_dir / "judge_results_live.json").write_text(
             json.dumps(live, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")

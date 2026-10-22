@@ -75,7 +75,7 @@ mapping-conflict question; see `PROGRESS.md`). That is not an accuracy evaluatio
 HTTP, and other question types are untested live. Without Gemini credentials the API still works and returns `status: "evidence_only"` with the full evidence bundle. Answers are
 validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows) but citation checks are
 structural: they do not prove the answer is faithful to the cited text, and no model confidence is reported.
-The generator is chosen by `LLM_PROVIDER` (`gemini`, the default and primary; or `mistral`, an optional backup that has had no successful live request yet). The judge is configured separately (`JUDGE_PROVIDER`/`JUDGE_MODEL`, currently Groq `openai/gpt-oss-120b`) and never falls back to the generator.
+The generator is chosen by `LLM_PROVIDER` (`gemini` is the default; `mistral` and `groq` — e.g. Qwen on Groq — are optional alternatives with no successful live generation yet). The judge is configured separately (`JUDGE_PROVIDER`/`JUDGE_MODEL`, currently Groq `openai/gpt-oss-120b`) and never falls back to the generator.
 A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.
 
 ## Evaluation

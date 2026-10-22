@@ -279,6 +279,10 @@ def independence_note(generator: dict, judge: dict) -> str:
     if g == j:
         return ("Judge and generator are the SAME model: scores are self-evaluation, likely biased toward the "
                 "generator's own style, and are not an independent assessment.")
+    if g[0] == j[0] and "/" in (g[1] or "") and "/" in (j[1] or "") and g[1].split("/")[0] != j[1].split("/")[0]:
+        return ("Generator and judge are different model families (different model vendors) but are served by the SAME "
+                "provider infrastructure (shared platform, API account and rate limits). Family-level bias is reduced, not "
+                "removed, and the judge's opinion is still not ground truth; calibrate with human review.")
     if g[0] == j[0]:
         return ("Judge and generator are different models from the SAME provider family: independence is NOT "
                 "established (shared training data and biases are likely). Treat scores as indicative only.")

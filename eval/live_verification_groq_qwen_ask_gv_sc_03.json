@@ -1,0 +1,223 @@
+{
+  "label": "PROVIDER SMOKE TEST - one /ask request; not an accuracy benchmark; semantic faithfulness NOT verified",
+  "date": "2026-10-22",
+  "question": "How does GV.SC-03 map to CSF 1.1?",
+  "gold_source": "eval/answer_questions.jsonl A01",
+  "generator": {
+    "provider": "groq",
+    "configured_model": "qwen/qwen3.8-27b",
+    "resolved_model": "qwen/qwen3.8-27b"
+  },
+  "settings": {
+    "llm_timeout_s": 90,
+    "request_timeout_s": 120,
+    "max_llm_attempts": 1
+  },
+  "provider_http_requests": [
+    {
+      "status": 200,
+      "seconds": 1.766
+    }
+  ],
+  "provider_hosts": [
+    "api.groq.com"
+  ],
+  "groq_generation_requests": 1,
+  "groq_judge_requests": 0,
+  "gemini_requests": 0,
+  "mistral_requests": 0,
+  "rate_limit_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "999",
+    "x-ratelimit-remaining-tokens": "4547",
+    "x-ratelimit-reset-requests": "1m26.4s",
+    "x-ratelimit-reset-tokens": "25.897s"
+  },
+  "provider_timeout_applied": {
+    "connect": 90.0,
+    "read": 90.0,
+    "write": 90.0,
+    "pool": 90.0
+  },
+  "retrieval_mode": "hybrid",
+  "question_id": "F01",
+  "judge_model_not_called": "openai/gpt-oss-120b",
+  "api_http_status": 200,
+  "end_to_end_latency_s": 1.788,
+  "token_usage": {
+    "prompt_tokens": 3141,
+    "output_tokens": 572,
+    "reasoning_tokens": null,
+    "total_tokens": 3713
+  },
+  "response_status": "answered",
+  "attempts": 1,
+  "rejection": [],
+  "warnings": [],
+  "answer": {
+    "answer": "According to the official crosswalk, CSF 2.0 subcategory GV.SC-03 maps to CSF 1.1 subcategory ID.SC-2. However, the official workbook also contains a separate entry indicating that GV.SC-03 is conceptually new in CSF 2.0, with no corresponding CSF 1.1 reference. Both entries are present in the official records.",
+    "key_changes": [
+      {
+        "statement": "CSF 2.0 GV.SC-03 is mapped to CSF 1.1 ID.SC-2 in the official crosswalk.",
+        "citations": [
+          "xwalk:row25"
+        ]
+      },
+      {
+        "statement": "CSF 2.0 GV.SC-03 is also listed as conceptually new in 2.0 with no CSF 1.1 reference in the official crosswalk.",
+        "citations": [
+          "xwalk:row26"
+        ]
+      }
+    ],
+    "citations": [
+      "xwalk:row25",
+      "xwalk:row26",
+      "chunk:csf2.0:subcategory:GV.SC-03",
+      "chunk:csf1.1:subcategory:ID.SC-2"
+    ],
+    "mappings": [
+      {
+        "focal_id": "GV.SC-03",
+        "reference_id": "ID.SC-2",
+        "note": "Official crosswalk row 25 maps GV.SC-03 to ID.SC-2.",
+        "citations": [
+          "xwalk:row25"
+        ]
+      },
+      {
+        "focal_id": "GV.SC-03",
+        "reference_id": null,
+        "note": "Official crosswalk row 26 lists GV.SC-03 as 'new_in_2_0' with the comment 'Conceptually new in 2.0' and no reference ID.",
+        "citations": [
+          "xwalk:row26"
+        ]
+      }
+    ],
+    "uncertainties": [
+      "The official crosswalk contains conflicting entries for GV.SC-03: one mapping it to ID.SC-2 and another marking it as new in 2.0. The pipeline findings confirm this conflict and state that neither entry is preferred."
+    ],
+    "unresolved_questions": [],
+    "abstained": false,
+    "abstention_reason": null
+  },
+  "verification": {
+    "evidence_bundle": {
+      "scope": "structural (existence + provenance); semantic faithfulness is not checked",
+      "citations_checked": 10,
+      "invalid": 0,
+      "errors": {}
+    },
+    "semantic_faithfulness": "not verified",
+    "answer_citations": {
+      "checked": 4,
+      "scope": "structural",
+      "valid": true
+    }
+  },
+  "evidence_summary": {
+    "query_type": "control_mapping",
+    "crosswalk_rows": null,
+    "conflicts": [
+      {
+        "kind": "mapped_and_new_in_2_0",
+        "control_id": "GV.SC-03",
+        "version": "2.0",
+        "citations": [
+          "xwalk:row25",
+          "xwalk:row26"
+        ],
+        "note": "The official workbook holds both mapped row(s) and a 'conceptually new' row for this element. Both are reported; neither is preferred."
+      }
+    ],
+    "unmapped": null
+  },
+  "deterministic_checks": [
+    {
+      "name": "schema_valid",
+      "level": "structural",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "citation_ids_valid",
+      "level": "structural",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "citations_in_bundle",
+      "level": "structural",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "abstention_correct",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "mapping_pairs_official",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "mapping_cites_matching_row",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "versions_correct",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "expected_rows_covered",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "expected_controls_referenced",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "conflict_preserved",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "new_control_no_reference",
+      "level": "deterministic_factual",
+      "status": "n/a",
+      "detail": ""
+    },
+    {
+      "name": "no_forbidden_mappings",
+      "level": "deterministic_factual",
+      "status": "n/a",
+      "detail": ""
+    },
+    {
+      "name": "no_unsupported_removal",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "name": "no_uncited_claims",
+      "level": "deterministic_factual",
+      "status": "pass",
+      "detail": ""
+    }
+  ],
+  "error_body": null
+}

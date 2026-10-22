@@ -740,7 +740,7 @@ def run_live(gold: list[dict], assembler, store, provider, settings, limit: int,
         entry["all_passed"] = bool(entry["checks"]) and all(c["status"] != "fail" for c in entry["checks"])
         per_q[g["question_id"]] = entry
     return {"provider": getattr(provider, "name", "unknown"), "model": getattr(provider, "model", None),
-            "is_live_model": getattr(provider, "name", "") in ("gemini", "mistral"), "questions_run": len(per_q),
+            "is_live_model": getattr(provider, "name", "") in ("gemini", "mistral", "groq"), "questions_run": len(per_q),
             "per_question": per_q, "aggregate": aggregate({k: v for k, v in per_q.items() if v["checks"]}),
             "semantic_faithfulness": SEMANTIC}
 
