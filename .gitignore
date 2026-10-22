@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.env
+.DS_Store
+
+# Data and generated artifacts (keep the folders, not the contents)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/
+*.sqlite
+*.db
+*.faiss
+indexes/
+models/
+.cache/
+eval/results/
