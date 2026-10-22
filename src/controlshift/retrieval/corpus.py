@@ -27,10 +27,12 @@ class Doc:
     section: str
     text: str  # original chunk text (what gets shown/cited)
     index_text: str  # text actually embedded / tokenised (adds control title + context)
+    index_prefix: str = ""  # leading context part of index_text (index_text = prefix + body)
 
     def meta(self) -> dict:
         d = asdict(self)
         d.pop("index_text")
+        d.pop("index_prefix")
         return d
 
 
@@ -46,18 +48,17 @@ SELECT c.chunk_id, c.version, c.chunk_type, c.source_file, c.page, c.printed_pag
 """
 
 
-def _index_text(r: sqlite3.Row) -> str:
-    """Context-enriched text: control chunks get ID, level, function and category titles."""
+def _index_parts(r: sqlite3.Row) -> tuple[str, str]:
+    """(context prefix, body). Control chunks get ID, level, function and category titles."""
     if r["chunk_type"] == "text":
-        return f"{r['section']}: {r['text']}"
+        return f"{r['section']}: ", r["text"]
     cid, level = r["original_id"], r["level"]
     if level == "function":
         head = f"{cid} {r['name']} function"
-        return f"{head}: {r['description']}" if r["description"] else head
+        return (f"{head}: ", r["description"]) if r["description"] else ("", head)
     if level == "category":
-        return (f"{cid} {r['name']} category ({r['function_name']}): {r['description']}")
-    return (f"{cid} subcategory ({r['function_name']} / {r['category_name']}): "
-            f"{r['description']}")
+        return f"{cid} {r['name']} category ({r['function_name']}): ", r["description"]
+    return f"{cid} subcategory ({r['function_name']} / {r['category_name']}): ", r["description"]
 
 
 def load_corpus(db_path: str | Path) -> list[Doc]:
@@ -70,13 +71,15 @@ def load_corpus(db_path: str | Path) -> list[Doc]:
         conn.close()
     if not rows:
         raise CorpusError("database contains no chunks")
-    return [
-        Doc(chunk_id=r["chunk_id"], version=r["version"], chunk_type=r["chunk_type"],
-            control_id=r["original_id"], element_id=r["element_id"],
-            source_file=r["source_file"], page=r["page"], printed_page=r["printed_page"],
-            section=r["section"], text=r["text"], index_text=_index_text(r))
-        for r in rows
-    ]
+    docs = []
+    for r in rows:
+        prefix, body = _index_parts(r)
+        docs.append(Doc(
+            chunk_id=r["chunk_id"], version=r["version"], chunk_type=r["chunk_type"],
+            control_id=r["original_id"], element_id=r["element_id"], source_file=r["source_file"],
+            page=r["page"], printed_page=r["printed_page"], section=r["section"], text=r["text"],
+            index_text=prefix + body, index_prefix=prefix))
+    return docs
 
 
 def content_hash(docs: list[Doc]) -> str:

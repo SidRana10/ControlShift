@@ -4,7 +4,7 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phases 1-3A complete (ingestion, SQLite store, BM25 + dense retrieval). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phases 1-3B complete (ingestion, SQLite store, BM25/dense/hybrid retrieval with reranking). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
@@ -45,7 +45,11 @@ controlshift-db unmapped [--direction no-later|flagged-new] [--level subcategory
 controlshift-retrieve build-index                  # downloads all-MiniLM-L6-v2 on first run
 controlshift-retrieve search "GV.SC-03" --mode bm25
 controlshift-retrieve search "protect data at rest" --mode dense --version 1.1
+controlshift-retrieve search "manage supplier risk" --mode hybrid_rerank --debug   # bm25|dense|hybrid|hybrid_rerank
 ```
+
+On macOS, dense search uses an exact NumPy product over the FAISS-stored vectors (faiss-cpu and torch ship
+conflicting OpenMP runtimes); see `src/controlshift/retrieval/dense.py` and `--dense-backend`.
 
 ## Layout
 

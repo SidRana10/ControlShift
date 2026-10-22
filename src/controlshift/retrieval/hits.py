@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 from .corpus import Doc
 
@@ -9,7 +9,7 @@ from .corpus import Doc
 class Hit:
     rank: int
     score: float
-    mode: str  # bm25 | dense
+    mode: str  # bm25 | dense | hybrid | hybrid_rerank
     chunk_id: str
     version: str
     control_id: str | None
@@ -19,6 +19,8 @@ class Hit:
     printed_page: str | None
     section: str
     text: str
+    matched_passage: str | None = None  # dense: the sub-passage that matched best
+    components: dict = field(default_factory=dict)  # per-stage {rank, score} for debugging
 
     @classmethod
     def from_doc(cls, doc: Doc, rank: int, score: float, mode: str) -> Hit:

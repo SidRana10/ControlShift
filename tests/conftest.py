@@ -1,6 +1,11 @@
+import os
 from pathlib import Path
 
 import pytest
+
+# In-process tests exercise the FAISS search backend (torch is never imported in the pytest process),
+# so allow the otherwise-refused macOS backend. Tests of the refusal itself remove this variable.
+os.environ.setdefault("CONTROLSHIFT_ALLOW_UNSAFE_FAISS", "1")
 
 RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
 

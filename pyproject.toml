@@ -37,6 +37,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = ["integration: uses the real downloaded models (skipped if not cached)"]
 
 [tool.ruff]
 line-length = 100

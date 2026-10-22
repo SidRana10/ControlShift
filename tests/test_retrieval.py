@@ -3,9 +3,7 @@ import dataclasses
 import itertools
 import json
 import sqlite3
-import zlib
 
-import numpy as np
 import pytest
 
 from controlshift.retrieval import persist
@@ -22,21 +20,7 @@ from controlshift.retrieval.persist import (
     load_dense,
 )
 from controlshift.retrieval.tokenize import tokenize
-
-
-class FakeEmbedder:
-    """Hashed bag-of-words vectors: deterministic, offline, lexically meaningful."""
-
-    def __init__(self, name="fake-embedder-v1", dim=256):
-        self.name, self.dim = name, dim
-
-    def encode(self, texts):
-        out = np.zeros((len(texts), self.dim), dtype=np.float32)
-        for i, t in enumerate(texts):
-            for tok in tokenize(t):
-                out[i, zlib.crc32(tok.encode()) % self.dim] += 1.0
-        norms = np.linalg.norm(out, axis=1, keepdims=True)
-        return out / np.maximum(norms, 1e-9)
+from fakes import FakeEmbedder
 
 
 @pytest.fixture(scope="module")

@@ -123,7 +123,71 @@ Limitations / notes:
 - Without `--version`, `PR.AT-1` also matches 2.0's `PR.AT-01` (same normalised ID, by design); use the filter to separate them.
 - No stemming beyond plural folding; no query expansion; BM25 drops zero-score hits, dense always returns k.
 - Query-time dense search loads the model each CLI call (~seconds); the HF Hub prints an unauthenticated-request warning.
-- `PROGRESS` items still open for Phase 3: RRF fusion, cross-encoder reranker (3B).
+### Phase 3B — Hybrid retrieval + cross-encoder reranking  ✅
+New modules: `fusion.py` (RRF), `reranker.py`, `hybrid.py`, `chunking.py`; `dense.py`, `corpus.py`, `persist.py`,
+`hits.py`, `cli.py` extended. CLI modes now: `bm25`, `dense`, `hybrid`, `hybrid_rerank`
+(`--rrf-k 60 --pool 30 --rerank-pool 30 --reranker-model ... --debug`).
+
+- [x] RRF: score = sum 1/(k+rank) over lists, default k=60; fuses ranks only (raw scores ignored); dedupes by chunk_id
+      keeping metadata; tie-break = score, then best rank in any list, then chunk_id (deterministic)
+- [x] Candidate pool: top 30 from each of BM25 and dense (configurable), version filter applied inside both retrievers
+- [x] Reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2` (downloaded on first `hybrid_rerank` run), scores the fused
+      top-30 `(query, index_text)` pairs, max_length 512; model cached per process; optional (`hybrid` skips it)
+- [x] Debug info: every hit keeps `components` = per-stage {rank, score} (bm25, dense, rrf/hybrid, rerank)
+- [x] Long chunks: 45 of 384 index texts exceeded MiniLM's 256-token limit (max 446). Dense now embeds sentence-window
+      passages (<=256 tokens, 1-sentence overlap, context prefix repeated, every sentence covered) and returns one hit per
+      parent chunk (best passage wins; `matched_passage` shows which). Real index: 384 docs -> 430 passages.
+      BM25, the SQLite DB and ingestion are untouched; citations still point at the parent chunk/page/section.
+- [x] FAISS filtering: version filter is an `IDSelectorBatch` inside the search; the search widens until k distinct parent
+      docs are found. Verified equal to exhaustive search within the version: 15 fake-embedder cases in tests, and 0
+      mismatches in 18 real-model cases (6 queries x {all, 1.1, 2.0}, k=10)
+- [x] Cache key now also covers dense chunking settings (max tokens, overlap, strategy) and format version 2
+- [x] Tests: 111 passing (41 new). Mocked embedder/scorer unit tests plus `tests/test_integration_real_models.py`, which
+      runs the real MiniLM + cross-encoder through the CLI in subprocesses (auto-skipped if the models are not cached)
+- Index on disk after rebuild: 1,505,225 bytes (docs.jsonl 456 KB, bm25 192 KB, dense 836 KB)
+
+Real-run observations (single queries, NOT a benchmark - no claim that hybrid is better; that needs Phase 5):
+- `GV.SC-03`: bm25 #1 = GV.SC-03; dense #3; hybrid puts GV.SC-02 first because RRF ties GV.SC-02 (bm25 #3, dense #1) with
+  GV.SC-03 (bm25 #1, dense #3) and the tie-break falls to chunk_id; hybrid_rerank puts GV.SC-03 #1.
+- "How should organizations manage supplier risks?": rankings differ a lot by mode (bm25 favours narrative text; dense favours
+  GV.SC-07/06/04; rerank favours 1.1 ID.SC category). Relevance of these is unjudged.
+- "How should sensitive information be protected at rest?": PR.DS-1 / PR.DS-01 near the top in all modes; without a
+  version filter, 1.1 and 2.0 results are interleaved.
+
+Known limitations:
+- Equal-weight RRF can tie on exact-ID queries (above); weights/ID-aware boosting were not added.
+- The cross-encoder is a general web-search model (MS MARCO): it cannot read control IDs, and scores are unbounded logits
+  (negative values are normal). It also truncates at 512 tokens (longest index text is 446).
+- The reranker only sees the fused pool (<=60 unique candidates, 30 by default); anything outside it cannot be recovered.
+- Each CLI call reloads the models (several seconds); there is no long-running service yet.
+- Passage overlap is one sentence; sentence splitting is regex-based.
+
+### Phase 3B reliability fix — macOS FAISS + torch OpenMP abort  ✅
+- Root cause (reproduced in fresh subprocesses): the macOS wheels of `faiss-cpu` and `torch` each bundle their own
+  `libomp.dylib` (`faiss/.dylibs/` and `torch/lib/`). LLVM's OpenMP runtime aborts with `OMP: Error #15` once both copies
+  are exercised in one process. Experiments: a FAISS search plus a torch import/op aborts in either order; `import faiss`,
+  `IndexFlat.add`, `write_index/read_index` and `reconstruct_n` do NOT trigger it; `OMP_NUM_THREADS=1`, `torch.set_num_threads(1)`
+  and `faiss.omp_set_num_threads(1)` do NOT help; only `KMP_DUPLICATE_LIB_OK=TRUE` (documented by Intel/LLVM as unsafe) bypasses it.
+  Whether it fires depends on which ops run, so the earlier "works if torch is loaded first" was luck, not a guarantee.
+- Fix (no package changes, no env hacks): FAISS still builds, saves and loads the index, but search runs as an exact NumPy
+  matrix product over the stored vectors (`DenseIndex(backend=...)`, `--dense-backend auto|numpy|faiss`,
+  `CONTROLSHIFT_DENSE_BACKEND`). `auto` = numpy on macOS, faiss elsewhere. Results are identical (flat exact index; tested
+  for both backends incl. version filters); on-disk index format and cache keys are unchanged. Details: `retrieval/dense.py`.
+- Regression tests (`tests/test_openmp_regression.py`, fresh subprocesses): canary that still reproduces the abort (skips if
+  new wheels fix it), thread-limiting is not a fix, supported sequence (3 rounds of torch work / FAISS build+write+read /
+  numpy search) exits 0, forced `faiss` backend + torch still aborts. The test process never imports torch itself.
+- Real-model checks: `tests/test_integration_real_models.py` runs encode/search/rerank interleaved in ONE process (6 queries x
+  {all,1.1,2.0} x {hybrid,hybrid_rerank} x 2 rounds + 64-text batch encodes) and all four CLI modes; both pass.
+  A forced-`faiss` run of the same real-model sequence happened not to abort, so the real-model path is only conditionally
+  affected; the synthetic canary shows the failure is real.
+- Reranker truncation: `CrossEncoderScorer` counts tokens and, if (query + passage) would exceed 512, scores sentence windows
+  and takes the max instead of truncating (unit-tested). Over the real corpus 0 passages needed windowing (longest index
+  text 446 tokens), asserted in the real-model test. Reranker input is the context-enriched `index_text`, not a snippet.
+- Tests now: 137 passing (26 new in this fix), ruff clean. RRF weights and ID boosting unchanged (left for Phase 5).
+- Safety: on macOS an explicit `--dense-backend faiss` (or `CONTROLSHIFT_DENSE_BACKEND=faiss`) now exits 2 with an actionable
+  message before any model loads; `CONTROLSHIFT_ALLOW_UNSAFE_FAISS=1` overrides it for diagnostics only (used by the tests).
+- Remaining limitation: the FAISS search backend is unusable with torch on macOS. Linux/Windows wheels were not
+  tested, so `auto` keeps FAISS there.
 
 ## Phase 4 — Grounded comparison
 - [ ] Query routing (single-version vs cross-version)

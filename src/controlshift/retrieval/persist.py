@@ -12,11 +12,12 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .bm25 import BM25Index
+from .chunking import DEFAULT_OVERLAP, STRATEGY
 from .corpus import Doc, content_hash
 from .dense import DenseIndex, Embedder
 from .tokenize import preprocessing_settings
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2
 DEFAULT_INDEX_DIR = Path("data/indexes")
 
 
@@ -24,9 +25,14 @@ class IndexStaleError(Exception):
     """The on-disk index is missing or does not match the current corpus/settings."""
 
 
-def fingerprint(docs: list[Doc], model: str | None = None) -> str:
+def dense_config(embedder: Embedder, overlap: int = DEFAULT_OVERLAP) -> dict:
+    """Embedding-passage settings that change the vectors and so must invalidate the cache."""
+    return {"max_tokens": embedder.max_tokens, "overlap_sentences": overlap, "strategy": STRATEGY}
+
+
+def fingerprint(docs: list[Doc], model: str | None = None, dense: dict | None = None) -> str:
     payload = {"content": content_hash(docs), "preprocessing": preprocessing_settings(),
-               "model": model, "format": FORMAT_VERSION}
+               "model": model, "dense": dense, "format": FORMAT_VERSION}
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 
@@ -54,9 +60,10 @@ def read_manifest(index_dir: Path, kind: str) -> dict | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
-def is_fresh(index_dir: Path, kind: str, docs: list[Doc], model: str | None = None) -> bool:
+def is_fresh(index_dir: Path, kind: str, docs: list[Doc], model: str | None = None,
+             dense: dict | None = None) -> bool:
     m = read_manifest(index_dir, kind)
-    return m is not None and m.get("fingerprint") == fingerprint(docs, model)
+    return m is not None and m.get("fingerprint") == fingerprint(docs, model, dense)
 
 
 def build_bm25(docs: list[Doc], index_dir: Path, force: bool = False) -> tuple[str, dict]:
@@ -75,21 +82,24 @@ def build_bm25(docs: list[Doc], index_dir: Path, force: bool = False) -> tuple[s
     return "built", manifest
 
 
-def build_dense(docs: list[Doc], index_dir: Path, embedder: Embedder,
-                force: bool = False) -> tuple[str, dict]:
-    if not force and is_fresh(index_dir, "dense", docs, embedder.name):
+def build_dense(docs: list[Doc], index_dir: Path, embedder: Embedder, force: bool = False,
+                overlap: int = DEFAULT_OVERLAP) -> tuple[str, dict]:
+    cfg = dense_config(embedder, overlap)
+    if not force and is_fresh(index_dir, "dense", docs, embedder.name, cfg):
         return "cached", read_manifest(index_dir, "dense")  # type: ignore[return-value]
     import faiss
 
-    index = DenseIndex.build(docs, embedder)
+    index = DenseIndex.build(docs, embedder, overlap)
     out = index_dir / "dense"
     out.mkdir(parents=True, exist_ok=True)
     _write_docs(index_dir, docs)
     faiss.write_index(index.index, str(out / "vectors.faiss"))
-    manifest = {"kind": "dense", "fingerprint": fingerprint(docs, embedder.name),
+    _atomic_write(out / "passages.json", json.dumps(
+        {"doc": index.passage_doc, "text": index.passage_text}, ensure_ascii=False))
+    manifest = {"kind": "dense", "fingerprint": fingerprint(docs, embedder.name, cfg),
                 "content_hash": content_hash(docs), "model": embedder.name, "n_docs": len(docs),
-                "dim": int(index.index.d), "preprocessing": preprocessing_settings(),
-                "format": FORMAT_VERSION}
+                "n_passages": len(index.passage_doc), "dim": int(index.index.d), "dense": cfg,
+                "preprocessing": preprocessing_settings(), "format": FORMAT_VERSION}
     _atomic_write(out / "manifest.json", json.dumps(manifest, indent=2, sort_keys=True))  # last
     return "built", manifest
 
@@ -104,8 +114,8 @@ def load_bm25(index_dir: Path, current_docs: list[Doc] | None = None) -> BM25Ind
     return BM25Index(docs, json.loads((index_dir / "bm25" / "tokens.json").read_text()))
 
 
-def load_dense(index_dir: Path, embedder: Embedder,
-               current_docs: list[Doc] | None = None) -> DenseIndex:
+def load_dense(index_dir: Path, embedder: Embedder, current_docs: list[Doc] | None = None,
+               overlap: int = DEFAULT_OVERLAP, backend: str | None = None) -> DenseIndex:
     import faiss
 
     manifest = read_manifest(index_dir, "dense")
@@ -114,14 +124,17 @@ def load_dense(index_dir: Path, embedder: Embedder,
     if manifest["model"] != embedder.name:
         raise IndexStaleError(
             f"dense index was built with {manifest['model']}, not {embedder.name} - rebuild")
-    if current_docs is not None and manifest["fingerprint"] != fingerprint(
-            current_docs, embedder.name):
-        raise IndexStaleError("dense index is stale (corpus or preprocessing changed) - rebuild")
+    if manifest["fingerprint"] != fingerprint(
+            current_docs if current_docs is not None else _read_docs(index_dir), embedder.name,
+            dense_config(embedder, overlap)):
+        raise IndexStaleError("dense index is stale (corpus, preprocessing or chunking "
+                              "settings changed) - rebuild")
     docs = _read_docs(index_dir)
     index = faiss.read_index(str(index_dir / "dense" / "vectors.faiss"))
-    if index.ntotal != len(docs):
-        raise IndexStaleError("dense index/doc count mismatch - rebuild")
-    return DenseIndex(docs, index, embedder)
+    passages = json.loads((index_dir / "dense" / "passages.json").read_text(encoding="utf-8"))
+    if index.ntotal != len(passages["doc"]):
+        raise IndexStaleError("dense index/passage count mismatch - rebuild")
+    return DenseIndex(docs, index, embedder, passages["doc"], passages["text"], backend)
 
 
 def dir_size_bytes(path: Path) -> int:
