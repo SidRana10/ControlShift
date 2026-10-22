@@ -247,7 +247,7 @@ Known limitations:
 - Passage relevance is whatever the retriever returns (not yet benchmarked); structural validity does not imply faithful answers.
 - 1.1 vs 2.0 same-ID pairs (e.g. PR.AT-1 / PR.AT-01) are different statements; both are reported when the version is not named.
 
-### Phase 4B — Grounded generation + FastAPI  ✅ (live provider NOT tested: no API key was available)
+### Phase 4B — Grounded generation + FastAPI  ✅ (built with a fake provider; see Phase 5B step 1 for the later live check)
 Code: `src/controlshift/generation/` (`config`, `provider`, `schema`, `context`, `prompt`, `generate`) and `src/controlshift/api/`
 (`app`, `schemas`, `services`). Dependencies added to the core set: `httpx` (Gemini REST + TestClient); no vendor SDK.
 
@@ -283,8 +283,8 @@ Code: `src/controlshift/generation/` (`config`, `provider`, `schema`, `context`,
   /ask and /compare returned `evidence_only` with valid evidence (`/compare` for GV.OC-01 returned official rows 4 and 5); blank question -> 422.
 
 Not tested / limitations:
-- No live Gemini call was made (no GEMINI_API_KEY/GEMINI_MODEL in this environment); `tests/test_live_provider.py` is opt-in via
-  `RUN_LIVE_LLM_TESTS=1` and was skipped. Prompt quality and Gemini's JSON compliance are therefore unverified.
+- At the end of Phase 4B no live Gemini call had been made (superseded by Phase 5B step 1 below); `tests/test_live_provider.py`
+  stays opt-in via `RUN_LIVE_LLM_TESTS=1` and is skipped in normal runs.
 - Validation is structural plus rule checks; it cannot detect a fluent but unfaithful paraphrase of a correctly cited chunk.
 - The removal-claim guard is a keyword heuristic (can reject benign wording, can miss synonyms).
 - Request timeouts return 504 but the worker thread keeps running until the provider timeout fires.
@@ -331,7 +331,30 @@ Limitations: small n and wide CIs; AI-written, unreviewed labels; unlabelled-but
 paraphrase control text (favours lexical overlap); tiny structured corpus; latency from one machine/device (MPS) and not a load test;
 no tuning or ID boosting was tried (must be evaluated on a separate held-out set to avoid overfitting to these questions).
 
+### Phase 5B, step 1 — Live Gemini verification  (partially complete)
+Model: `gemini-3.6-flash` (from `GEMINI_MODEL`; credentials live only in the gitignored `.env`, never printed or committed).
+- Direct provider test (1 real request, `max_llm_attempts=1`): question "How does GV.SC-03 map to CSF 1.1?" with the real hybrid
+  retrieval pipeline. HTTP 200, `finishReason: STOP`, response keys `candidates/usageMetadata/modelVersion/responseId`, parts carry
+  `text` (+ `thoughtSignature`), which the provider's parser handles. Usage: 3115 prompt + 629 output + 1155 thinking tokens.
+  Result `status: answered`, schema valid, 4 answer citations structurally valid (GV.SC-03, ID.SC-2, xwalk rows 25 and 26), 0 invalid
+  bundle citations. The answer quoted GV.SC-03 and ID.SC-2 text matching the stored source, reported both official mappings
+  (row 25 -> ID.SC-2; row 26 "Conceptually new in 2.0" with no reference) and stated that the official records conflict. Semantic
+  faithfulness was only eyeballed by the developer for this single answer; it is not verified by the pipeline.
+- FastAPI `/ask` with the live provider: NOT verified. Every attempt after the successful direct call returned Google
+  `503 UNAVAILABLE` ("model is currently experiencing high demand"), which the API reported as a controlled `502 provider_error` with no
+  leak. The no-LLM path (`generate:false`) and the health endpoint work against the real stack. Retried at spaced intervals, then stopped.
+- Evidence levels: (a) LIVE, verified once: direct `GroundedGenerator` + Gemini call. (b) LIVE, NOT verified: FastAPI `/ask` with
+  Gemini (only 503s). (c) MOCKED/OFFLINE: all automated tests (316 passed, 1 skipped) use a fake provider or mocked HTTP; the
+  skipped live test is opt-in and was not run in the suite.
+- Real API requests made in total: 6 (1 success, 5 x 503 which returned no content). No batch evaluation was run.
+- Small change: provider errors now include Google's short status token (e.g. "HTTP 503 UNAVAILABLE"); message text is never copied
+  (test added). No automatic retry was added; a bounded retry/backoff for 429/503 is a decision for later.
+- Limitations: one question, one successful response; Gemini JSON compliance across question types, latency under load and answer
+  faithfulness are untested; transient 503s are surfaced to the caller as 502.
+
 ### Phase 5B — remaining
+- [ ] Re-run the live `/ask` check once Gemini capacity recovers
+
 - [ ] Answer-faithfulness / abstention evaluation of generation (needs a configured LLM provider)
 - [ ] Held-out question set for any future retrieval tuning
 

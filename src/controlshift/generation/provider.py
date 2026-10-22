@@ -72,7 +72,7 @@ class GeminiProvider:
         except httpx.HTTPError as exc:  # connection errors etc.; type name only, no URL/headers
             raise ProviderFailure(f"Gemini request failed ({type(exc).__name__})") from exc
         if resp.status_code != 200:
-            raise ProviderFailure(f"Gemini returned HTTP {resp.status_code}")
+            raise ProviderFailure(f"Gemini returned HTTP {resp.status_code}{_error_status(resp)}")
         try:
             data = resp.json()
             candidate = data["candidates"][0]
@@ -83,6 +83,16 @@ class GeminiProvider:
         if not text.strip():
             raise ProviderFailure("Gemini returned empty text")
         return text
+
+
+def _error_status(resp: httpx.Response) -> str:
+    """' UNAVAILABLE'-style status word from Google's error body (only a short enum-like token is
+    kept; the message text, which could echo request content, is never copied)."""
+    try:
+        status = resp.json()["error"]["status"]
+    except (ValueError, KeyError, TypeError):
+        return ""
+    return f" {status}" if isinstance(status, str) and status.isupper() and len(status) <= 40 else ""
 
 
 def provider_from_settings(s: Settings) -> LLMProvider | None:

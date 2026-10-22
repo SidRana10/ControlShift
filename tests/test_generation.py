@@ -138,6 +138,9 @@ def test_gemini_request_shape_and_success():
 @pytest.mark.parametrize("handler,exc,fragment", [
     (lambda r: httpx.Response(500, text="boom SECRET-KEY-123"), ProviderFailure, "HTTP 500"),
     (lambda r: httpx.Response(429, json={}), ProviderFailure, "HTTP 429"),
+    (lambda r: httpx.Response(503, json={"error": {"code": 503, "status": "UNAVAILABLE",
+                                                   "message": "high demand SECRET-KEY-123"}}),
+     ProviderFailure, "HTTP 503 UNAVAILABLE"),
     (lambda r: httpx.Response(200, json={"candidates": []}), ProviderFailure, "unusable"),
     (lambda r: httpx.Response(200, text="<html>not json"), ProviderFailure, "unusable"),
     (lambda r: httpx.Response(200, json=ok_body("   ")), ProviderFailure, "empty"),
