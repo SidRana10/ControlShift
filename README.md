@@ -4,18 +4,29 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phase 0 (scaffold only). No RAG pipeline yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phase 1 complete (ingestion). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
+python3.12 -m venv venv
+source venv/bin/activate
 pip install -e ".[dev]"        # full deps (downloads torch; large)
 pip install -e ".[dev,ui]"     # plus Streamlit
 cp .env.example .env
 pytest
 ```
+
+## Ingestion
+
+Place the three NIST files in `data/raw/` (`nist_csf_1_1.pdf`, `nist_csf_2_0.pdf`,
+`nist_csf_transition.xlsx`), then:
+
+```bash
+controlshift-ingest            # writes data/processed/{chunks.jsonl,crosswalk.jsonl,manifest.json}
+```
+
+Phase 1 needs only `pymupdf`, `pandas`, `openpyxl` (plus `pytest`, `ruff` for dev).
 
 ## Layout
 
