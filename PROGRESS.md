@@ -45,9 +45,47 @@ Known limitations / notes:
   so an editable install inside `.venv/` is silently not importable outside pytest. A non-dot venv
   avoids it with no workaround.
 
-## Phase 2 — Structured store
-- [ ] SQLite schema: controls per version, v1.1↔v2.0 mappings (added/removed/moved/reworded)
-- [ ] Loader from the NIST mapping spreadsheet; query helpers; tests
+## Phase 2 — Structured store  ✅
+`data/processed/controlshift.db` (gitignored), built only from `chunks.jsonl`, `crosswalk.jsonl`,
+`manifest.json` (PDFs are never reparsed). Code: `src/controlshift/store/`.
+
+- [x] Schema (`schema.py`): `source_document`, `framework_version`, `element` (function/category/
+      subcategory, PK `(version, element_id)`, self-FK to parent), `informative_reference`, `chunk`,
+      `chunk_mention`, `crosswalk_mapping`, `build_info`
+- [x] Version safety: composite FKs everywhere; `chunk (version, source_file)` must match
+      `framework_version`; crosswalk `focal_version` is CHECKed to 2.0 and `reference_version` to 1.1;
+      `mapping_type='mapped'` iff a reference exists; foreign keys on for every connection
+- [x] Transactional, idempotent loader (`loader.py`): drop + recreate + insert in one transaction;
+      any failure rolls back and leaves the previous database intact; rebuilt dump is byte-identical
+- [x] Queries (`queries.py`): get control, list category, forward 2.0->1.1 mappings, reverse 1.1->2.0
+      (derived from stored official rows), evidence, controls without earlier mapping, controls
+      without later mapping, controls flagged new
+- [x] Validation (`validate.py`): integrity_check, foreign_key_check, counts vs Phase 1 manifest,
+      no invented mappings, hierarchy consistency
+- [x] CLI `controlshift-db {build,inspect,validate,get,map,evidence,category,unmapped}`
+- [x] Tests: 44 total passing (19 new: real data + synthetic constraint/rollback tests); ruff clean
+
+Loaded counts (match the Phase 1 manifest; `validate` reports no problems):
+
+| table | rows |
+|---|---|
+| source_document / framework_version | 3 / 2 |
+| element | 270 (2.0: 6 fn, 22 cat, 106 sub; 1.1: 5 fn, 23 cat, 108 sub) |
+| informative_reference | 504 (1.1 only) |
+| chunk | 384 (1.1: 207, 2.0: 177) |
+| chunk_mention | 10 |
+| crosswalk_mapping | 205 (185 mapped, 20 new_in_2_0) |
+
+Notes:
+- Control IDs are keyed zero-padded (`PR.AT-01`) with the printed spelling kept in `original_id`
+  (`PR.AT-1`); queries accept either. The same ID can exist in both versions (e.g. `PR.AT-01`).
+- Official-data quirk, kept as-is: `GV.SC-03` has both a mapped row (-> ID.SC-2) and a
+  "Conceptually new" row. So 20 elements are flagged new but only 19 have no earlier mapping;
+  both queries are provided.
+- `chunk_mention` only records exact control-ID mentions that resolve to a real control of that
+  version; unresolved IDs in prose are dropped.
+- Evidence = the control's own chunk plus narrative chunks mentioning its ID; semantic retrieval
+  is Phase 3.
 
 ## Phase 3 — Retrieval
 - [ ] Dense index (SentenceTransformers + FAISS) with version filtering

@@ -4,7 +4,7 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phase 1 complete (ingestion). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phases 1-2 complete (ingestion, SQLite store). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
@@ -27,6 +27,17 @@ controlshift-ingest            # writes data/processed/{chunks.jsonl,crosswalk.j
 ```
 
 Phase 1 needs only `pymupdf`, `pandas`, `openpyxl` (plus `pytest`, `ruff` for dev).
+
+## Knowledge store
+
+```bash
+controlshift-db build      # data/processed/*.jsonl -> data/processed/controlshift.db
+controlshift-db validate   # integrity + counts vs ingestion manifest
+controlshift-db inspect
+controlshift-db map GV.OC-01 --version 2.0     # forward (2.0 -> 1.1) official rows
+controlshift-db map ID.BE-2 --version 1.1      # reverse lookup over the same rows
+controlshift-db unmapped [--direction no-later|flagged-new] [--level subcategory]
+```
 
 ## Layout
 

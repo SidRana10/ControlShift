@@ -20,3 +20,14 @@ def ingested(raw_dir, tmp_path_factory):
     out = tmp_path_factory.mktemp("processed")
     manifest = run(raw_dir, out)
     return out, manifest
+
+
+@pytest.fixture(scope="session")
+def real_db(ingested, tmp_path_factory):
+    """Database built from the real NIST data (processed dir from the `ingested` fixture)."""
+    from controlshift.store.loader import build_database
+
+    processed, _ = ingested
+    db = tmp_path_factory.mktemp("db") / "controlshift.db"
+    counts = build_database(db, processed)
+    return db, processed, counts

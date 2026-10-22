@@ -28,6 +28,7 @@ dev = ["pytest>=8.0", "ruff>=0.5"]
 
 [project.scripts]
 controlshift-ingest = "controlshift.ingest.cli:main"
+controlshift-db = "controlshift.store.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
