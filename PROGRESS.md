@@ -292,9 +292,48 @@ Not tested / limitations:
 - Single process, no auth, rate limiting or caching; dense/rerank calls are serialised.
 
 ## Phase 5 — Evaluation
-- [ ] Hand-labeled question set in `eval/`
-- [ ] Reproducible scripts: dense vs BM25 vs hybrid vs hybrid+rerank (recall@k, MRR, nDCG)
-- [ ] Citation-faithfulness checks; results written only from real runs
+### Phase 5A — Retrieval benchmark  ✅ (answer-faithfulness evaluation still open)
+Code: `src/controlshift/evaluation/` (`metrics`, `dataset`, `runner`, `report`); scripts `eval/build_questions.py`,
+`eval/benchmark.py`; artifacts `eval/questions.jsonl`, `eval/questions_audit.md`, `eval/results.json`, `eval/report.md`.
+Re-run: `python eval/build_questions.py && python eval/benchmark.py` (`--render-only` rebuilds report.md from results.json).
+
+- Dataset: 40 questions (39 final, 1 provisional): exact_id 11, semantic 10, version_specific 11, cross_version 8; easy 14 /
+  medium 19 / hard 7; 21 with a version filter, 19 unfiltered; 73 labelled chunks (59 grade-2, 14 grade-1).
+- Label provenance: written by Claude from the stored source text and the official crosswalk rows; no retrieval output was used. Each
+  label carries chunk id, version, control id, file, page, section, a source excerpt and a "why". `build_questions.py` fails on a
+  nonexistent chunk; tests re-verify every label against SQLite (including that cited crosswalk rows involve the labelled control).
+  **Not human-reviewed** (`human_reviewed: false` everywhere); audit via `eval/questions_audit.md`. Uncertain query S08 is
+  `provisional` and excluded from headline metrics.
+- Metrics: Recall@1/5/10, MRR@10, nDCG@5 (graded, 2^g-1), Hit@5, version-isolation accuracy; overall, per category, per mode; seeded
+  bootstrap 95% CIs and paired differences vs BM25; repeated chunk IDs counted once; dense passages scored as parent chunks.
+- Fairness: same questions/filters/corpus/top-10, one process, models loaded once, NumPy dense backend, default pool 30 / RRF k 60 /
+  rerank pool 30; nothing was tuned on these questions.
+
+Measured results (39 final queries, Apple M4, embedder and cross-encoder ran on MPS):
+
+| Mode | R@1 | R@5 | R@10 | MRR@10 | nDCG@5 | Hit@5 | p50 ms | p95 ms |
+|---|---|---|---|---|---|---|---|---|
+| BM25 | 0.530 | 0.791 | 0.893 | 0.836 | 0.780 | 0.897 | 0.2 | 0.4 |
+| Dense | 0.278 | 0.714 | 0.816 | 0.606 | 0.594 | 0.846 | 5.5 | 6.7 |
+| Hybrid RRF | 0.479 | 0.821 | 0.859 | 0.790 | 0.771 | 0.897 | 5.8 | 7.3 |
+| Hybrid + cross-encoder | 0.585 | 0.876 | 0.902 | 0.905 | 0.848 | 0.974 | 113.4 | 172.3 |
+
+- Version isolation: 1.000 for every mode (21 filtered queries).
+- Paired nDCG@5 vs BM25: dense -0.187 (CI excludes 0); hybrid -0.009 [-0.080, +0.055]; hybrid+rerank +0.067 [-0.006, +0.155]
+  (CI includes 0). So only "dense < BM25" is statistically distinguishable at n=39; hybrid ~ BM25 on this set.
+- Hybrid vs the better of its two parts (nDCG@5): better on 7 queries, worse on 11. Reranker vs plain hybrid: better on 13, worse on 5
+  (S09, V04, V06, X02, X04). Exact-ID queries: hybrid+rerank nDCG@5 0.993, BM25 0.857, hybrid 0.903, dense 0.599.
+- Cold start (once per process): MiniLM load + first encode 6.0 s, cross-encoder 0.4 s, FAISS index 0.04 s.
+- Tests: 315 passed + 1 skipped (35 new: metrics, dataset/label integrity, aggregation, latency helpers, report generation, BM25
+  reproducibility and report/results sync); ruff clean.
+
+Limitations: small n and wide CIs; AI-written, unreviewed labels; unlabelled-but-relevant chunks count as misses; questions mostly
+paraphrase control text (favours lexical overlap); tiny structured corpus; latency from one machine/device (MPS) and not a load test;
+no tuning or ID boosting was tried (must be evaluated on a separate held-out set to avoid overfitting to these questions).
+
+### Phase 5B — remaining
+- [ ] Answer-faithfulness / abstention evaluation of generation (needs a configured LLM provider)
+- [ ] Held-out question set for any future retrieval tuning
 
 ## Phase 6 — API & UI
 - [ ] FastAPI endpoints (search, compare, mapping lookup)

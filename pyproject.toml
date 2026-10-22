@@ -48,3 +48,8 @@ markers = [
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+# long prose lists in the generated report are written as adjacent string literals on purpose
+"src/controlshift/evaluation/report.py" = ["ISC004"]
+"eval/*.py" = ["ISC004"]

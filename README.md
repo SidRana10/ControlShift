@@ -4,7 +4,7 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phases 1-4B complete (ingestion, SQLite store, hybrid retrieval + reranking, evidence bundles, grounded generation, FastAPI). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phases 1-5A complete (ingestion, SQLite store, hybrid retrieval + reranking, evidence bundles, grounded generation, FastAPI, retrieval benchmark). See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
@@ -75,6 +75,16 @@ provider and mocked HTTP. Without Gemini credentials the API still works and ret
 validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows) but citation checks are
 structural: they do not prove the answer is faithful to the cited text, and no model confidence is reported.
 A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.
+
+## Evaluation
+
+```bash
+python eval/build_questions.py     # validates the curated labels against SQLite, writes eval/questions.jsonl + audit sheet
+python eval/benchmark.py           # runs the 4 retrieval modes with the real models; writes eval/results.json + eval/report.md
+```
+
+See `eval/report.md` for measured results and limitations. The relevance labels are AI-curated and source-checked, **not
+human-reviewed**; review them in `eval/questions_audit.md`.
 
 ## Layout
 
