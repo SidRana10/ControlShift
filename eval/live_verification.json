@@ -1,0 +1,40 @@
+{
+  "scope": "Live-provider smoke verification of 3 questions. NOT an accuracy benchmark.",
+  "semantic_faithfulness": "requires_human_review",
+  "max_requests": 3,
+  "questions": [
+    {
+      "question_id": "F01",
+      "category": "conflict",
+      "question": "How does GV.SC-03 map to CSF 1.1?",
+      "http_status": 502,
+      "api_seconds": 0.71,
+      "status": "error",
+      "error": {
+        "code": "provider_error",
+        "message": "Gemini returned HTTP 503 UNAVAILABLE",
+        "details": null
+      }
+    },
+    {
+      "question_id": "E01",
+      "status": "not_attempted",
+      "reason": "provider error on an earlier request; stopped"
+    },
+    {
+      "question_id": "C01",
+      "status": "not_attempted",
+      "reason": "provider error on an earlier request; stopped"
+    }
+  ],
+  "model": "gemini-3.6-flash",
+  "retrieval_mode": "hybrid",
+  "real_api_requests": 1,
+  "provider_http_statuses": [
+    {
+      "n": 1,
+      "status": 503,
+      "seconds": 0.68
+    }
+  ]
+}

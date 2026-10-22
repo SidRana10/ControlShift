@@ -70,8 +70,9 @@ curl -s localhost:8000/compare -H 'content-type: application/json' \
   -d '{"question": "supplier risk", "control_ids": ["GV.OC-01"]}'
 ```
 
-**Live Gemini generation has NOT been tested** (no API key was available during development); all generation tests use a fake
-provider and mocked HTTP. Without Gemini credentials the API still works and returns `status: "evidence_only"` with the full evidence bundle. Answers are
+**Live Gemini generation has had exactly one successful end-to-end smoke test** (FastAPI `/ask`, `gemini-3.8-flash`, the GV.SC-03
+mapping-conflict question; see `PROGRESS.md`). That is not an accuracy evaluation: all automated tests use a fake provider and mocked
+HTTP, and other question types are untested live. Without Gemini credentials the API still works and returns `status: "evidence_only"` with the full evidence bundle. Answers are
 validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows) but citation checks are
 structural: they do not prove the answer is faithful to the cited text, and no model confidence is reported.
 A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.

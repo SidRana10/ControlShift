@@ -340,7 +340,7 @@ Model: `gemini-3.6-flash` (from `GEMINI_MODEL`; credentials live only in the git
   bundle citations. The answer quoted GV.SC-03 and ID.SC-2 text matching the stored source, reported both official mappings
   (row 25 -> ID.SC-2; row 26 "Conceptually new in 2.0" with no reference) and stated that the official records conflict. Semantic
   faithfulness was only eyeballed by the developer for this single answer; it is not verified by the pipeline.
-- FastAPI `/ask` with the live provider: NOT verified. Every attempt after the successful direct call returned Google
+- FastAPI `/ask` with the live provider: NOT verified at that time (verified once later with gemini-3.8-flash; see the sections below). Every attempt after the successful direct call returned Google
   `503 UNAVAILABLE` ("model is currently experiencing high demand"), which the API reported as a controlled `502 provider_error` with no
   leak. The no-LLM path (`generate:false`) and the health endpoint work against the real stack. Retried at spaced intervals, then stopped.
 - Evidence levels: (a) LIVE, verified once: direct `GroundedGenerator` + Gemini call. (b) LIVE, NOT verified: FastAPI `/ask` with
@@ -397,6 +397,39 @@ artifacts `eval/answer_questions.jsonl` (gold), `eval/answer_results.json`, `eva
 Remaining for Phase 5B: run the live mode on a few questions once Gemini capacity allows (and re-check FastAPI `/ask` live); have a human
 review the gold labels and the generated answers; extend to hybrid/rerank evidence and to unseen questions; calibrate the removal-wording
 heuristic against real outputs.
+
+### Phase 5B, live FastAPI `/ask` verification with gemini-3.8-flash  (ONE successful smoke test - not an accuracy evaluation)
+After `gemini-3.6-flash` kept returning 503 (below), `GEMINI_MODEL` was changed to `gemini-3.8-flash` and one controlled request was made
+through the real FastAPI `/ask` endpoint (TestClient, real services, hybrid retrieval, `LLM_MAX_ATTEMPTS=1`, no retries, budget of 1 request).
+- Question: "How does GV.SC-03 map to CSF 1.1?" (gold F01, the mapped-and-conceptually-new conflict).
+- Requests: exactly 1 real Gemini request; 1 success (HTTP 200 from Gemini and from `/ask`); 0 provider errors; 13.4 s end-to-end latency
+  (single observation).
+- Outcome: `status: answered`, 1 attempt, no rejection, no warnings. Schema valid. 4 citations, all structurally valid and inside the evidence
+  bundle: `chunk:csf2.0:subcategory:GV.SC-03`, `chunk:csf1.1:subcategory:ID.SC-2`, `xwalk:row25`, `xwalk:row26`.
+- Official mappings: the answer's two mapping claims matched official crosswalk rows exactly - GV.SC-03 -> ID.SC-2 (row 25) and
+  GV.SC-03 -> no CSF 1.1 reference (row 26, "Conceptually new in 2.0"); nothing invented; row coverage complete.
+- Conflict handling: the pipeline flagged `mapped_and_new_in_2_0`; the model reported both records, stated that they conflict and chose neither.
+- Deterministic answer checks (the Phase 5B step 2 checker): 14 checks, 12 pass, 2 not applicable (`new_control_no_reference`,
+  `no_forbidden_mappings`), 0 fail.
+- What this does NOT show: one question on one model is a smoke test, not an accuracy measurement. Not tested live: conceptually-new or
+  unmapped controls, one-to-many mappings, comparisons, abstention, and other models/prompts. The checks are structural and rule-based;
+  whether the prose is faithful and complete is still pending human review (the worksheet stays PENDING), and the quoted definitions were
+  only eyeballed.
+- Artifact (sanitized: statuses, timings, answer text, check results; no key, headers or raw provider response):
+  `eval/live_verification_ask_gv_sc_03.json`.
+
+### Earlier attempt with gemini-3.6-flash (blocked by 503)
+- Setup: model `gemini-3.6-flash`, hybrid retrieval, real FastAPI `/ask` via TestClient with the real services, `LLM_MAX_ATTEMPTS=1` (no repair
+  retry, no automatic retry anywhere), a hard budget of 3 provider requests and a stop-on-first-error guard. Credentials came from the gitignored
+  `.env`; the key never appears in output or artifacts (asserted before writing). Plan: F01 (GV.SC-03 conflict), E01 (conceptually-new GV.OV-01),
+  then C01 (official one-to-many mapping) only if the service responded normally.
+- Result: 1 real request, 1 failure. Gemini returned HTTP 503 UNAVAILABLE in 0.68 s; `/ask` returned a controlled 502 `provider_error` in 0.71 s.
+  F01/E01/C01 were therefore not generated: E01 and C01 were deliberately not attempted. Total real requests in this attempt: 1 (all prior
+  attempts: 6 requests, 1 success, 5 x 503; running total 7).
+- At that point nothing new was verified live; the gemini-3.8-flash test above later covered `/ask` generation and the GV.SC-03 conflict.
+- Sanitized artifact: `eval/live_verification.json` (statuses, timings, error code; no key, no raw provider response).
+- Resolution: a later request with `gemini-3.8-flash` succeeded (see above). The 503 was a service-side condition on the earlier model; our code
+  handled it as designed and no code change was needed.
 
 ### Phase 5B — open items
 - [ ] Re-run the live `/ask` check once Gemini capacity recovers

@@ -1,0 +1,174 @@
+{
+  "scope": "Live-provider smoke verification of 1 question. NOT an accuracy benchmark.",
+  "semantic_faithfulness": "requires_human_review",
+  "max_requests": 1,
+  "questions": [
+    {
+      "question_id": "F01",
+      "category": "conflict",
+      "question": "How does GV.SC-03 map to CSF 1.1?",
+      "http_status": 200,
+      "api_seconds": 13.38,
+      "status": "answered",
+      "attempts": 1,
+      "rejection": [],
+      "system_uncertainties": [],
+      "warnings": [],
+      "answer": {
+        "answer": "In the official NIST crosswalk, CSF 2.0 Subcategory GV.SC-03 has two conflicting entries regarding its mapping to CSF 1.1:\n\n1. It is mapped to CSF 1.1 Subcategory ID.SC-2.\n2. It is also listed with mapping type 'new_in_2_0' (with no CSF 1.1 reference) and noted as 'Conceptually new in 2.0'.\n\nPer CSF 2.0, GV.SC-03 is defined as: \"Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes.\" Per CSF 1.1, ID.SC-2 is defined as: \"Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process.\"",
+        "key_changes": [
+          {
+            "statement": "CSF 2.0 Subcategory GV.SC-03 maps to CSF 1.1 Subcategory ID.SC-2 in the official crosswalk.",
+            "citations": [
+              "xwalk:row25"
+            ]
+          },
+          {
+            "statement": "CSF 2.0 Subcategory GV.SC-03 is also identified in the official crosswalk as conceptually new in CSF 2.0 without a CSF 1.1 reference.",
+            "citations": [
+              "xwalk:row26"
+            ]
+          }
+        ],
+        "citations": [
+          "chunk:csf2.0:subcategory:GV.SC-03",
+          "chunk:csf1.1:subcategory:ID.SC-2",
+          "xwalk:row25",
+          "xwalk:row26"
+        ],
+        "mappings": [
+          {
+            "focal_id": "GV.SC-03",
+            "reference_id": "ID.SC-2",
+            "note": "Mapped in official crosswalk row 25.",
+            "citations": [
+              "xwalk:row25"
+            ]
+          },
+          {
+            "focal_id": "GV.SC-03",
+            "reference_id": null,
+            "note": "Conceptually new in 2.0 in official crosswalk row 26.",
+            "citations": [
+              "xwalk:row26"
+            ]
+          }
+        ],
+        "uncertainties": [
+          "The official crosswalk contains conflicting entries for GV.SC-03: one entry maps it to ID.SC-2, while another entry designates it as conceptually new in 2.0 with no reference."
+        ],
+        "unresolved_questions": [],
+        "abstained": false,
+        "abstention_reason": null
+      },
+      "evidence_summary": {
+        "query_type": "control_mapping",
+        "crosswalk_rows": [
+          25,
+          26
+        ],
+        "conflicts": [
+          "GV.SC-03"
+        ],
+        "unmapped": []
+      },
+      "checks": [
+        {
+          "name": "schema_valid",
+          "level": "structural",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "citation_ids_valid",
+          "level": "structural",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "citations_in_bundle",
+          "level": "structural",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "abstention_correct",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "mapping_pairs_official",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "mapping_cites_matching_row",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "versions_correct",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "expected_rows_covered",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "expected_controls_referenced",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "conflict_preserved",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "new_control_no_reference",
+          "level": "deterministic_factual",
+          "status": "n/a",
+          "detail": ""
+        },
+        {
+          "name": "no_forbidden_mappings",
+          "level": "deterministic_factual",
+          "status": "n/a",
+          "detail": ""
+        },
+        {
+          "name": "no_unsupported_removal",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "name": "no_uncited_claims",
+          "level": "deterministic_factual",
+          "status": "pass",
+          "detail": ""
+        }
+      ],
+      "all_deterministic_checks_passed": true
+    }
+  ],
+  "model": "gemini-3.8-flash",
+  "retrieval_mode": "hybrid",
+  "real_api_requests": 1,
+  "provider_http_statuses": [
+    {
+      "n": 1,
+      "status": 200,
+      "seconds": 13.34
+    }
+  ]
+}
