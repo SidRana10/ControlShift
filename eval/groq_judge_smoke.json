@@ -1,0 +1,220 @@
+{
+  "label": "PROVIDER SMOKE TEST - single request; not an accuracy benchmark or proof of correctness",
+  "date": "2026-10-22",
+  "question_id": "F01",
+  "answer_source": "eval/live_verification_ask_gv_sc_03.json (existing Gemini answer, reused; 0 Gemini requests)",
+  "evidence_source": "re-assembled offline from local DB/indexes (deterministic, no API)",
+  "config": {
+    "judge_provider": "groq",
+    "judge_model": "openai/gpt-oss-120b",
+    "judge_key_present": true,
+    "timeout_s": 60.0,
+    "max_attempts": 1
+  },
+  "rubric_version": "1",
+  "groq_requests_made": 1,
+  "gemini_requests_made": 0,
+  "retries": 0,
+  "repair_attempts": 0,
+  "http_status": 200,
+  "finish_reason": "stop",
+  "response_model": "openai/gpt-oss-120b",
+  "usage": {
+    "prompt_tokens": 4260,
+    "completion_tokens": 2251,
+    "reasoning_tokens": 1229,
+    "total_tokens": 6511
+  },
+  "latency_s": 5.508,
+  "request_prompt_chars": 12950,
+  "error": null,
+  "json_parse_ok": true,
+  "top_level_keys": [
+    "answer_relevance",
+    "citation_assessments",
+    "citation_support",
+    "claims",
+    "completeness",
+    "factual_correctness",
+    "non_factual_units"
+  ],
+  "schema_valid": true,
+  "validation_errors": [],
+  "unit_ids_expected": [
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "K1",
+    "K2",
+    "M1",
+    "M2"
+  ],
+  "judge_output": {
+    "claims": [
+      {
+        "claim": "In the official NIST crosswalk, CSF 2.0 Subcategory GV.SC-03 has two conflicting entries regarding its mapping to CSF 1.1.",
+        "unit_ids": [
+          "S1"
+        ],
+        "evidence_ids": [
+          "xwalk:row25",
+          "xwalk:row26"
+        ],
+        "verdict": "supported",
+        "justification": "Both crosswalk rows 25 and 26 are present, showing a mapped entry and a new_in_2_0 entry, confirming the conflict."
+      },
+      {
+        "claim": "It is mapped to CSF 1.1 Subcategory ID.SC-2.",
+        "unit_ids": [
+          "S2"
+        ],
+        "evidence_ids": [
+          "xwalk:row25"
+        ],
+        "verdict": "supported",
+        "justification": "Row 25 explicitly maps GV.SC-03 to ID.SC-2."
+      },
+      {
+        "claim": "It is also listed with mapping type 'new_in_2_0' (with no CSF 1.1 reference) and noted as 'Conceptually new in 2.0'.",
+        "unit_ids": [
+          "S3"
+        ],
+        "evidence_ids": [
+          "xwalk:row26"
+        ],
+        "verdict": "supported",
+        "justification": "Row 26 shows GV.SC-03 with mapping_type=new_in_2_0 and no reference, labeled conceptually new."
+      },
+      {
+        "claim": "Per CSF 2.0, GV.SC-03 is defined as: \"Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes.\" Per CSF 1.1, ID.SC-2 is defined as: \"Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process.\"",
+        "unit_ids": [
+          "S4"
+        ],
+        "evidence_ids": [
+          "chunk:csf2.0:subcategory:GV.SC-03",
+          "chunk:csf1.1:subcategory:ID.SC-2"
+        ],
+        "verdict": "supported",
+        "justification": "The two chunk evidences contain the exact quoted definitions."
+      },
+      {
+        "claim": "CSF 2.0 Subcategory GV.SC-03 maps to CSF 1.1 Subcategory ID.SC-2 in the official crosswalk.",
+        "unit_ids": [
+          "K1"
+        ],
+        "evidence_ids": [
+          "xwalk:row25"
+        ],
+        "verdict": "supported",
+        "justification": "Row 25 provides this mapping."
+      },
+      {
+        "claim": "CSF 2.0 Subcategory GV.SC-03 is also identified in the official crosswalk as conceptually new in CSF 2.0 without a CSF 1.1 reference.",
+        "unit_ids": [
+          "K2"
+        ],
+        "evidence_ids": [
+          "xwalk:row26"
+        ],
+        "verdict": "supported",
+        "justification": "Row 26 indicates the conceptually new status with no reference."
+      },
+      {
+        "claim": "Mapping claim: GV.SC-03 -> ID.SC-2. Mapped in official crosswalk row 25.",
+        "unit_ids": [
+          "M1"
+        ],
+        "evidence_ids": [
+          "xwalk:row25"
+        ],
+        "verdict": "supported",
+        "justification": "Row 25 shows this mapping."
+      },
+      {
+        "claim": "Mapping claim: GV.SC-03 -> no CSF 1.1 reference. Conceptually new in 2.0 in official crosswalk row 26.",
+        "unit_ids": [
+          "M2"
+        ],
+        "evidence_ids": [
+          "xwalk:row26"
+        ],
+        "verdict": "supported",
+        "justification": "Row 26 shows no reference and the new_in_2_0 note."
+      }
+    ],
+    "non_factual_units": [],
+    "answer_relevance": {
+      "score": 5,
+      "justification": "The answer directly explains how GV.SC-03 maps to CSF 1.1, including both the mapped subcategory and the conceptually new status."
+    },
+    "factual_correctness": {
+      "score": 5,
+      "justification": "All statements align with the gold facts about rows 25 and 26 and the definitions of the subcategories."
+    },
+    "completeness": {
+      "score": 5,
+      "justification": "The answer covers the official mapping, the conflicting new entry, and provides the relevant definitions, matching all expected facts."
+    },
+    "citation_support": {
+      "score": 5,
+      "justification": "Each cited evidence directly supports the claim it is attached to."
+    },
+    "citation_assessments": [
+      {
+        "citation_id": "chunk:csf1.1:subcategory:ID.SC-2",
+        "verdict": "supports",
+        "justification": "Provides the exact definition of ID.SC-2 used in claim S4."
+      },
+      {
+        "citation_id": "chunk:csf2.0:subcategory:GV.SC-03",
+        "verdict": "supports",
+        "justification": "Provides the exact definition of GV.SC-03 used in claim S4."
+      },
+      {
+        "citation_id": "xwalk:row25",
+        "verdict": "supports",
+        "justification": "Shows the mapping of GV.SC-03 to ID.SC-2 and is used for multiple mapping claims."
+      },
+      {
+        "citation_id": "xwalk:row26",
+        "verdict": "supports",
+        "justification": "Shows GV.SC-03 as conceptually new with no CSF 1.1 reference, supporting related claims."
+      }
+    ]
+  },
+  "derived_scores": {
+    "faithfulness": {
+      "status": "evaluated",
+      "factual_units": 8,
+      "supported_units": 8,
+      "unsupported_units": 0,
+      "unclear_units": 0,
+      "non_factual_units": 0,
+      "unit_verdicts": {
+        "S1": "supported",
+        "S2": "supported",
+        "S3": "supported",
+        "S4": "supported",
+        "K1": "supported",
+        "K2": "supported",
+        "M1": "supported",
+        "M2": "supported"
+      },
+      "claims": 8,
+      "supported": 8,
+      "unsupported": 0,
+      "unclear": 0,
+      "rate": 1.0,
+      "score_1_5": 5
+    },
+    "answer_relevance": 5,
+    "factual_correctness": 5,
+    "completeness": 5,
+    "citation_support": 5,
+    "citation_verdicts": {
+      "supports": 4
+    },
+    "citation_support_rate": 1.0
+  }
+}

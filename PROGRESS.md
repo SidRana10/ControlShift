@@ -474,8 +474,15 @@ OpenAI-compatible chat-completions API (`https://api.groq.com/openai/v1`, Bearer
 `generate(system, prompt)` interface, with the same controlled errors (timeout, HTTP status plus a short error code token, empty/truncated output)
 and no key, URL or message text in error messages. A Groq judge uses `JUDGE_API_KEY` (or `GROQ_API_KEY`) and never receives the Gemini key.
 Configured locally: generator `gemini-3.8-flash`, judge `groq` / `openai/gpt-oss-120b` (different providers: correlation reduced, not removed).
-Verified offline only (mocked HTTP): request shape, parsing, error mapping, settings, and end-to-end use inside the unchanged judging logic. NOT yet
-verified against the live Groq API: that `openai/gpt-oss-120b` honours JSON-object mode, produces the expected schema, and fits the token limits.
+Verified offline only (mocked HTTP): request shape, parsing, error mapping, settings, and end-to-end use inside the unchanged judging logic.
+
+Live Groq smoke test (2026-10-22, `eval/groq_judge_smoke.json`): ONE real request to `openai/gpt-oss-120b`, reusing the saved Gemini answer for F01
+(GV.SC-03) with its evidence bundle re-assembled offline; 0 Gemini requests, no retries or repair. Result: HTTP 200 (`finish_reason=stop`), latency
+5.5 s, 4,260 prompt + 2,251 completion tokens (1,229 reasoning). JSON-object mode returned a valid JSON object that passed the `JudgeOutput`
+schema and the id/coverage validation; all 8 answer units (S1-S4, K1-K2, M1-M2) were accounted for with valid evidence references; the judge
+scored faithfulness 5/5 (8/8 units supported) and judged all 4 citations as supporting. This is a PROVIDER SMOKE TEST only: one question, one
+request, no human review. It is not an accuracy benchmark and does not show the judge is correct or well calibrated (all scores were 5, so
+discrimination is untested). Still unverified: behaviour across the six-question set, token/rate limits at scale, and agreement with humans.
 
 Exact commands for a small live run later (a real, billable run; nothing below has been executed):
 ```bash
