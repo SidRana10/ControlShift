@@ -30,6 +30,7 @@ dev = ["pytest>=8.0", "ruff>=0.5"]
 controlshift-ingest = "controlshift.ingest.cli:main"
 controlshift-db = "controlshift.store.cli:main"
 controlshift-retrieve = "controlshift.retrieval.cli:main"
+controlshift-evidence = "controlshift.evidence.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

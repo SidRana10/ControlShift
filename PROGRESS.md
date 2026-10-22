@@ -190,9 +190,65 @@ Known limitations:
   tested, so `auto` keeps FAISS there.
 
 ## Phase 4 — Grounded comparison
-- [ ] Query routing (single-version vs cross-version)
-- [ ] Combine SQLite mappings with retrieved evidence
-- [ ] LLM answer generation with citations; citation verification; refusal when unsupported
+### Phase 4A — Query planning, evidence assembly, structural citation checks  ✅ (no LLM)
+Code: `src/controlshift/evidence/` (`planner`, `assemble`, `bundle`, `citations`, `cli`).
+CLI: `controlshift-evidence "<question>" [--retrieval none|bm25|dense|hybrid|hybrid_rerank] [-k 5] [--compact]` prints the
+evidence bundle as JSON (default retrieval = hybrid; `none` = structured records only; no API keys, no network).
+
+Planner (rule-based, deterministic; `plan_query`):
+- Extracts explicit versions (`CSF 1.1`, `version 2.0`, `v2.0`; "section 1.1"/"page 2.0" are ignored) and control IDs
+  (any case, normalised like the store: `pr.at-1` -> `PR.AT-01`; function/category/subcategory). ID-like strings with an
+  unknown function code (e.g. `ZZ.AB-01`) are reported, never guessed.
+- Types: `control_mapping` (control ID + mapping/comparison cue, or both versions named), `single_version` (incl. exact control
+  lookup), `cross_version_comparison` (comparison/mapping/"new" cue or both versions, no IDs), `unsupported` (empty question).
+- Uncertainty is carried into `unresolved_questions`: no version named (both searched separately), comparison with one named
+  version (baseline unstated), relative wording ("previous", "latest"), removal wording (the crosswalk has no "removed" status),
+  an ID present in both versions with no version named.
+
+Evidence assembly (`EvidenceAssembler`):
+- Exact control records come from SQLite, not similarity. In mapping questions a named version may be source or target, so
+  controls are looked up in all versions; single-version lookups honour the named version (no silent substitution: a control missing
+  from the named version is `missing_evidence`, with a note if it exists in the other version).
+- Official mappings only from stored crosswalk rows: forward (2.0->1.1) and reverse (1.1->2.0), counterpart controls attached as
+  records. Conceptually-new elements -> `unmapped_controls` with the official reason; a 1.1 control no row points to -> reported as
+  "no crosswalk row" (explicitly not "removed"); an element with both a mapped and a new row (GV.SC-03) -> `conflicts`
+  (`mapped_and_new_in_2_0`), both rows kept, neither preferred.
+- Passages: retrieval runs per version (k=5; k=3 for mapping questions) so comparisons always carry both versions; for comparisons
+  the top retrieved controls also pull their official crosswalk rows; "new"-type questions add all 20 official `new_in_2_0` rows.
+- Bundle fields: question, query_type, plan, referenced/searched versions, control_ids, control_records, crosswalk_records,
+  passages, citations (registry), conflicts, unmapped_controls, missing_evidence, unresolved_questions, retrieval info.
+  Citation IDs: `chunk:<chunk_id>` and `xwalk:row<excel_row>`.
+
+Citation validation (`validate_citations`, `validate_bundle`) is STRUCTURAL only: the cited chunk/crosswalk row exists; stated
+version, source file, page, section, control and mapping endpoints equal the database; (optionally) the citation belongs to the bundle;
+bundle text equals stored chunk text. Whether an answer's claims are supported by the cited text (semantic faithfulness) is not
+checked and is reported as out of scope in every validation result.
+
+Real runs (hybrid_rerank over the real corpus; all citations valid):
+- "How does GV.SC-03 map to CSF 1.1?" -> control_mapping; records GV.SC-03 (2.0 p.22) and ID.SC-2 (1.1 p.35); rows 25 (mapped to
+  ID.SC-2) and 26 (new_in_2_0); one `mapped_and_new_in_2_0` conflict; 9 citations, 0 invalid.
+- "What are the differences between CSF 1.1 and 2.0 for supply chain risk management?" -> cross_version_comparison; 5 passages per
+  version, 14 control records, official rows for the retrieved controls; 32 citations, 0 invalid.
+- "How should sensitive information be protected at rest in CSF 1.1?" -> single_version, searched ['1.1'] only; PR.DS-1 first;
+  5 citations, 0 invalid.
+
+Tests: 217 passing (78 in the evidence suites, incl. routing regressions for the cases above; planner routing/extraction/uncertainty; single-version and version isolation; exact lookup; both-version
+IDs; one-to-many and many-to-one mappings; reverse lookups; new/unmapped; the GV.SC-03 conflict; 1.1 element with no row; unknown
+and unsupported questions; missing evidence; positive and negative citation validation incl. tampered bundles; CLI). Ruff clean.
+
+Known limitations:
+- Routing is rule-based. Incidental words ("new technologies", "changes in the threat landscape", "between") no longer trigger a
+  comparison: only strong cues (compare, differences, versus, ...), both versions named, or a change idiom ("what is new", "what
+  changed", "added in 2.0", "changed from") anchored to a named version or control ID do. An unanchored idiom ("What changed?") stays
+  single-version, searches both versions and records the ambiguity. Idioms outside the listed patterns are missed (-> single-version).
+- Only function/category/subcategory IDs are detected; function names in prose ("the Govern function") are not.
+- A version number typed without "CSF"/"version"/"v" is accepted unless preceded by section/page/figure/table/appendix.
+- Counterpart controls are fetched for explicitly named IDs and for the top 3 retrieved controls per version only.
+- Passage relevance is whatever the retriever returns (not yet benchmarked); structural validity does not imply faithful answers.
+- 1.1 vs 2.0 same-ID pairs (e.g. PR.AT-1 / PR.AT-01) are different statements; both are reported when the version is not named.
+
+### Phase 4B — remaining
+- [ ] LLM answer generation constrained to the bundle, with citations; semantic faithfulness checks; refusal when evidence is missing
 
 ## Phase 5 — Evaluation
 - [ ] Hand-labeled question set in `eval/`

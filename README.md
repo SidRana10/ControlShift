@@ -4,7 +4,7 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phases 1-3B complete (ingestion, SQLite store, BM25/dense/hybrid retrieval with reranking). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phases 1-4A complete (ingestion, SQLite store, hybrid retrieval with reranking, evidence bundles). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
@@ -50,6 +50,13 @@ controlshift-retrieve search "manage supplier risk" --mode hybrid_rerank --debug
 
 On macOS, dense search uses an exact NumPy product over the FAISS-stored vectors (faiss-cpu and torch ship
 conflicting OpenMP runtimes); see `src/controlshift/retrieval/dense.py` and `--dense-backend`.
+
+## Evidence bundles (no LLM)
+
+```bash
+controlshift-evidence "How does GV.SC-03 map to CSF 1.1?"            # JSON: records, official mappings, passages, citations
+controlshift-evidence "What changed for supply chain risk management?" --retrieval bm25
+```
 
 ## Layout
 
