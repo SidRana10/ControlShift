@@ -88,11 +88,42 @@ Notes:
   is Phase 3.
 
 ## Phase 3 — Retrieval
-- [ ] Dense index (SentenceTransformers + FAISS) with version filtering
-- [ ] BM25 index
-- [ ] Reciprocal Rank Fusion
-- [ ] Cross-encoder reranker
-- [ ] Unit tests with fake embedders
+### Phase 3A — BM25 + dense retrieval  ✅ (independent retrievers; no fusion/reranking yet)
+Code: `src/controlshift/retrieval/` (`corpus`, `tokenize`, `bm25`, `dense`, `persist`, `hits`, `cli`).
+CLI: `controlshift-retrieve build-index [--mode bm25|dense|all] [--force]` and
+`controlshift-retrieve search "<q>" --mode bm25|dense [--version 1.1|2.0] [-k N] [--json]`.
+
+- [x] Corpus read from SQLite only; control chunks are indexed with ID, level, function and category
+      titles (e.g. "GV.SC-03 subcategory (Govern / Cybersecurity Supply Chain Risk Management): ...");
+      narrative chunks are prefixed with their section path. Displayed text stays the original chunk text.
+- [x] BM25 (`rank-bm25` BM25Okapi); tokenizer keeps control IDs as single normalised tokens
+      (`PR.AT-1` == `pr.at-01` -> `pr.at-01`, plus category token `pr.at`), light plural folding, stop-words
+- [x] Dense: `sentence-transformers/all-MiniLM-L6-v2` (384-d, L2-normalised) in FAISS `IndexFlatIP`
+- [x] Version filter before ranking: BM25 builds statistics over only the allowed version; FAISS uses an
+      `IDSelectorBatch` inside the search
+- [x] Hits carry chunk_id, version, control_id, chunk_type, source_file, page, printed_page, section, text, score, rank
+- [x] Persistence in gitignored `data/indexes/` (`docs.jsonl`, `bm25/`, `dense/`); manifest written last
+- [x] Cache key = sha256(corpus content hash, preprocessing settings incl. stop-words/tokenizer version,
+      embedding model id, format version); `build-index` reuses fresh indexes, `search` refuses stale ones
+- [x] Tests: 70 passing in total (26 new, using a deterministic fake embedder - no model download in tests); ruff clean
+
+Actual results:
+- Indexed 384 documents (1.1: 207, 2.0: 177) in both indexes.
+- Model downloaded on first dense build: `sentence-transformers/all-MiniLM-L6-v2` (87 MB in the HF cache); dense build took ~28 s on CPU.
+- Index size on disk: 1,220,451 bytes total (docs.jsonl 428 KB, bm25 192 KB, dense 584 KB).
+- Spot checks on real data (top-5 listed in the 3A report): exact ID `GV.SC-03` is rank 1 for BM25 but only
+  rank 3 for dense; `PR.AT-1` with `--version 1.1` is rank 1 for BM25; "data at rest" question with
+  `--version 1.1` finds `PR.DS-1` at rank 1 for both. No benchmark/recall numbers yet (Phase 5).
+
+Limitations / notes:
+- Dense is weak on bare identifiers (hence hybrid retrieval in 3B); BM25 is weak on paraphrase
+  (a supplier-risk question ranks GV.RM-05 / ID.SC-5 first, dense ranks GV.SC-07 first).
+- all-MiniLM-L6-v2 truncates input at 256 word-pieces: 45 of 384 indexed texts (max 446 tokens) are cut,
+  so the tail of long narrative chunks is not embedded. BM25 sees the full text.
+- Without `--version`, `PR.AT-1` also matches 2.0's `PR.AT-01` (same normalised ID, by design); use the filter to separate them.
+- No stemming beyond plural folding; no query expansion; BM25 drops zero-score hits, dense always returns k.
+- Query-time dense search loads the model each CLI call (~seconds); the HF Hub prints an unauthenticated-request warning.
+- `PROGRESS` items still open for Phase 3: RRF fusion, cross-encoder reranker (3B).
 
 ## Phase 4 — Grounded comparison
 - [ ] Query routing (single-version vs cross-version)

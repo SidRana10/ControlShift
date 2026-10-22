@@ -4,7 +4,7 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phases 1-2 complete (ingestion, SQLite store). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
+**Status:** Phases 1-3A complete (ingestion, SQLite store, BM25 + dense retrieval). Retrieval and answering are not built yet. See [PROGRESS.md](PROGRESS.md).
 
 ## Setup
 
@@ -37,6 +37,14 @@ controlshift-db inspect
 controlshift-db map GV.OC-01 --version 2.0     # forward (2.0 -> 1.1) official rows
 controlshift-db map ID.BE-2 --version 1.1      # reverse lookup over the same rows
 controlshift-db unmapped [--direction no-later|flagged-new] [--level subcategory]
+```
+
+## Retrieval
+
+```bash
+controlshift-retrieve build-index                  # downloads all-MiniLM-L6-v2 on first run
+controlshift-retrieve search "GV.SC-03" --mode bm25
+controlshift-retrieve search "protect data at rest" --mode dense --version 1.1
 ```
 
 ## Layout
