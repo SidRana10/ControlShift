@@ -53,3 +53,4 @@ src = ["src", "tests"]
 # long prose lists in the generated report are written as adjacent string literals on purpose
 "src/controlshift/evaluation/report.py" = ["ISC004"]
 "eval/*.py" = ["ISC004"]
+"src/controlshift/evaluation/answer_report.py" = ["ISC004"]

@@ -1,0 +1,1820 @@
+{
+  "evidence_stage": {
+    "aggregate": {
+      "failed_questions": [],
+      "n_questions": 20,
+      "per_category": {
+        "abstention": {
+          "all_passed": 3,
+          "questions": 3
+        },
+        "comparison": {
+          "all_passed": 3,
+          "questions": 3
+        },
+        "conceptually_new": {
+          "all_passed": 2,
+          "questions": 2
+        },
+        "conflict": {
+          "all_passed": 2,
+          "questions": 2
+        },
+        "exact_control": {
+          "all_passed": 3,
+          "questions": 3
+        },
+        "invalid_input": {
+          "all_passed": 1,
+          "questions": 1
+        },
+        "missing_mapping": {
+          "all_passed": 1,
+          "questions": 1
+        },
+        "official_mapping": {
+          "all_passed": 3,
+          "questions": 3
+        },
+        "one_to_many": {
+          "all_passed": 2,
+          "questions": 2
+        }
+      },
+      "per_check": {
+        "bundle_citations_structurally_valid": {
+          "applicable": 20,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 20
+        },
+        "conflict_surfaced": {
+          "applicable": 2,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 2
+        },
+        "defence_in_depth_if_reached": {
+          "applicable": 1,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 1
+        },
+        "expected_controls_present": {
+          "applicable": 14,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 14
+        },
+        "expected_rows_present": {
+          "applicable": 12,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 12
+        },
+        "expected_uncertainty_surfaced": {
+          "applicable": 1,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 1
+        },
+        "missing_evidence_reported": {
+          "applicable": 1,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 1
+        },
+        "query_type": {
+          "applicable": 20,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 20
+        },
+        "rejected_as_invalid_request": {
+          "applicable": 1,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 1
+        },
+        "unmapped_flagged": {
+          "applicable": 3,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 3
+        },
+        "version_isolation": {
+          "applicable": 20,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "passed": 20
+        }
+      },
+      "questions_all_checks_passed": 20
+    },
+    "per_question": {
+      "A01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "GV.SC-03@2.0"
+          ],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 4,
+          "query_type": "single_version",
+          "searched_versions": [
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "exact_control",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "A02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "PR.AT-1@1.1"
+          ],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 4,
+          "query_type": "single_version",
+          "searched_versions": [
+            "1.1"
+          ],
+          "unmapped": []
+        },
+        "category": "exact_control",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "A03": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "DE.CM-1@1.1",
+            "DE.CM-01@2.0"
+          ],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 8,
+          "query_type": "single_version",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "exact_control",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "B01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [
+            "GV.SC-03"
+          ],
+          "controls": [
+            "ID.SC@1.1",
+            "GV.SC@2.0",
+            "ID.SC-1@1.1",
+            "GV.RM-05@2.0",
+            "GV.SC-01@2.0",
+            "GV.SC-06@2.0",
+            "GV.SC-09@2.0",
+            "GV.SC-10@2.0",
+            "GV.SC-03@2.0",
+            "ID.SC-2@1.1"
+          ],
+          "crosswalk_rows": [
+            19,
+            22,
+            23,
+            25,
+            26,
+            29,
+            33,
+            34
+          ],
+          "missing_evidence": [],
+          "n_passages": 10,
+          "query_type": "cross_version_comparison",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "comparison",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "B02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "GV.RM-02@2.0",
+            "ID.RM-2@1.1",
+            "ID.RM-3@1.1",
+            "GV.RM@2.0",
+            "ID.RM@1.1"
+          ],
+          "crosswalk_rows": [
+            13,
+            15,
+            16
+          ],
+          "missing_evidence": [],
+          "n_passages": 10,
+          "query_type": "cross_version_comparison",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "comparison",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "B03": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [],
+          "crosswalk_rows": [
+            21,
+            26,
+            36,
+            45,
+            46,
+            47,
+            48,
+            57,
+            83,
+            104,
+            127,
+            137,
+            139,
+            181,
+            185,
+            186,
+            199,
+            200,
+            201,
+            202
+          ],
+          "missing_evidence": [],
+          "n_passages": 10,
+          "query_type": "cross_version_comparison",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "comparison",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "C01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "GV.OC-01@2.0",
+            "ID.BE-2@1.1",
+            "ID.BE-3@1.1"
+          ],
+          "crosswalk_rows": [
+            4,
+            5
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "official_mapping",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "C02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "ID.BE-2@1.1",
+            "GV.OC-01@2.0"
+          ],
+          "crosswalk_rows": [
+            4
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "official_mapping",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "C03": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "PR.DS-1@1.1",
+            "PR.DS-01@2.0",
+            "PR.DS-5@1.1",
+            "PR.DS-6@1.1",
+            "PR.PT-2@1.1"
+          ],
+          "crosswalk_rows": [
+            119,
+            120,
+            121,
+            122
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "official_mapping",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "D01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "GV.RR-02@2.0",
+            "ID.AM-6@1.1",
+            "ID.GV-2@1.1",
+            "DE.DP-1@1.1"
+          ],
+          "crosswalk_rows": [
+            37,
+            38,
+            39
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "one_to_many",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "D02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "ID.SC-1@1.1",
+            "GV.RM-05@2.0",
+            "GV.SC-01@2.0",
+            "GV.SC-06@2.0",
+            "GV.SC-09@2.0",
+            "GV.SC-10@2.0"
+          ],
+          "crosswalk_rows": [
+            19,
+            23,
+            29,
+            33,
+            34
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "one_to_many",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "E01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "GV.OV-01@2.0"
+          ],
+          "crosswalk_rows": [
+            46
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": [
+            "GV.OV-01"
+          ]
+        },
+        "category": "conceptually_new",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "E02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "RC.RP-04@2.0"
+          ],
+          "crosswalk_rows": [
+            200
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": [
+            "RC.RP-04"
+          ]
+        },
+        "category": "conceptually_new",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "F01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [
+            "GV.SC-03"
+          ],
+          "controls": [
+            "GV.SC-03@2.0",
+            "ID.SC-2@1.1"
+          ],
+          "crosswalk_rows": [
+            25,
+            26
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "conflict",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "F02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [
+            "GV.SC-03"
+          ],
+          "controls": [
+            "GV.SC-03@2.0",
+            "ID.SC-2@1.1"
+          ],
+          "crosswalk_rows": [
+            25,
+            26
+          ],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "conflict",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "G01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "RC.CO-2@1.1"
+          ],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 5,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": [
+            "RC.CO-2"
+          ]
+        },
+        "category": "missing_mapping",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "H01": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [],
+          "crosswalk_rows": [],
+          "missing_evidence": [
+            "control_not_found"
+          ],
+          "n_passages": 6,
+          "query_type": "control_mapping",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "abstention",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "pass"
+          }
+        ]
+      },
+      "H02": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 10,
+          "query_type": "single_version",
+          "searched_versions": [
+            "1.1",
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "abstention",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "H03": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [
+            "GV.SC-03@2.0"
+          ],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 4,
+          "query_type": "single_version",
+          "searched_versions": [
+            "2.0"
+          ],
+          "unmapped": []
+        },
+        "category": "abstention",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "missing_evidence_reported",
+            "status": "n/a"
+          }
+        ]
+      },
+      "H04": {
+        "all_passed": true,
+        "bundle_summary": {
+          "conflicts": [],
+          "controls": [],
+          "crosswalk_rows": [],
+          "missing_evidence": [],
+          "n_passages": 0,
+          "query_type": "unsupported",
+          "searched_versions": [],
+          "unmapped": []
+        },
+        "category": "invalid_input",
+        "checks": [
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "query_type",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_controls_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_rows_present",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "conflict_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "unmapped_flagged",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "expected_uncertainty_surfaced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "version_isolation",
+            "status": "pass"
+          },
+          {
+            "detail": "{}",
+            "level": "evidence_pipeline",
+            "name": "bundle_citations_structurally_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "rejected_as_invalid_request",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "evidence_pipeline",
+            "name": "defence_in_depth_if_reached",
+            "status": "pass"
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "by_category": {
+      "abstention": 3,
+      "comparison": 3,
+      "conceptually_new": 2,
+      "conflict": 2,
+      "exact_control": 3,
+      "invalid_input": 1,
+      "missing_mapping": 1,
+      "official_mapping": 3,
+      "one_to_many": 2
+    },
+    "gold_sha256": "664bdd74c0dccc3a46ccbe1256e8d6fa68ab3147a7a68a4b92a33eb451c8b835",
+    "human_reviewed_labels": false,
+    "mode": "offline",
+    "n_questions": 20,
+    "retrieval": "bm25"
+  },
+  "semantic_faithfulness": "requires_human_review (not evaluated)",
+  "validator_self_test": {
+    "corruptions": {
+      "answer_instead_of_abstaining": {
+        "applicable": 3,
+        "detected": 3,
+        "missed": []
+      },
+      "dropped_conflict_row": {
+        "applicable": 2,
+        "detected": 2,
+        "missed": []
+      },
+      "fabricated_citation": {
+        "applicable": 16,
+        "detected": 16,
+        "missed": []
+      },
+      "invalid_structure": {
+        "applicable": 19,
+        "detected": 19,
+        "missed": []
+      },
+      "invented_mapping": {
+        "applicable": 16,
+        "detected": 16,
+        "missed": []
+      },
+      "invented_reference_for_new_control": {
+        "applicable": 2,
+        "detected": 2,
+        "missed": []
+      },
+      "mapping_for_unmapped_control": {
+        "applicable": 1,
+        "detected": 1,
+        "missed": []
+      },
+      "miscited_mapping": {
+        "applicable": 8,
+        "detected": 8,
+        "missed": []
+      },
+      "missing_expected_control": {
+        "applicable": 13,
+        "detected": 13,
+        "missed": []
+      },
+      "missing_expected_row": {
+        "applicable": 6,
+        "detected": 6,
+        "missed": []
+      },
+      "out_of_bundle_citation": {
+        "applicable": 16,
+        "detected": 16,
+        "missed": []
+      },
+      "uncited_claim": {
+        "applicable": 16,
+        "detected": 16,
+        "missed": []
+      },
+      "unsupported_removal_claim": {
+        "applicable": 16,
+        "detected": 16,
+        "missed": []
+      },
+      "unwarranted_abstention": {
+        "applicable": 16,
+        "detected": 16,
+        "missed": []
+      },
+      "wrong_framework_version": {
+        "applicable": 2,
+        "detected": 2,
+        "missed": []
+      }
+    },
+    "fixture_failures": {},
+    "fixtures_accepted": 19,
+    "fixtures_built": 19,
+    "scope": "synthetic fixtures built from the gold file; measures the checker, not any model"
+  }
+}

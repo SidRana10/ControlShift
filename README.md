@@ -83,7 +83,16 @@ python eval/build_questions.py     # validates the curated labels against SQLite
 python eval/benchmark.py           # runs the 4 retrieval modes with the real models; writes eval/results.json + eval/report.md
 ```
 
-See `eval/report.md` for measured results and limitations. The relevance labels are AI-curated and source-checked, **not
+```bash
+python eval/build_answer_questions.py   # gold file for grounded-answer evaluation, verified against SQLite
+python eval/answer_eval.py              # OFFLINE: evidence-stage checks + validator self-test; no LLM calls
+```
+
+`eval/answer_report.md` and `eval/answer_review_worksheet.md` separate structural checks, deterministic factual checks and
+semantic faithfulness; the last is **pending human review** (nothing is scored yet). A live-Gemini mode exists but is disabled by
+default (`--live` plus `RUN_LIVE_LLM_EVAL=1`) and has not been run.
+
+See `eval/report.md` for retrieval results and limitations. The relevance labels are AI-curated and source-checked, **not
 human-reviewed**; review them in `eval/questions_audit.md`.
 
 ## Layout

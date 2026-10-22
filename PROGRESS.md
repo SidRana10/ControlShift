@@ -352,7 +352,53 @@ Model: `gemini-3.6-flash` (from `GEMINI_MODEL`; credentials live only in the git
 - Limitations: one question, one successful response; Gemini JSON compliance across question types, latency under load and answer
   faithfulness are untested; transient 503s are surfaced to the caller as 502.
 
-### Phase 5B — remaining
+### Phase 5B, step 2 — Grounded-answer evaluation framework (offline; NO model calls)
+Code: `src/controlshift/evaluation/answers.py`, `answer_report.py`; scripts `eval/build_answer_questions.py`, `eval/answer_eval.py`;
+artifacts `eval/answer_questions.jsonl` (gold), `eval/answer_results.json`, `eval/answer_report.md`, `eval/answer_review_worksheet.md`,
+`eval/answer_review.json` (reviewer input; all pending). Re-run: `python eval/build_answer_questions.py && python eval/answer_eval.py`.
+
+- Gold: 20 questions - exact_control 3, comparison 3, official_mapping 3, one_to_many 2, conceptually_new 2, conflict 2 (GV.SC-03),
+  missing_mapping 1 (RC.CO-2, the only 1.1 subcategory no crosswalk row references), abstention 3 (unknown control GV.XX-99; quantum-safe
+  cryptography; penalties for not implementing GV.SC-03), invalid_input 1 (blank question: the API returns HTTP 422 and never reaches
+  retrieval or generation - this is NOT an evidence-based abstention). The two topic-absent abstentions are justified by several concept
+  terms having zero occurrences (quantum/post-quantum/cryptograph/encrypt/crypto; penalt/sanction/punish/consequence/noncompliance),
+  not by one missing keyword, plus a written justification and recorded review of the nearest related passages (e.g. 1.1 'compliance'
+  and 'voluntary'), whose counts are re-verified against the corpus. For the penalty question an explicit "the documents define no
+  penalty" reply would also be reasonable; the automatic check is deliberately strict (only an explicit abstention passes). Each records expected controls+versions, official crosswalk rows (read from SQLite by control ID), quoted facts,
+  conflict/new/unmapped constraints, allowed versions and abstention conditions. Verified against the DB at build time and in tests
+  (quotes are substrings of stored chunks, rows involve the stated pairs, "absent" terms occur nowhere in the corpus). Labels are
+  AI-curated and **not human-reviewed**; no generated answer was used as ground truth.
+- Three assurance levels, kept apart: structural (ids exist / in bundle), deterministic factual (mappings equal official rows, versions,
+  conflicts preserved, new controls get no reference, no invented/forbidden mappings, removal wording supported, abstention right,
+  expected rows/controls covered, claims cited), and semantic faithfulness (always `requires_human_review`, never decided by code).
+- Offline results (all deterministic, reproducible byte-for-byte):
+  * Evidence stage - REGRESSION VALIDATION of the deterministic pipeline, not live-model accuracy (BM25 retrieval, no models): 20 of 20
+    questions passed every applicable check (including the blank question being rejected by the API request models). The pipeline handed over the expected
+    controls and official rows, flagged the GV.SC-03 conflict and unmapped/new controls, reported the unknown control, abstained
+    deterministically on the blank question, and kept versions isolated. Caveat: the gold author also built the pipeline, so this is
+    a regression check, not proof of robustness; retrieval-dependent comparison questions (B01-B03) passed with BM25 and were not
+    tried with other modes.
+  * Validator self-test: 19 of 19 gold-derived reference answers accepted (the invalid-input question has none); 15 injected defect types (fabricated/out-of-bundle citation,
+    invented or mis-cited mapping, wrong version, unsupported removal claim, dropped conflict row, reference for a new control, mapping
+    for an unmapped control, missing row/control, answering instead of abstaining, unwarranted abstention, uncited claim, invalid
+    structure) were each detected in every applicable fixture (see `eval/answer_report.md` for counts). This measures the checker on
+    synthetic inputs, not any model.
+- Human review: `eval/answer_review.json` has 20 entries, all `pending`; groundedness/completeness are unscored. The worksheet shows,
+  per question, expected facts, the evidence the pipeline assembled, check results and PENDING review fields. Reviewer input survives
+  regeneration; invalid review values are rejected.
+- Live mode exists but is disabled: `RUN_LIVE_LLM_EVAL=1 python eval/answer_eval.py --live --live-limit 3` (needs Gemini credentials,
+  one attempt per question, writes `answer_results_live.json` with the generated answers and deterministic check results for review).
+  It was not run. Results carry `is_live_model`, true only for the real provider, so fake-provider runs in tests are never reported as
+  model accuracy.
+- Tests: 374 passed + 1 skipped (58 new: gold integrity and corruption, valid/invalid citations, invented/mis-cited mappings, versions,
+  conflicts, new/unmapped controls, abstention, missing evidence, invalid structures, review tracking, aggregates, reproducibility,
+  live mode disabled by default); ruff clean.
+
+Remaining for Phase 5B: run the live mode on a few questions once Gemini capacity allows (and re-check FastAPI `/ask` live); have a human
+review the gold labels and the generated answers; extend to hybrid/rerank evidence and to unseen questions; calibrate the removal-wording
+heuristic against real outputs.
+
+### Phase 5B — open items
 - [ ] Re-run the live `/ask` check once Gemini capacity recovers
 
 - [ ] Answer-faithfulness / abstention evaluation of generation (needs a configured LLM provider)
