@@ -465,9 +465,17 @@ Code: `src/controlshift/evaluation/judge.py` (rubric, schema, judging, aggregati
   provider) and `judge_kind`; a mocked run is never reported as generator or judge results.
 - Report structure keeps four result types apart: offline fixtures, real generator (deterministic checks, latency), LLM judge, human-reviewed.
   Sections without data say **Not run** and show no numbers. Retrieval effectiveness is pulled unchanged from `eval/results.json`.
-- Tests: 425 passed + 1 skipped (51 new, all with mocked judge/generator responses): rubric and prompt (injection escaping), schema and bounds,
+- Tests: 439 passed + 1 skipped (65 new, all with mocked judge/generator responses): rubric and prompt (injection escaping), schema and bounds,
   scoring math, id rules, invalid output, no-retry behaviour, independence notes and settings, aggregation with missing judgments, calibration and
   agreement statistics, orchestration (mock labelling, budgets, stop-on-error, missing judge), report/worksheet structure, CLI refusals.
+
+Judge provider support: `JUDGE_PROVIDER` may be `gemini` or `groq`. The Groq adapter (`GroqProvider` in `generation/provider.py`) speaks Groq's
+OpenAI-compatible chat-completions API (`https://api.groq.com/openai/v1`, Bearer auth, JSON-object response mode, temperature 0) behind the same
+`generate(system, prompt)` interface, with the same controlled errors (timeout, HTTP status plus a short error code token, empty/truncated output)
+and no key, URL or message text in error messages. A Groq judge uses `JUDGE_API_KEY` (or `GROQ_API_KEY`) and never receives the Gemini key.
+Configured locally: generator `gemini-3.8-flash`, judge `groq` / `openai/gpt-oss-120b` (different providers: correlation reduced, not removed).
+Verified offline only (mocked HTTP): request shape, parsing, error mapping, settings, and end-to-end use inside the unchanged judging logic. NOT yet
+verified against the live Groq API: that `openai/gpt-oss-120b` honours JSON-object mode, produces the expected schema, and fits the token limits.
 
 Exact commands for a small live run later (a real, billable run; nothing below has been executed):
 ```bash

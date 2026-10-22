@@ -25,7 +25,7 @@ from .judge import (
 )
 
 SUBSET_SIX = ["A01", "B01", "C01", "F01", "E01", "H02"]  # one per required question type
-LIVE_PROVIDERS = {"gemini"}
+LIVE_PROVIDERS = {"gemini", "groq"}
 
 
 class BudgetExhausted(ProviderFailure):

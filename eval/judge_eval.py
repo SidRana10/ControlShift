@@ -94,7 +94,7 @@ def main() -> int:
             return 2
         jset = JudgeSettings.from_env()
         if args.judge_same_as_generator:
-            jset = dataclasses.replace(jset, model=gen.model, api_key=settings.gemini_api_key)
+            jset = dataclasses.replace(jset, provider="gemini", model=gen.model, api_key=settings.gemini_api_key)
         judge = judge_provider(jset)
         if judge is None:
             print("refusing: judge not configured. Set JUDGE_MODEL (and JUDGE_PROVIDER/JUDGE_API_KEY if needed), "

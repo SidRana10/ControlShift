@@ -18,7 +18,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
-from ..generation.provider import GeminiProvider, LLMProvider, ProviderError
+from ..generation.provider import GeminiProvider, GroqProvider, LLMProvider, ProviderError
 from .answers import ReviewError
 
 RUBRIC_VERSION = "1"
@@ -254,7 +254,10 @@ class JudgeSettings:
     def from_env(cls, env: dict | None = None) -> JudgeSettings:
         e = dict(os.environ if env is None else env)
         provider = e.get("JUDGE_PROVIDER", "gemini").lower()
-        key = e.get("JUDGE_API_KEY") or (e.get("GEMINI_API_KEY") if provider == "gemini" else None)
+        # JUDGE_API_KEY always wins. The generator's Gemini key is reused only for a Gemini judge; a Groq
+        # judge needs its own key (JUDGE_API_KEY or GROQ_API_KEY) and never receives the Gemini key.
+        key = e.get("JUDGE_API_KEY") or (e.get("GEMINI_API_KEY") if provider == "gemini" else None) or (
+            e.get("GROQ_API_KEY") if provider == "groq" else None)
         return cls(provider=provider, model=e.get("JUDGE_MODEL") or None, api_key=key or None,
                    timeout_seconds=float(e.get("JUDGE_TIMEOUT_SECONDS", 60)),
                    max_attempts=int(e.get("JUDGE_MAX_ATTEMPTS", 1)))
@@ -262,9 +265,13 @@ class JudgeSettings:
 
 def judge_provider(s: JudgeSettings) -> LLMProvider | None:
     """The configured judge, or None. There is deliberately no fallback to the generator's model."""
-    if s.provider != "gemini" or not s.model or not s.api_key:
+    if not s.model or not s.api_key:
         return None
-    return GeminiProvider(s.api_key, s.model, s.timeout_seconds)
+    if s.provider == "gemini":
+        return GeminiProvider(s.api_key, s.model, s.timeout_seconds)
+    if s.provider == "groq":
+        return GroqProvider(s.api_key, s.model, s.timeout_seconds)
+    return None
 
 
 def independence_note(generator: dict, judge: dict) -> str:

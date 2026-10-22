@@ -1,6 +1,7 @@
 """LLM provider interface and the Gemini REST implementation (httpx; no vendor SDK)."""
 from __future__ import annotations
 
+import re
 from typing import Protocol
 
 import httpx
@@ -8,6 +9,7 @@ import httpx
 from .config import Settings
 
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 
 class ProviderError(Exception):
@@ -93,6 +95,58 @@ def _error_status(resp: httpx.Response) -> str:
     except (ValueError, KeyError, TypeError):
         return ""
     return f" {status}" if isinstance(status, str) and status.isupper() and len(status) <= 40 else ""
+
+
+class GroqProvider:
+    """Groq's OpenAI-compatible chat-completions API (used as the independent LLM judge)."""
+
+    name = "groq"
+
+    def __init__(self, api_key: str, model: str, timeout: float = 60.0,
+                 base_url: str = GROQ_BASE_URL, client: httpx.Client | None = None):
+        if not api_key or not model:
+            raise ProviderNotConfigured("a Groq API key and model must both be set")
+        self._key, self.model, self.timeout, self.base_url = api_key, model, timeout, base_url
+        self._client = client  # injectable for tests (httpx.MockTransport)
+
+    def generate(self, system: str, prompt: str) -> str:
+        body = {"model": self.model, "temperature": 0,
+                "response_format": {"type": "json_object"},
+                "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]}
+        url = f"{self.base_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {self._key}"}
+        try:
+            if self._client is not None:
+                resp = self._client.post(url, json=body, headers=headers, timeout=self.timeout)
+            else:
+                with httpx.Client(timeout=self.timeout) as client:
+                    resp = client.post(url, json=body, headers=headers)
+        except httpx.TimeoutException as exc:
+            raise ProviderTimeout(f"Groq request timed out after {self.timeout:g}s") from exc
+        except httpx.HTTPError as exc:  # type name only: no URL, headers or body
+            raise ProviderFailure(f"Groq request failed ({type(exc).__name__})") from exc
+        if resp.status_code != 200:
+            raise ProviderFailure(f"Groq returned HTTP {resp.status_code}{_groq_error_token(resp)}")
+        try:
+            choice = resp.json()["choices"][0]
+            text = choice["message"]["content"]
+        except (ValueError, KeyError, IndexError, TypeError) as exc:
+            raise ProviderFailure("Groq response was unusable: no choices or message content") from exc
+        if not isinstance(text, str) or not text.strip():
+            raise ProviderFailure("Groq returned empty text")
+        if choice.get("finish_reason") == "length":
+            raise ProviderFailure("Groq output was cut off (finish_reason=length); the JSON would be incomplete")
+        return text
+
+
+def _groq_error_token(resp: httpx.Response) -> str:
+    """' (rate_limit_exceeded)'-style short token from the error body; the message text is never copied."""
+    try:
+        err = resp.json()["error"]
+        token = err.get("code") or err.get("type")
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return ""
+    return f" ({token})" if isinstance(token, str) and re.fullmatch(r"[a-z0-9_]{1,40}", token) else ""
 
 
 def provider_from_settings(s: Settings) -> LLMProvider | None:

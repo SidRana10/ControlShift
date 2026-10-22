@@ -672,3 +672,120 @@ def test_no_secrets_or_live_artifacts_in_the_repo_state():
     cal = json.loads((EVAL / "judge_calibration.json").read_text())
     assert all(v["status"] == "pending" and v["reviewer"] is None and all(x is None for x in v["human_scores"].values())
                for v in cal.values())
+
+
+# ======================================================================================================================
+# Groq judge adapter (OpenAI-compatible chat completions) - all HTTP is mocked; no real request is ever sent
+# ======================================================================================================================
+import httpx
+
+from controlshift.generation.provider import GroqProvider, ProviderNotConfigured
+
+SECRET = "gsk_SECRET_TEST_KEY_123"
+
+
+def groq(handler, model="openai/gpt-oss-120b", timeout=5):
+    return GroqProvider(SECRET, model, timeout, client=httpx.Client(transport=httpx.MockTransport(handler)))
+
+
+def chat_ok(text, finish="stop"):
+    return {"choices": [{"message": {"role": "assistant", "content": text}, "finish_reason": finish}]}
+
+
+def test_groq_request_shape_and_response_parsing():
+    seen = {}
+
+    def handler(request):
+        seen.update(url=str(request.url), auth=request.headers.get("authorization"), body=json.loads(request.content))
+        return httpx.Response(200, json=chat_ok('{"ok": true}'))
+
+    assert groq(handler).generate("SYS", "PROMPT") == '{"ok": true}'
+    assert seen["url"] == "https://api.groq.com/openai/v1/chat/completions"
+    assert seen["auth"] == f"Bearer {SECRET}" and SECRET not in seen["url"]
+    b = seen["body"]
+    assert b["model"] == "openai/gpt-oss-120b" and b["temperature"] == 0
+    assert b["response_format"] == {"type": "json_object"}
+    assert b["messages"] == [{"role": "system", "content": "SYS"}, {"role": "user", "content": "PROMPT"}]
+
+
+@pytest.mark.parametrize("handler,fragment", [
+    (lambda r: httpx.Response(429, json={"error": {"message": f"slow down {SECRET}", "type": "tokens", "code": "rate_limit_exceeded"}}),
+     "HTTP 429 (rate_limit_exceeded)"),
+    (lambda r: httpx.Response(401, json={"error": {"message": "bad key", "type": "invalid_request_error", "code": "invalid_api_key"}}),
+     "HTTP 401 (invalid_api_key)"),
+    (lambda r: httpx.Response(500, text=f"boom {SECRET}"), "HTTP 500"),
+    (lambda r: httpx.Response(200, json={"choices": []}), "unusable"),
+    (lambda r: httpx.Response(200, text="<html>"), "unusable"),
+    (lambda r: httpx.Response(200, json=chat_ok("   ")), "empty"),
+    (lambda r: httpx.Response(200, json={"choices": [{"message": {"content": None}}]}), "empty"),
+    (lambda r: httpx.Response(200, json=chat_ok('{"cut": ', finish="length")), "cut off"),
+])
+def test_groq_failures_are_controlled_and_leak_nothing(handler, fragment):
+    with pytest.raises(ProviderFailure, match=r"Groq.*" + re.escape(fragment)) as info:
+        groq(handler).generate("s", "p")
+    assert SECRET not in str(info.value) and "slow down" not in str(info.value)
+
+
+def test_groq_timeout_and_connection_errors():
+    def slow(request):
+        raise httpx.ReadTimeout("slow", request=request)
+
+    def down(request):
+        raise httpx.ConnectError(f"refused {SECRET}", request=request)
+
+    with pytest.raises(ProviderTimeout, match="timed out"):
+        groq(slow).generate("s", "p")
+    with pytest.raises(ProviderFailure, match="ConnectError") as info:
+        groq(down).generate("s", "p")
+    assert SECRET not in str(info.value)
+
+
+def test_groq_requires_key_and_model_and_makes_no_request_on_construction(monkeypatch):
+    monkeypatch.setattr(httpx.Client, "send", lambda *a, **k: (_ for _ in ()).throw(AssertionError("network call")))
+    with pytest.raises(ProviderNotConfigured):
+        GroqProvider("", "openai/gpt-oss-120b")
+    with pytest.raises(ProviderNotConfigured):
+        GroqProvider(SECRET, "")
+    assert GroqProvider(SECRET, "openai/gpt-oss-120b").name == "groq"      # constructing never sends anything
+
+
+def test_judge_settings_select_groq_with_its_own_key_only():
+    env = {"JUDGE_PROVIDER": "groq", "JUDGE_MODEL": "openai/gpt-oss-120b", "JUDGE_API_KEY": "gsk-judge",
+           "GEMINI_API_KEY": "gem-key", "GEMINI_MODEL": "gemini-3.8-flash"}
+    s = jg.JudgeSettings.from_env(env)
+    p = jg.judge_provider(s)
+    assert isinstance(p, GroqProvider) and (p.name, p.model) == ("groq", "openai/gpt-oss-120b")
+    assert s.api_key == "gsk-judge" and "gsk-judge" not in repr(s)
+    # the Gemini key is never handed to Groq, and an unconfigured Groq judge does not fall back to Gemini
+    no_key = jg.JudgeSettings.from_env({k: v for k, v in env.items() if k != "JUDGE_API_KEY"})
+    assert no_key.api_key is None and jg.judge_provider(no_key) is None
+    assert jg.JudgeSettings.from_env({**{k: v for k, v in env.items() if k != "JUDGE_API_KEY"},
+                                      "GROQ_API_KEY": "gsk-env"}).api_key == "gsk-env"
+    assert jg.judge_provider(jg.JudgeSettings.from_env({**env, "JUDGE_MODEL": ""})) is None   # no model fallback either
+    assert jg.judge_provider(jg.JudgeSettings.from_env({**env, "JUDGE_PROVIDER": "unknown"})) is None
+
+
+def test_gemini_generator_with_groq_judge_is_labelled_as_different_providers():
+    note = jg.independence_note({"name": "gemini", "model": "gemini-3.8-flash"}, {"name": "groq", "model": "openai/gpt-oss-120b"})
+    assert "different providers" in note and "reduces but does not remove" in note and "not ground truth" in note
+    assert "SAME" not in note
+
+
+def test_groq_judge_works_end_to_end_through_the_unchanged_judging_logic():
+    """The adapter plugs into judge_answer exactly like any provider: same units, schema and validation rules."""
+    payload = judge_json(["xwalk:row25"], ["xwalk:row25"])
+
+    def handler(request):
+        user = json.loads(request.content)["messages"][1]["content"]
+        assert "Unit ids: ['S1']" in user and "Supplied evidence ids" in user          # same prompt as before
+        return httpx.Response(200, json=chat_ok(json.dumps(payload)))
+
+    j = jg.judge_answer(groq(handler), "q?", {"expected_facts": []}, ANSWER, EVID)
+    assert j.status == "judged" and j.judge["name"] == "groq" and j.derived["faithfulness"]["score_1_5"] == 5
+    omitted = dict(payload, claims=[], non_factual_units=[])                           # still rejects incomplete output
+    j2 = jg.judge_answer(groq(lambda r: httpx.Response(200, json=chat_ok(json.dumps(omitted)))), "q?",
+                         {"expected_facts": []}, ANSWER, EVID)
+    assert j2.status == "invalid_output" and "units not accounted for" in j2.errors[0]
+    j3 = jg.judge_answer(groq(lambda r: httpx.Response(429, json={"error": {"code": "rate_limit_exceeded"}})), "q?",
+                         {"expected_facts": []}, ANSWER, EVID, max_attempts=3)
+    assert j3.status == "provider_error" and "rate_limit_exceeded" in j3.reason and j3.attempts == 1   # never retried
