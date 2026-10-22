@@ -1,0 +1,17 @@
+{
+  "automatic_retries": false,
+  "max_generation_requests": 6,
+  "max_judge_requests": 6,
+  "max_total_requests": 12,
+  "mode": "dry_run_no_api_calls",
+  "questions": [
+    "A01",
+    "B01",
+    "C01",
+    "F01",
+    "E01",
+    "H02"
+  ],
+  "requests_made_by_this_invocation": 0,
+  "subset": "six"
+}

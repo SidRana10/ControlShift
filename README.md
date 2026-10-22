@@ -93,6 +93,14 @@ python eval/answer_eval.py              # OFFLINE: evidence-stage checks + valid
 semantic faithfulness; the last is **pending human review** (nothing is scored yet). A live-Gemini mode exists but is disabled by
 default (`--live` plus `RUN_LIVE_LLM_EVAL=1`) and has not been run.
 
+```bash
+python eval/judge_eval.py          # DRY RUN, 0 API calls: plan, calibration worksheet, report (generator/judge sections say "Not run")
+```
+
+An LLM-as-a-judge framework (faithfulness at claim level, relevance, factual correctness, completeness, citation support) is built and
+tested offline with mocked judges only; **no real judge run has been made**. A judge's scores are opinions, not ground truth, and a judge from
+the same model family as the generator is not an independent evaluation. Live commands are in `PROGRESS.md`.
+
 See `eval/report.md` for retrieval results and limitations. The relevance labels are AI-curated and source-checked, **not
 human-reviewed**; review them in `eval/questions_audit.md`.
 

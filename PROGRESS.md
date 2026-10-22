@@ -431,6 +431,61 @@ through the real FastAPI `/ask` endpoint (TestClient, real services, hybrid retr
 - Resolution: a later request with `gemini-3.8-flash` succeeded (see above). The 503 was a service-side condition on the earlier model; our code
   handled it as designed and no code change was needed.
 
+### Phase 5B, step 3 — LLM-as-a-judge framework (built and tested OFFLINE; ZERO real API calls made)
+Code: `src/controlshift/evaluation/judge.py` (rubric, schema, judging, aggregation, calibration), `judge_run.py` (orchestration),
+`judge_report.py` (report + calibration worksheet); script `eval/judge_eval.py`. Artifacts from the default dry run: `eval/judge_plan.json`,
+`eval/judge_report.md`, `eval/judge_review_worksheet.md`, `eval/judge_calibration.json` (19 entries, all pending).
+
+- Dimensions judged separately, rubric v1 (documented in `judge_report.md`): **faithfulness** (claim-level: claim, evidence ids, supported /
+  unsupported / unclear, justification; the 1-5 value is derived as 1 + 4 x supported-rate, not scored by the judge), **answer relevance**,
+  **factual correctness** (against the source-verified gold facts), **completeness**, **citation support** (1-5 plus per-citation verdicts).
+  Judge output is schema-validated; a judge cannot cite evidence ids it was not given; invalid output is recorded as missing and not repaired
+  (default 1 attempt); provider errors are never retried.
+  Methodology audit (claim coverage): the application splits each answer into numbered UNITS (sentences, key changes, mapping claims) and the
+  judge must account for every unit - cover it by claims or declare it non-factual (allowed only for plain hedges; units that name controls,
+  quote text, or are key changes/mappings cannot be dismissed). A judgment that omits a unit is invalid and counts as a missing judgment, so an
+  unsupported claim cannot disappear by being left out. Faithfulness is computed per unit (a unit is supported only if every claim covering it
+  is), so adding extra supported claims cannot inflate it. An answer with no factual units, or with no citations for the citation dimension, is
+  **not applicable** (None, excluded from means), never an automatic 5. Faithfulness uses ONLY the retrieved evidence; gold facts are used only for
+  factual correctness and completeness (stated in the prompt and rubric; claims may cite only supplied evidence ids).
+- The judge is NOT ground truth and does not replace the deterministic validators, which remain authoritative for official mappings,
+  mapping completeness, versions, conflicts, structural citations, unmapped controls and abstention. Abstentions are not sent to the judge.
+- Independence: the judge is configured separately (`JUDGE_PROVIDER`, `JUDGE_MODEL`, `JUDGE_API_KEY`, ...) with NO fallback to the generator's
+  model (`--judge-same-as-generator` must be passed explicitly). Every result records the pairing and an independence note: same model =
+  self-evaluation; different models of the same provider = independence NOT established; different providers = reduced but not removed
+  correlation. Using Gemini to judge Gemini is not an independent evaluation.
+- Human calibration: `eval/judge_calibration.json` holds, per question, five 1-5 human scores, reviewer, notes and judge/human disagreement
+  notes (all pending). `judge_human_agreement` reports exact agreement, within-one, mean absolute difference, signed bias and a list of 2+ point
+  disagreements, only for questions both judged by a real judge run and human-reviewed; with none reviewed the report says no agreement figure exists.
+- Subsets: `--subset six` = A01 (exact control), B01 (cross-version comparison), C01 (official mapping), F01 (GV.SC-03 conflict), E01
+  (conceptually new), H02 (unsupported question requiring abstention); `--subset all` = the 19 valid gold questions (H04, a blank input rejected
+  with HTTP 422, is excluded).
+- Safety: hard separate request budgets for generator and judge, no automatic retries, stop at the first provider error, live mode needs `--live`
+  plus `RUN_LIVE_LLM_EVAL=1`, and refuses unless generator and judge are configured. Results record `kind` (`real_generator` only for a live
+  provider) and `judge_kind`; a mocked run is never reported as generator or judge results.
+- Report structure keeps four result types apart: offline fixtures, real generator (deterministic checks, latency), LLM judge, human-reviewed.
+  Sections without data say **Not run** and show no numbers. Retrieval effectiveness is pulled unchanged from `eval/results.json`.
+- Tests: 425 passed + 1 skipped (51 new, all with mocked judge/generator responses): rubric and prompt (injection escaping), schema and bounds,
+  scoring math, id rules, invalid output, no-retry behaviour, independence notes and settings, aggregation with missing judgments, calibration and
+  agreement statistics, orchestration (mock labelling, budgets, stop-on-error, missing judge), report/worksheet structure, CLI refusals.
+
+Exact commands for a small live run later (a real, billable run; nothing below has been executed):
+```bash
+# 1. set JUDGE_MODEL in .env (ideally a model from a different provider/family than the generator; see the independence note)
+RUN_LIVE_LLM_EVAL=1 python eval/judge_eval.py --live --subset six \
+    --max-generation-requests 6 --max-judge-requests 6          # at most 12 requests; writes eval/judge_results_live.json
+python eval/judge_eval.py                                        # re-renders report + worksheet from the saved live results (0 API calls)
+# all 19 valid questions: --subset all --max-generation-requests 19 --max-judge-requests 19
+# same model as judge (self-evaluation, labelled as such): add --judge-same-as-generator
+```
+After a live run, a human fills `eval/judge_calibration.json` (guided by `eval/judge_review_worksheet.md`) and re-runs the dry-run command to see agreement.
+
+Remaining evaluation limitations: no real judge or human-calibrated result exists yet; unit splitting is rule-based (sentence regex), so exotic
+phrasing may merge or split claims oddly; the non-factual check is a heuristic (IDs, quotes, "CSF", citation markers); whether a unit is truly
+supported is still the judge's opinion; judge and generator share a vendor unless a different provider is configured; gold facts and retrieval
+labels are AI-curated and not human-reviewed; samples of 6 or 19 questions cannot support accuracy claims.
+Remaining work: run the live subset; human review of gold labels, answers and judge scores; decide on a judge from a different provider; larger samples.
+
 ### Phase 5B — open items
 - [ ] Re-run the live `/ask` check once Gemini capacity recovers
 

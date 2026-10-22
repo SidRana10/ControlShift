@@ -1,0 +1,249 @@
+{
+  "A01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "A02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "A03": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "B01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "B02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "B03": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "C01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "C02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "C03": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "D01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "D02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "E01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "E02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "F01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "F02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "G01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "H01": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "H02": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "H03": {
+    "disagreement_notes": "",
+    "human_scores": {
+      "answer_relevance": null,
+      "citation_support": null,
+      "completeness": null,
+      "factual_correctness": null,
+      "faithfulness": null
+    },
+    "notes": "",
+    "reviewer": null,
+    "status": "pending"
+  }
+}
