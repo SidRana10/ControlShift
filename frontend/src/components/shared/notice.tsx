@@ -1,4 +1,4 @@
-import { AlertCircle, CircleDashed, Info, Split } from "lucide-react";
+import { AlertCircle, CircleDashed, Info, Split, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const VARIANTS = {
@@ -10,6 +10,8 @@ const VARIANTS = {
     tone: "text-fg-2",
   },
   ambiguous: { icon: Split, box: "bg-ambiguous-soft", edge: "bg-ambiguous", tone: "text-ambiguous" },
+  /** Output was withheld or limited; not a request failure, so not the error colour. */
+  caution: { icon: TriangleAlert, box: "bg-ambiguous-soft", edge: "bg-ambiguous", tone: "text-ambiguous" },
   error: { icon: AlertCircle, box: "bg-error-soft", edge: "bg-error", tone: "text-error" },
 } as const;
 

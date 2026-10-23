@@ -36,7 +36,9 @@ read-only endpoints to FastAPI (`CONTROLSHIFT_API_URL`, default `http://127.0.0.
 | `/api/backend/catalog/elements` | `GET /catalog/elements` |
 | `/api/backend/catalog/elements/{version}/{element_id}` | `GET /catalog/elements/{version}/{element_id}` |
 
-`/ask` and `/compare` are not proxied. No CORS is needed. The variable is read when the Next.js
+`POST /api/backend/ask` is a route handler (`src/app/api/backend/ask/route.ts`), not a rewrite: it accepts only
+`question` (1-2000 characters) and optional `version`, forwards them to `POST /ask`, applies a 100s upstream timeout and answers
+failures in the API's error envelope. `/compare` is not proxied. No CORS is needed. The variable is read when the Next.js
 server starts (`next build` for `next start`), so rebuild after changing it.
 
 ## Layout
@@ -46,8 +48,10 @@ server starts (`next build` for `next start`), so rebuild after changing it.
 - `src/components/layout/` application shell, sidebar navigation
 - `src/components/shared/` reusable pieces (VersionChip, SourceTag/DerivedTag, Notice, StateBlock, BrandMark)
 - `src/features/explorer/` Control Explorer: provider (URL state), navigator (tree, search, filters), version toggle, record pane (identity, provenance, crosswalk, children, references)
+- `src/features/ask/` Ask ControlShift: workspace, question form, answer view, evidence inspector, `useAsk` (one in-flight request, stale-response guard)
 - `src/features/health/` sidebar API status
 - `src/lib/explorer/` pure logic (URL parsing, hierarchy, search helpers), request cache, `useLoader`; `src/test/` test setup and fixtures
+- `src/lib/ask/` `/ask` types, runtime response parser, citation helpers, error copy; `src/test/fixtures/ask/` recorded responses
 - `src/lib/api/` typed client, response types (backend snake_case), `useApi` hook
 
 ## Known dependency advisory

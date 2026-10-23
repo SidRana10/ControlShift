@@ -647,8 +647,17 @@ Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customi
 - **Verification:** 61 frontend tests (Vitest + Testing Library, recorded real Catalog API data), ESLint, `next typegen` + `tsc` and production build pass; browser-verified against the live Catalog API at 1920/1440/1024/390px; no LLM calls. `npm audit --omit=dev`: 0 (development-only `braces` advisory unchanged).
 - **Known limitations:** facts-rail anchors do not track scroll position; search is substring only (`GV.SC-3` does not match `GV.SC-03` in CSF 2.0); no side-by-side comparison.
 
+### Phase 6B.4 - Ask ControlShift research workspace  ✅
+- **Backend integration:** `POST /ask` through a same-origin route handler (`/api/backend/ask`) that forwards only `question` and optional `version`, with a 100s upstream timeout and the API's error envelope; provider credentials never reach the frontend. Backend unchanged. Response parsed by a runtime parser built from the real `/ask` payload (the backend types `answer`/`evidence` as untyped dicts); malformed responses become errors, never results.
+- **Workspace:** question input (Enter to ask), version scope (described as a request that prefixes "In CSF x:", not a hard filter; searched versions are shown), Cancel/Clear, examples that only fill the box, no history or memory; one in-flight request, duplicate-submit and stale-response protection, slow-response note, actionable error copy per backend error code with retry.
+- **Outcomes:** `answered` (AI-generated text with per-key-point and per-mapping citations, API disclaimer, structural-only verification stated), `abstained` (backend reason), `evidence_only` (nothing generated), `rejected` (model text withheld, check failures in a disclosure).
+- **Citations and Evidence Inspector:** interactive citation chips link to evidence entries (focus, selection, back-to-citation); evidence grouped into official control records, workbook rows and retrieved passages with version, source file, page, section and chunk provenance; "Cited in answer" filter; Control Explorer links only where version and control ID are present; no invented source URLs or claim-to-citation mappings.
+- **Content labels:** official text (`NIST`, serif), ControlShift-derived notes and ingest labels (`Derived`), model text (`AI-generated`, Sans).
+- **Responsive:** side-by-side answer and evidence at 1360px+, stacked below, 44px touch targets on narrow screens, no horizontal overflow at 1920/1360/1280/1024/768/390px.
+- **Verification:** 114 frontend tests (53 new, recorded real pipeline responses), ESLint, `tsc` and production build pass; browser-verified against the real NIST retrieval data (BM25) with a scripted fake LLM; no external LLM/provider calls. Real model output and hybrid/rerank retrieval were not exercised in the UI.
+
 ### Next
-- [ ] Compare Frameworks (needs a crosswalk-listing endpoint) and Ask ControlShift experiences.
+- [ ] Compare Frameworks (needs a crosswalk-listing endpoint).
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes

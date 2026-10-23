@@ -1,3 +1,5 @@
+import { parseAskResponse } from "@/lib/ask/parse";
+import type { AskRequestBody, AskResult } from "@/lib/ask/types";
 import type {
   ApiErrorEnvelope,
   ElementDetail,
@@ -13,6 +15,7 @@ export const API_PREFIX = "/api/backend";
 
 export type ApiErrorKind =
   | "unreachable" // network failure, or the proxy could not reach FastAPI
+  | "timeout" // the browser gave up waiting (POST /ask only)
   | "api" // FastAPI answered with its error envelope
   | "unexpected"; // anything else (non-JSON body, unknown shape)
 
@@ -62,15 +65,17 @@ const guards = {
     isObject(b.crosswalk.summary),
 };
 
-async function get<T>(
+async function send<T>(
   path: string,
+  init: RequestInit,
   guard: (body: unknown) => body is T,
   signal?: AbortSignal,
 ): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_PREFIX}${path}`, {
-      headers: { accept: "application/json" },
+      ...init,
+      headers: { accept: "application/json", ...init.headers },
       cache: "no-store",
       signal,
     });
@@ -102,6 +107,9 @@ async function get<T>(
   return body;
 }
 
+const get = <T>(path: string, guard: (body: unknown) => body is T, signal?: AbortSignal) =>
+  send(path, {}, guard, signal);
+
 export const getHealth = (signal?: AbortSignal) => get("/health", guards.health, signal);
 
 export const getVersions = (signal?: AbortSignal) =>
@@ -130,3 +138,46 @@ export const getElement = (version: FrameworkVersion, elementId: string, signal?
     guards.element,
     signal,
   );
+
+/** The backend allows 90s per request by default; the browser waits a little longer than that. */
+export const ASK_TIMEOUT_MS = 120_000;
+
+/**
+ * POST /ask through the same-origin proxy. `signal` cancels the request; independently, the call
+ * fails with an ApiError("timeout") after `timeoutMs`. HTTP 200 bodies are normalised by
+ * parseAskResponse; anything it rejects becomes an "unexpected" error.
+ */
+export async function askQuestion(
+  request: AskRequestBody,
+  signal?: AbortSignal,
+  timeoutMs: number = ASK_TIMEOUT_MS,
+): Promise<AskResult> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const onAbort = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  signal?.addEventListener("abort", onAbort, { once: true });
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
+  try {
+    const body = await send(
+      "/ask",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(request),
+      },
+      (b): b is object => parseAskResponse(b) !== null,
+      controller.signal,
+    );
+    return parseAskResponse(body)!;
+  } catch (err) {
+    if (timedOut) throw new ApiError("timeout", "The request took too long.");
+    throw err;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener("abort", onAbort);
+  }
+}

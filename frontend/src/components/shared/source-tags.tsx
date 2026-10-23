@@ -27,3 +27,20 @@ export function DerivedTag({ className }: { className?: string }) {
     </span>
   );
 }
+
+/**
+ * Marks model-written text (Ask ControlShift only). Solid neutral border on a sunken fill: unlike
+ * the black NIST tag (solid fill) and the Derived tag (dashed border), and carrying its own label.
+ */
+export function GeneratedTag({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-sm border border-fg-3 bg-surface-sunken px-1.5 text-label leading-4 font-medium text-fg-1",
+        className,
+      )}
+    >
+      AI-generated
+    </span>
+  );
+}

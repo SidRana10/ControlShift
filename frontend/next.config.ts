@@ -7,8 +7,9 @@ import type { NextConfig } from "next";
  * CONTROLSHIFT_API_URL is read by the Next.js server when `next dev` / `next build` starts
  * (rewrites are resolved at build time for `next start`). Default: http://127.0.0.1:8000.
  *
- * Only the read-only endpoints this stage needs are proxied. /ask and /compare are deliberately
- * absent. Rewrites cannot filter by HTTP method, but every proxied FastAPI route is GET-only.
+ * Only the read-only endpoints below are proxied by rewrite (every one is GET-only in FastAPI).
+ * POST /ask is served by the route handler in src/app/api/backend/ask/route.ts, which takes
+ * precedence over rewrites and forwards a fixed field set. /compare is deliberately absent.
  */
 const API_URL = (process.env.CONTROLSHIFT_API_URL ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
 
