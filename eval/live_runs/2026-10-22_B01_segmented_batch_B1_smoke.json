@@ -1,0 +1,499 @@
+{
+  "label": "SMOKE TEST of ONE segmented-judge batch (B1 of the saved B01 answer); not a complete judgment, not an accuracy benchmark",
+  "date": "2026-10-22",
+  "question_id": "B01",
+  "mode": "segmented",
+  "batches_planned": [
+    {
+      "batch_id": "B1",
+      "unit_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-07",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "chunk:csf2.0:text:65a38d02bf94",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-07"
+      ],
+      "estimated_tokens": 6401,
+      "over_budget": false
+    },
+    {
+      "batch_id": "B2",
+      "unit_ids": [
+        "S5",
+        "K1"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-07",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "chunk:csf2.0:text:65a38d02bf94",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:text:65a38d02bf94"
+      ],
+      "estimated_tokens": 5765,
+      "over_budget": false
+    },
+    {
+      "batch_id": "B3",
+      "unit_ids": [
+        "K2",
+        "K3",
+        "M1",
+        "M2"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row29",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "xwalk:row19",
+        "xwalk:row23"
+      ],
+      "estimated_tokens": 5650,
+      "over_budget": false
+    },
+    {
+      "batch_id": "B4",
+      "unit_ids": [
+        "M3",
+        "M4",
+        "M5",
+        "M6"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-07",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30"
+      ],
+      "estimated_tokens": 5424,
+      "over_budget": false
+    },
+    {
+      "batch_id": "B5",
+      "unit_ids": [
+        "M7",
+        "M8",
+        "M9"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row77"
+      ],
+      "estimated_tokens": 4963,
+      "over_budget": false
+    }
+  ],
+  "requests": {
+    "groq_judge": 1,
+    "qwen": 0,
+    "gemini": 0,
+    "mistral": 0,
+    "retries": 0
+  },
+  "http_status": 200,
+  "judge": {
+    "configured_model": "openai/gpt-oss-120b",
+    "resolved_model": "openai/gpt-oss-120b",
+    "response_format": "json_schema strict (judge_batch)"
+  },
+  "token_usage": {
+    "prompt_tokens": 3401,
+    "output_tokens": 1851,
+    "reasoning_tokens": 1113,
+    "total_tokens": 5252
+  },
+  "latency_s": 4.346,
+  "rate_limit_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "999",
+    "x-ratelimit-remaining-tokens": "4274",
+    "x-ratelimit-reset-requests": "1m26.4s",
+    "x-ratelimit-reset-tokens": "27.945s"
+  },
+  "overall_status": "incomplete",
+  "overall_reason": "stopped: request limit for this invocation reached",
+  "batches": [
+    {
+      "batch_id": "B1",
+      "unit_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-07",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "chunk:csf2.0:text:65a38d02bf94",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-07"
+      ],
+      "estimated_tokens": 6401,
+      "over_budget": false,
+      "status": "judged",
+      "errors": [],
+      "seconds": 4.345,
+      "tokens": {
+        "prompt_tokens": 3401,
+        "output_tokens": 1851,
+        "reasoning_tokens": 1113,
+        "total_tokens": 5252
+      },
+      "output": {
+        "claims": [
+          {
+            "claim": "In CSF 1.1, supply chain risk management is addressed under the Identify function with two subcategories: ID.SC-1 (processes identified and established) and ID.SC-2 (suppliers identified, prioritized, and assessed).",
+            "unit_ids": [
+              "S1"
+            ],
+            "evidence_ids": [
+              "chunk:csf1.1:subcategory:ID.SC-1",
+              "chunk:csf1.1:subcategory:ID.SC-2"
+            ],
+            "verdict": "supported",
+            "justification": "The evidence provides the exact definitions of ID.SC-1 and ID.SC-2, confirming their presence in CSF 1.1 under Identify."
+          },
+          {
+            "claim": "In CSF 2.0 the supply chain risk management focus is significantly expanded and restructured.",
+            "unit_ids": [
+              "S2"
+            ],
+            "evidence_ids": [
+              "chunk:csf2.0:subcategory:GV.SC-01",
+              "xwalk:row23"
+            ],
+            "verdict": "supported",
+            "justification": "Evidence shows a new Govern category GV.SC with multiple subcategories, indicating an expansion beyond the limited ID.SC subcategories of CSF 1.1."
+          },
+          {
+            "claim": "A new category, Cybersecurity Supply Chain Risk Management (GV.SC), is introduced under the Govern function, containing multiple subcategories (GV.SC-01 through GV.SC-10) that cover program establishment, integration with enterprise risk management, supplier prioritization, due diligence, lifecycle monitoring, and post\u2011contract activities.",
+            "unit_ids": [
+              "S3"
+            ],
+            "evidence_ids": [
+              "chunk:csf2.0:subcategory:GV.SC-01",
+              "chunk:csf2.0:subcategory:GV.SC-03",
+              "chunk:csf2.0:subcategory:GV.SC-04",
+              "chunk:csf2.0:subcategory:GV.SC-06",
+              "chunk:csf2.0:subcategory:GV.SC-07",
+              "chunk:csf2.0:subcategory:GV.SC-09",
+              "chunk:csf2.0:subcategory:GV.SC-10"
+            ],
+            "verdict": "supported",
+            "justification": "Each listed evidence item defines a GV.SC subcategory that together span program establishment, integration, prioritization, due diligence, monitoring, and post\u2011contract provisions, confirming the claim."
+          },
+          {
+            "claim": "CSF 2.0 also includes GV.RM-05 for communication lines regarding supplier risks and ID.RA-10 for assessing critical suppliers prior to acquisition.",
+            "unit_ids": [
+              "S4"
+            ],
+            "evidence_ids": [
+              "chunk:csf2.0:subcategory:GV.RM-05",
+              "chunk:csf2.0:subcategory:ID.RA-10"
+            ],
+            "verdict": "supported",
+            "justification": "The evidence provides the definitions of GV.RM-05 and ID.RA-10, matching the claim about their inclusion in CSF 2.0."
+          }
+        ],
+        "non_factual_units": [],
+        "citation_assessments": [
+          {
+            "citation_id": "chunk:csf2.0:subcategory:GV.SC-04",
+            "verdict": "supports",
+            "justification": "The evidence defines GV.SC-04 (Suppliers are known and prioritized by criticality), directly supporting the answer's statement that this subcategory is part of the new GV.SC category."
+          },
+          {
+            "citation_id": "chunk:csf2.0:subcategory:GV.SC-07",
+            "verdict": "supports",
+            "justification": "The evidence defines GV.SC-07 (risk understanding, recording, prioritizing, assessing, responding, and monitoring over the relationship), which underpins the answer's claim about lifecycle monitoring within the GV.SC category."
+          }
+        ]
+      }
+    },
+    {
+      "batch_id": "B2",
+      "unit_ids": [
+        "S5",
+        "K1"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-07",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "chunk:csf2.0:text:65a38d02bf94",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:text:65a38d02bf94"
+      ],
+      "estimated_tokens": 5765,
+      "over_budget": false,
+      "status": "not_attempted",
+      "errors": []
+    },
+    {
+      "batch_id": "B3",
+      "unit_ids": [
+        "K2",
+        "K3",
+        "M1",
+        "M2"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row29",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "chunk:csf2.0:subcategory:GV.SC-01",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:GV.RM-05",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "xwalk:row19",
+        "xwalk:row23"
+      ],
+      "estimated_tokens": 5650,
+      "over_budget": false,
+      "status": "not_attempted",
+      "errors": []
+    },
+    {
+      "batch_id": "B4",
+      "unit_ids": [
+        "M3",
+        "M4",
+        "M5",
+        "M6"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.SC-03",
+        "chunk:csf2.0:subcategory:GV.SC-04",
+        "chunk:csf2.0:subcategory:GV.SC-06",
+        "chunk:csf2.0:subcategory:GV.SC-07",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30"
+      ],
+      "estimated_tokens": 5424,
+      "over_budget": false,
+      "status": "not_attempted",
+      "errors": []
+    },
+    {
+      "batch_id": "B5",
+      "unit_ids": [
+        "M7",
+        "M8",
+        "M9"
+      ],
+      "evidence_ids": [
+        "chunk:csf1.1:subcategory:ID.SC-1",
+        "chunk:csf1.1:subcategory:ID.SC-2",
+        "chunk:csf2.0:subcategory:GV.SC-09",
+        "chunk:csf2.0:subcategory:GV.SC-10",
+        "chunk:csf2.0:subcategory:ID.RA-10",
+        "xwalk:row19",
+        "xwalk:row23",
+        "xwalk:row25",
+        "xwalk:row27",
+        "xwalk:row29",
+        "xwalk:row30",
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row6",
+        "xwalk:row77"
+      ],
+      "citation_ids": [
+        "xwalk:row33",
+        "xwalk:row34",
+        "xwalk:row77"
+      ],
+      "estimated_tokens": 4963,
+      "over_budget": false,
+      "status": "not_attempted",
+      "errors": []
+    }
+  ],
+  "limitations": [
+    "Segmented judging: each faithfulness batch saw only a relevance-selected subset of the supplied evidence, so a claim can be marked unsupported/unclear because its evidence was not in the subset (never because of evidence the generator lacked).",
+    "Batches are judged independently; the judge could not notice contradictions between claims in different batches.",
+    "Relevance, factual correctness, completeness and citation support come from ONE holistic call that did not re-read the evidence; citation support is scored from the batch citation verdicts.",
+    "Results from segmented and single-call judging are not directly comparable."
+  ]
+}

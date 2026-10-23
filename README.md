@@ -70,12 +70,11 @@ curl -s localhost:8000/compare -H 'content-type: application/json' \
   -d '{"question": "supplier risk", "control_ids": ["GV.OC-01"]}'
 ```
 
-**Live Gemini generation has had exactly one successful end-to-end smoke test** (FastAPI `/ask`, `gemini-3.8-flash`, the GV.SC-03
-mapping-conflict question; see `PROGRESS.md`). That is not an accuracy evaluation: all automated tests use a fake provider and mocked
-HTTP, and other question types are untested live. Without Gemini credentials the API still works and returns `status: "evidence_only"` with the full evidence bundle. Answers are
-validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows) but citation checks are
+**Live status.** A six-question exploratory live evaluation was run with Groq `qwen/qwen3.8-27b` as generator (Gemini returned repeated HTTP 503s and Mistral a 429; both remain
+selectable). That is a small exploratory sample, **not an accuracy evaluation**, and ControlShift is not production-deployed. Without LLM credentials the API still works and returns
+`status: "evidence_only"` with the full evidence bundle. Answers are validated (cited ids must exist in the supplied evidence, mappings must match official crosswalk rows), but citation checks are
 structural: they do not prove the answer is faithful to the cited text, and no model confidence is reported.
-The generator is chosen by `LLM_PROVIDER` (`gemini` is the default; `mistral` and `groq` — e.g. Qwen on Groq — are optional alternatives with no successful live generation yet). The judge is configured separately (`JUDGE_PROVIDER`/`JUDGE_MODEL`, currently Groq `openai/gpt-oss-120b`) and never falls back to the generator.
+The generator is chosen by `LLM_PROVIDER` (`gemini` is the default; `mistral` and `groq` — e.g. Qwen on Groq — are alternatives). The judge is configured separately (`JUDGE_PROVIDER`/`JUDGE_MODEL`, currently Groq `openai/gpt-oss-120b`) and never falls back to the generator.
 A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.
 
 ## Evaluation
@@ -98,9 +97,13 @@ default (`--live` plus `RUN_LIVE_LLM_EVAL=1`) and has not been run.
 python eval/judge_eval.py          # DRY RUN, 0 API calls: plan, calibration worksheet, report (generator/judge sections say "Not run")
 ```
 
-An LLM-as-a-judge framework (faithfulness at claim level, relevance, factual correctness, completeness, citation support) is built and
-tested offline with mocked judges only; **no real judge run has been made**. A judge's scores are opinions, not ground truth, and a judge from
-the same model family as the generator is not an independent evaluation. Live commands are in `PROGRESS.md`.
+An LLM-as-a-judge framework (faithfulness at claim level, relevance, factual correctness, completeness, citation support; plus an opt-in segmented mode for long answers) exists. In the six-question
+exploratory run GPT-OSS judged four answers (A01, C01, E01, F01); the original B01 is unjudged and H02 is an abstention. Judge scores are opinions, not ground truth; generator and judge share Groq
+infrastructure; and **the judge has not been validated against human reviewers** (no independent human review was completed). Live commands are in `PROGRESS.md`.
+
+**Evaluation status.** Retrieval benchmark: `eval/report.md` (39 AI-labelled questions; chunk ranking only). Six-question live-answer evaluation, complete with documented limitations:
+`eval/final_evaluation_report.md` (supporting: `eval/human_review_packet.md`, `eval/b01_before_after.md`, `eval/live_answer_review.md`; raw records in `eval/live_runs/` and `eval/failed_runs/`). Five of six original
+answers passed every applicable deterministic check; the original B01 did not (a retrieval omission and a factual error), and its two post-hoc repairs are documented separately.
 
 See `eval/report.md` for retrieval results and limitations. The relevance labels are AI-curated and source-checked, **not
 human-reviewed**; review them in `eval/questions_audit.md`.

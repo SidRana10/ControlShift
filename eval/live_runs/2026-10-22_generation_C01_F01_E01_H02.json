@@ -1,0 +1,919 @@
+{
+  "budgets": {
+    "automatic_retries": false,
+    "generation_requests_made": 4,
+    "judge_requests_made": 0,
+    "max_generation_requests": 4,
+    "max_judge_requests": 0
+  },
+  "deterministic_aggregate": {
+    "failed_questions": [],
+    "n_questions": 4,
+    "per_category": {
+      "abstention": {
+        "all_passed": 1,
+        "questions": 1
+      },
+      "conceptually_new": {
+        "all_passed": 1,
+        "questions": 1
+      },
+      "conflict": {
+        "all_passed": 1,
+        "questions": 1
+      },
+      "official_mapping": {
+        "all_passed": 1,
+        "questions": 1
+      }
+    },
+    "per_check": {
+      "abstention_correct": {
+        "applicable": 4,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 4
+      },
+      "citation_ids_valid": {
+        "applicable": 4,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 4
+      },
+      "citations_in_bundle": {
+        "applicable": 4,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 4
+      },
+      "conflict_preserved": {
+        "applicable": 1,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 1
+      },
+      "expected_controls_referenced": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      },
+      "expected_rows_covered": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      },
+      "mapping_cites_matching_row": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      },
+      "mapping_pairs_official": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      },
+      "new_control_no_reference": {
+        "applicable": 1,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 1
+      },
+      "no_forbidden_mappings": {
+        "applicable": 0,
+        "failed": 0,
+        "pass_rate": null,
+        "passed": 0
+      },
+      "no_uncited_claims": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      },
+      "no_unsupported_removal": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      },
+      "schema_valid": {
+        "applicable": 4,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 4
+      },
+      "versions_correct": {
+        "applicable": 3,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 3
+      }
+    },
+    "questions_all_checks_passed": 4
+  },
+  "generator": {
+    "model": "qwen/qwen3.8-27b",
+    "name": "groq",
+    "resolved_models": [
+      "qwen/qwen3.8-27b"
+    ]
+  },
+  "independence_note": "No judge configured; no judge scores exist.",
+  "judge": {
+    "model": null,
+    "name": null,
+    "resolved_models": []
+  },
+  "judge_aggregate": {
+    "citation_verdicts": {},
+    "claims": {
+      "supported": 0,
+      "supported_rate": null,
+      "total": 0,
+      "unclear": 0,
+      "unsupported": 0
+    },
+    "dimensions": {
+      "answer_relevance": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "citation_support": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "completeness": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "factual_correctness": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      },
+      "faithfulness": {
+        "distribution": {},
+        "mean": null,
+        "n": 0
+      }
+    },
+    "judged": 0,
+    "not_applicable": {
+      "answer_relevance": 0,
+      "citation_support": 0,
+      "completeness": 0,
+      "factual_correctness": 0,
+      "faithfulness": 0
+    },
+    "questions": 4,
+    "status_counts": {
+      "absent": 1,
+      "skipped": 3
+    },
+    "units": {
+      "factual_units": 0,
+      "supported": 0,
+      "supported_rate": null,
+      "unclear": 0,
+      "unsupported": 0
+    }
+  },
+  "judge_kind": "mocked_or_missing_judge",
+  "kind": "real_generator",
+  "latency": {
+    "end_to_end": {
+      "max_s": 76.863,
+      "mean_s": 59.045,
+      "median_s": 76.2765,
+      "n": 4
+    },
+    "generation": {
+      "max_s": 76.863,
+      "mean_s": 59.045,
+      "median_s": 76.2765,
+      "n": 4
+    },
+    "judge": {
+      "n": 0
+    }
+  },
+  "per_question": {
+    "C01": {
+      "category": "official_mapping",
+      "deterministic": {
+        "all_passed": true,
+        "checks": [
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "schema_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citation_ids_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citations_in_bundle",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "abstention_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_pairs_official",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_cites_matching_row",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "versions_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_rows_covered",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_controls_referenced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "conflict_preserved",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "new_control_no_reference",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_forbidden_mappings",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_unsupported_removal",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_uncited_claims",
+            "status": "pass"
+          }
+        ]
+      },
+      "evidence_supplied": {
+        "chunk:csf1.1:subcategory:ID.BE-2": "ID.BE-2: The organization’s place in critical infrastructure and its industry sector is identified and communicated",
+        "chunk:csf1.1:subcategory:ID.BE-3": "ID.BE-3: Priorities for organizational mission, objectives, and activities are established and communicated",
+        "chunk:csf1.1:text:409dec4508b8": "The remainder of this document contains the following sections and appendices:\n• Section 2 describes the Framework components: the Framework Core, the Tiers, and the Profiles.\n• Section 3 presents examples of how the Framework can be used.\n• Section 4 describes how to use the Framework for self-assessing and demonstrating cybersecurity through measurements.\n• Appendix A presents the Framework Core in a tabular format: the Functions, Categories, Subcategories, and Informative References.\n• Appendix B contains a glossary of selected terms.\n• Appendix C lists acronyms used in this document.\n6 International Organization for Standardization, Risk management – Principles and guidelines, ISO 31000:2009, 2009. http://www.iso.org/iso/home/standards/iso31000.htm\n7 International Organization for Standardization/International Electrotechnical Commission, Information technology – Security techniques – Information security risk management, ISO/IEC 27005:2011, 2011. https://www.iso.org/standard/56742.html\n8 Joint Task Force Transformation Initiative, Managing Information Security Risk: Organization, Mission, and Information System View, NIST Special Publication 800-39, March 2011. https://doi.org/10.6028/NIST.SP.800- 39\n9 U.S. Department of Energy, Electricity Subsector Cybersecurity Risk Management Process, DOE/OE-0003, May 2012. https://energy.gov/sites/prod/files/Cybersecurity Risk Management Process Guideline - Final - May 2012.pdf",
+        "chunk:csf1.1:text:4dd835ba7743": "Framework for Improving Critical Infrastructure Cybersecurity\nVersion 1.1\nNational Institute of Standards and Technology\nApril 16, 2018\nNote to Readers on the Update\nVersion 1.1 of this Cybersecurity Framework refines, clarifies, and enhances Version 1.0, which was issued in February 2014. It incorporates comments received on the two drafts of Version 1.1.\nVersion 1.1 is intended to be implemented by first-time and current Framework users. Current users should be able to implement Version 1.1 with minimal or no disruption; compatibility with Version 1.0 has been an explicit objective.\nThe following table summarizes the changes made between Version 1.0 and Version 1.1.\nTable NTR-1 - Summary of changes between Framework Version 1.0 and Version 1.1.\nUpdate Description of Update Clarified that terms like Added clarity that the Framework has utility as a structure and “compliance” can be language for organizing and expressing compliance with an confusing and mean organization’s own cybersecurity requirements. However, the something very different variety of ways in which the Framework can be used by an to various Framework organization means that phrases like “compliance with the stakeholders Framework” can be confusing.",
+        "chunk:csf1.1:text:9a8b2283038f": "To account for the unique cybersecurity needs of organizations, there are a wide variety of ways to use the Framework. The decision about how to apply it is left to the implementing organization. For example, one organization may choose to use the Framework Implementation Tiers to articulate envisioned risk management practices. Another organization may use the Framework’s five Functions to analyze its entire risk management portfolio; that analysis may or may not rely on more detailed companion guidance, such as controls catalogs. There sometimes is discussion about “compliance” with the Framework, and the Framework has utility as a structure and language for organizing and expressing compliance with an organization’s own cybersecurity requirements. Nevertheless, the variety of ways in which the Framework can be used by an organization means that phrases like “compliance with the Framework” can be confusing and mean something very different to various stakeholders.\nThe Framework complements, and does not replace, an organization’s risk management process and cybersecurity program. The organization can use its current processes and leverage the Framework to identify opportunities to strengthen and communicate its management of cybersecurity risk while aligning with industry practices. Alternatively, an organization without an existing cybersecurity program can use the Framework as a reference to establish one.",
+        "chunk:csf2.0:subcategory:GV.OC-01": "GV.OC-01: The organizational mission is understood and informs cybersecurity risk management",
+        "chunk:csf2.0:text:65a38d02bf94": "This appendix describes the Functions, Categories, and Subcategories of the CSF Core. Table 1 lists the CSF 2.0 Core Function and Category names and unique alphabetic identifiers. Each Function name in the table is linked to its portion of the appendix. The order of Functions, Categories, and Subcategories of the Core is not alphabetical; it is intended to resonate most with those charged with operationalizing risk management within an organization. The numbering of the Subcategories is intentionally not sequential; gaps in numbering indicate CSF 1.1 Subcategories that were relocated in CSF 2.0.\nTable 1. CSF 2.0 Core Function and Category names and identifiers\nFunction Category Category Identifier\nGovern (GV) Organizational Context GV.OC\nRisk Management Strategy GV.RM\nRoles, Responsibilities, and Authorities GV.RR\nPolicy GV.PO\nOversight GV.OV\nCybersecurity Supply Chain Risk Management GV.SC\nIdentify (ID) Asset Management ID.AM\nRisk Assessment ID.RA\nImprovement ID.IM\nProtect (PR) Identity Management, Authentication, and Access Control PR.AA\nAwareness and Training PR.AT\nData Security PR.DS\nPlatform Security PR.PS\nTechnology Infrastructure Resilience PR.IR\nDetect (DE) Continuous Monitoring DE.CM\nAdverse Event Analysis DE.AE\nRespond (RS) Incident Management RS.MA\nIncident Analysis RS.AN\nIncident Response Reporting and Communication RS.CO\nIncident Mitigation RS.MI\nRecover (RC) Incident Recovery Plan Execution RC.RP\nIncident Recovery Communication RC.CO",
+        "chunk:csf2.0:text:a199d63dc39b": "The CSF Core, Informative References, and Implementation Examples are available on the CSF 2.0 website and through the CSF 2.0 Reference Tool, which allows users to explore them and export them in human- and machine-readable formats. The CSF 2.0 Core is also available in a legacy format similar to that of CSF 1.1.",
+        "xwalk:row4": "Official crosswalk row 4: CSF 2.0 GV.OC-01 (The organizational mission is understood and informs cybersecurity risk management) -> CSF 1.1 ID.BE-2 (The organization’s place in critical infrastructure and its industry sector is identified and communicated); mapping_type=mapped; comments=",
+        "xwalk:row5": "Official crosswalk row 5: CSF 2.0 GV.OC-01 (The organizational mission is understood and informs cybersecurity risk management) -> CSF 1.1 ID.BE-3 (Priorities for organizational mission, objectives, and activities are established and communicated); mapping_type=mapped; comments="
+      },
+      "generation": {
+        "abstention_reason": null,
+        "answer": {
+          "abstained": false,
+          "abstention_reason": null,
+          "answer": "According to the official crosswalk, the CSF 2.0 subcategory GV.OC-01 maps to two CSF 1.1 subcategories: ID.BE-2 and ID.BE-3.",
+          "citations": [
+            "xwalk:row4",
+            "xwalk:row5",
+            "chunk:csf2.0:subcategory:GV.OC-01",
+            "chunk:csf1.1:subcategory:ID.BE-2",
+            "chunk:csf1.1:subcategory:ID.BE-3"
+          ],
+          "key_changes": [
+            {
+              "citations": [
+                "xwalk:row4"
+              ],
+              "statement": "GV.OC-01 (CSF 2.0) is mapped to ID.BE-2 (CSF 1.1)."
+            },
+            {
+              "citations": [
+                "xwalk:row5"
+              ],
+              "statement": "GV.OC-01 (CSF 2.0) is mapped to ID.BE-3 (CSF 1.1)."
+            }
+          ],
+          "mappings": [
+            {
+              "citations": [
+                "xwalk:row4"
+              ],
+              "focal_id": "GV.OC-01",
+              "note": "Official crosswalk mapping from CSF 2.0 to CSF 1.1.",
+              "reference_id": "ID.BE-2"
+            },
+            {
+              "citations": [
+                "xwalk:row5"
+              ],
+              "focal_id": "GV.OC-01",
+              "note": "Official crosswalk mapping from CSF 2.0 to CSF 1.1.",
+              "reference_id": "ID.BE-3"
+            }
+          ],
+          "uncertainties": [],
+          "unresolved_questions": []
+        },
+        "attempts": 1,
+        "rejection": [],
+        "status": "answered",
+        "system_uncertainties": [],
+        "warnings": []
+      },
+      "judgment": {
+        "attempts": 0,
+        "batches": [],
+        "derived": null,
+        "errors": [],
+        "judge": {
+          "model": null,
+          "name": null,
+          "rubric_version": "1"
+        },
+        "limitations": [],
+        "mode": "single_call",
+        "output": null,
+        "reason": "no judge configured",
+        "seconds": null,
+        "status": "skipped",
+        "units": []
+      },
+      "latency_s": {
+        "end_to_end": 6.764,
+        "generation": 6.764,
+        "judge": 0.0
+      },
+      "question": "How does GV.OC-01 map to CSF 1.1?",
+      "tokens": {
+        "generation": {
+          "output_tokens": 476,
+          "prompt_tokens": 2850,
+          "reasoning_tokens": 0,
+          "total_tokens": 3326
+        },
+        "judge": null
+      }
+    },
+    "E01": {
+      "category": "conceptually_new",
+      "deterministic": {
+        "all_passed": true,
+        "checks": [
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "schema_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citation_ids_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citations_in_bundle",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "abstention_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_pairs_official",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_cites_matching_row",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "versions_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_rows_covered",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_controls_referenced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "conflict_preserved",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "new_control_no_reference",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_forbidden_mappings",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_unsupported_removal",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_uncited_claims",
+            "status": "pass"
+          }
+        ]
+      },
+      "evidence_supplied": {
+        "chunk:csf1.1:text:409dec4508b8": "The remainder of this document contains the following sections and appendices:\n• Section 2 describes the Framework components: the Framework Core, the Tiers, and the Profiles.\n• Section 3 presents examples of how the Framework can be used.\n• Section 4 describes how to use the Framework for self-assessing and demonstrating cybersecurity through measurements.\n• Appendix A presents the Framework Core in a tabular format: the Functions, Categories, Subcategories, and Informative References.\n• Appendix B contains a glossary of selected terms.\n• Appendix C lists acronyms used in this document.\n6 International Organization for Standardization, Risk management – Principles and guidelines, ISO 31000:2009, 2009. http://www.iso.org/iso/home/standards/iso31000.htm\n7 International Organization for Standardization/International Electrotechnical Commission, Information technology – Security techniques – Information security risk management, ISO/IEC 27005:2011, 2011. https://www.iso.org/standard/56742.html\n8 Joint Task Force Transformation Initiative, Managing Information Security Risk: Organization, Mission, and Information System View, NIST Special Publication 800-39, March 2011. https://doi.org/10.6028/NIST.SP.800- 39\n9 U.S. Department of Energy, Electricity Subsector Cybersecurity Risk Management Process, DOE/OE-0003, May 2012. https://energy.gov/sites/prod/files/Cybersecurity Risk Management Process Guideline - Final - May 2012.pdf",
+        "chunk:csf1.1:text:4dd835ba7743": "Framework for Improving Critical Infrastructure Cybersecurity\nVersion 1.1\nNational Institute of Standards and Technology\nApril 16, 2018\nNote to Readers on the Update\nVersion 1.1 of this Cybersecurity Framework refines, clarifies, and enhances Version 1.0, which was issued in February 2014. It incorporates comments received on the two drafts of Version 1.1.\nVersion 1.1 is intended to be implemented by first-time and current Framework users. Current users should be able to implement Version 1.1 with minimal or no disruption; compatibility with Version 1.0 has been an explicit objective.\nThe following table summarizes the changes made between Version 1.0 and Version 1.1.\nTable NTR-1 - Summary of changes between Framework Version 1.0 and Version 1.1.\nUpdate Description of Update Clarified that terms like Added clarity that the Framework has utility as a structure and “compliance” can be language for organizing and expressing compliance with an confusing and mean organization’s own cybersecurity requirements. However, the something very different variety of ways in which the Framework can be used by an to various Framework organization means that phrases like “compliance with the stakeholders Framework” can be confusing.",
+        "chunk:csf1.1:text:9a8b2283038f": "To account for the unique cybersecurity needs of organizations, there are a wide variety of ways to use the Framework. The decision about how to apply it is left to the implementing organization. For example, one organization may choose to use the Framework Implementation Tiers to articulate envisioned risk management practices. Another organization may use the Framework’s five Functions to analyze its entire risk management portfolio; that analysis may or may not rely on more detailed companion guidance, such as controls catalogs. There sometimes is discussion about “compliance” with the Framework, and the Framework has utility as a structure and language for organizing and expressing compliance with an organization’s own cybersecurity requirements. Nevertheless, the variety of ways in which the Framework can be used by an organization means that phrases like “compliance with the Framework” can be confusing and mean something very different to various stakeholders.\nThe Framework complements, and does not replace, an organization’s risk management process and cybersecurity program. The organization can use its current processes and leverage the Framework to identify opportunities to strengthen and communicate its management of cybersecurity risk while aligning with industry practices. Alternatively, an organization without an existing cybersecurity program can use the Framework as a reference to establish one.",
+        "chunk:csf2.0:subcategory:GV.OV-01": "GV.OV-01: Cybersecurity risk management strategy outcomes are reviewed to inform and adjust strategy and direction",
+        "chunk:csf2.0:text:2400d2aa8dcf": "Appendix A is the CSF Core — a set of cybersecurity outcomes arranged by Function, then Category, and finally Subcategory, as depicted in Fig. 1. These outcomes are not a checklist of actions to perform; specific actions taken to achieve an outcome will vary by organization and use case, as will the individual responsible for those actions. Additionally, the order and size of Functions, Categories, and Subcategories in the Core does not imply the sequence or importance of achieving them. The structure of the Core is intended to resonate most with those charged with operationalizing risk management within an organization.\nFig. 1. CSF Core structure\nThe CSF Core Functions — GOVERN, IDENTIFY, PROTECT, DETECT, RESPOND, and RECOVER — organize cybersecurity outcomes at their highest level.",
+        "chunk:csf2.0:text:65a38d02bf94": "This appendix describes the Functions, Categories, and Subcategories of the CSF Core. Table 1 lists the CSF 2.0 Core Function and Category names and unique alphabetic identifiers. Each Function name in the table is linked to its portion of the appendix. The order of Functions, Categories, and Subcategories of the Core is not alphabetical; it is intended to resonate most with those charged with operationalizing risk management within an organization. The numbering of the Subcategories is intentionally not sequential; gaps in numbering indicate CSF 1.1 Subcategories that were relocated in CSF 2.0.\nTable 1. CSF 2.0 Core Function and Category names and identifiers\nFunction Category Category Identifier\nGovern (GV) Organizational Context GV.OC\nRisk Management Strategy GV.RM\nRoles, Responsibilities, and Authorities GV.RR\nPolicy GV.PO\nOversight GV.OV\nCybersecurity Supply Chain Risk Management GV.SC\nIdentify (ID) Asset Management ID.AM\nRisk Assessment ID.RA\nImprovement ID.IM\nProtect (PR) Identity Management, Authentication, and Access Control PR.AA\nAwareness and Training PR.AT\nData Security PR.DS\nPlatform Security PR.PS\nTechnology Infrastructure Resilience PR.IR\nDetect (DE) Continuous Monitoring DE.CM\nAdverse Event Analysis DE.AE\nRespond (RS) Incident Management RS.MA\nIncident Analysis RS.AN\nIncident Response Reporting and Communication RS.CO\nIncident Mitigation RS.MI\nRecover (RC) Incident Recovery Plan Execution RC.RP\nIncident Recovery Communication RC.CO",
+        "chunk:csf2.0:text:a199d63dc39b": "The CSF Core, Informative References, and Implementation Examples are available on the CSF 2.0 website and through the CSF 2.0 Reference Tool, which allows users to explore them and export them in human- and machine-readable formats. The CSF 2.0 Core is also available in a legacy format similar to that of CSF 1.1.",
+        "xwalk:row46": "Official crosswalk row 46: CSF 2.0 GV.OV-01 (Cybersecurity risk management strategy outcomes are reviewed to inform and adjust strategy and direction) -> CSF 1.1 NO REFERENCE (); mapping_type=new_in_2_0; comments=Conceptually new in 2.0"
+      },
+      "generation": {
+        "abstention_reason": null,
+        "answer": {
+          "abstained": false,
+          "abstention_reason": null,
+          "answer": "GV.OV-01 does not map to any CSF 1.1 element. The official crosswalk identifies GV.OV-01 as 'new_in_2_0' with the comment 'Conceptually new in 2.0', indicating there is no corresponding CSF 1.1 reference element.",
+          "citations": [
+            "xwalk:row46",
+            "chunk:csf2.0:subcategory:GV.OV-01"
+          ],
+          "key_changes": [
+            {
+              "citations": [
+                "xwalk:row46"
+              ],
+              "statement": "GV.OV-01 is a new subcategory in CSF 2.0 with no direct equivalent in CSF 1.1."
+            }
+          ],
+          "mappings": [
+            {
+              "citations": [
+                "xwalk:row46"
+              ],
+              "focal_id": "GV.OV-01",
+              "note": "Official crosswalk marks this element as conceptually new in CSF 2.0 with no CSF 1.1 reference.",
+              "reference_id": null
+            }
+          ],
+          "uncertainties": [],
+          "unresolved_questions": []
+        },
+        "attempts": 1,
+        "rejection": [],
+        "status": "answered",
+        "system_uncertainties": [],
+        "warnings": []
+      },
+      "judgment": {
+        "attempts": 0,
+        "batches": [],
+        "derived": null,
+        "errors": [],
+        "judge": {
+          "model": null,
+          "name": null,
+          "rubric_version": "1"
+        },
+        "limitations": [],
+        "mode": "single_call",
+        "output": null,
+        "reason": "no judge configured",
+        "seconds": null,
+        "status": "skipped",
+        "units": []
+      },
+      "latency_s": {
+        "end_to_end": 76.343,
+        "generation": 76.343,
+        "judge": 0.0
+      },
+      "question": "How does GV.OV-01 map to CSF 1.1?",
+      "tokens": {
+        "generation": {
+          "output_tokens": 314,
+          "prompt_tokens": 2868,
+          "reasoning_tokens": 0,
+          "total_tokens": 3182
+        },
+        "judge": null
+      }
+    },
+    "F01": {
+      "category": "conflict",
+      "deterministic": {
+        "all_passed": true,
+        "checks": [
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "schema_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citation_ids_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citations_in_bundle",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "abstention_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_pairs_official",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_cites_matching_row",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "versions_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_rows_covered",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_controls_referenced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "conflict_preserved",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "new_control_no_reference",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_forbidden_mappings",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_unsupported_removal",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_uncited_claims",
+            "status": "pass"
+          }
+        ]
+      },
+      "evidence_supplied": {
+        "chunk:csf1.1:subcategory:ID.SC-2": "ID.SC-2: Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process",
+        "chunk:csf1.1:text:409dec4508b8": "The remainder of this document contains the following sections and appendices:\n• Section 2 describes the Framework components: the Framework Core, the Tiers, and the Profiles.\n• Section 3 presents examples of how the Framework can be used.\n• Section 4 describes how to use the Framework for self-assessing and demonstrating cybersecurity through measurements.\n• Appendix A presents the Framework Core in a tabular format: the Functions, Categories, Subcategories, and Informative References.\n• Appendix B contains a glossary of selected terms.\n• Appendix C lists acronyms used in this document.\n6 International Organization for Standardization, Risk management – Principles and guidelines, ISO 31000:2009, 2009. http://www.iso.org/iso/home/standards/iso31000.htm\n7 International Organization for Standardization/International Electrotechnical Commission, Information technology – Security techniques – Information security risk management, ISO/IEC 27005:2011, 2011. https://www.iso.org/standard/56742.html\n8 Joint Task Force Transformation Initiative, Managing Information Security Risk: Organization, Mission, and Information System View, NIST Special Publication 800-39, March 2011. https://doi.org/10.6028/NIST.SP.800- 39\n9 U.S. Department of Energy, Electricity Subsector Cybersecurity Risk Management Process, DOE/OE-0003, May 2012. https://energy.gov/sites/prod/files/Cybersecurity Risk Management Process Guideline - Final - May 2012.pdf",
+        "chunk:csf1.1:text:4dd835ba7743": "Framework for Improving Critical Infrastructure Cybersecurity\nVersion 1.1\nNational Institute of Standards and Technology\nApril 16, 2018\nNote to Readers on the Update\nVersion 1.1 of this Cybersecurity Framework refines, clarifies, and enhances Version 1.0, which was issued in February 2014. It incorporates comments received on the two drafts of Version 1.1.\nVersion 1.1 is intended to be implemented by first-time and current Framework users. Current users should be able to implement Version 1.1 with minimal or no disruption; compatibility with Version 1.0 has been an explicit objective.\nThe following table summarizes the changes made between Version 1.0 and Version 1.1.\nTable NTR-1 - Summary of changes between Framework Version 1.0 and Version 1.1.\nUpdate Description of Update Clarified that terms like Added clarity that the Framework has utility as a structure and “compliance” can be language for organizing and expressing compliance with an confusing and mean organization’s own cybersecurity requirements. However, the something very different variety of ways in which the Framework can be used by an to various Framework organization means that phrases like “compliance with the stakeholders Framework” can be confusing.",
+        "chunk:csf1.1:text:9a8b2283038f": "To account for the unique cybersecurity needs of organizations, there are a wide variety of ways to use the Framework. The decision about how to apply it is left to the implementing organization. For example, one organization may choose to use the Framework Implementation Tiers to articulate envisioned risk management practices. Another organization may use the Framework’s five Functions to analyze its entire risk management portfolio; that analysis may or may not rely on more detailed companion guidance, such as controls catalogs. There sometimes is discussion about “compliance” with the Framework, and the Framework has utility as a structure and language for organizing and expressing compliance with an organization’s own cybersecurity requirements. Nevertheless, the variety of ways in which the Framework can be used by an organization means that phrases like “compliance with the Framework” can be confusing and mean something very different to various stakeholders.\nThe Framework complements, and does not replace, an organization’s risk management process and cybersecurity program. The organization can use its current processes and leverage the Framework to identify opportunities to strengthen and communicate its management of cybersecurity risk while aligning with industry practices. Alternatively, an organization without an existing cybersecurity program can use the Framework as a reference to establish one.",
+        "chunk:csf2.0:subcategory:GV.SC-03": "GV.SC-03: Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes",
+        "chunk:csf2.0:text:2400d2aa8dcf": "Appendix A is the CSF Core — a set of cybersecurity outcomes arranged by Function, then Category, and finally Subcategory, as depicted in Fig. 1. These outcomes are not a checklist of actions to perform; specific actions taken to achieve an outcome will vary by organization and use case, as will the individual responsible for those actions. Additionally, the order and size of Functions, Categories, and Subcategories in the Core does not imply the sequence or importance of achieving them. The structure of the Core is intended to resonate most with those charged with operationalizing risk management within an organization.\nFig. 1. CSF Core structure\nThe CSF Core Functions — GOVERN, IDENTIFY, PROTECT, DETECT, RESPOND, and RECOVER — organize cybersecurity outcomes at their highest level.",
+        "chunk:csf2.0:text:65a38d02bf94": "This appendix describes the Functions, Categories, and Subcategories of the CSF Core. Table 1 lists the CSF 2.0 Core Function and Category names and unique alphabetic identifiers. Each Function name in the table is linked to its portion of the appendix. The order of Functions, Categories, and Subcategories of the Core is not alphabetical; it is intended to resonate most with those charged with operationalizing risk management within an organization. The numbering of the Subcategories is intentionally not sequential; gaps in numbering indicate CSF 1.1 Subcategories that were relocated in CSF 2.0.\nTable 1. CSF 2.0 Core Function and Category names and identifiers\nFunction Category Category Identifier\nGovern (GV) Organizational Context GV.OC\nRisk Management Strategy GV.RM\nRoles, Responsibilities, and Authorities GV.RR\nPolicy GV.PO\nOversight GV.OV\nCybersecurity Supply Chain Risk Management GV.SC\nIdentify (ID) Asset Management ID.AM\nRisk Assessment ID.RA\nImprovement ID.IM\nProtect (PR) Identity Management, Authentication, and Access Control PR.AA\nAwareness and Training PR.AT\nData Security PR.DS\nPlatform Security PR.PS\nTechnology Infrastructure Resilience PR.IR\nDetect (DE) Continuous Monitoring DE.CM\nAdverse Event Analysis DE.AE\nRespond (RS) Incident Management RS.MA\nIncident Analysis RS.AN\nIncident Response Reporting and Communication RS.CO\nIncident Mitigation RS.MI\nRecover (RC) Incident Recovery Plan Execution RC.RP\nIncident Recovery Communication RC.CO",
+        "chunk:csf2.0:text:a199d63dc39b": "The CSF Core, Informative References, and Implementation Examples are available on the CSF 2.0 website and through the CSF 2.0 Reference Tool, which allows users to explore them and export them in human- and machine-readable formats. The CSF 2.0 Core is also available in a legacy format similar to that of CSF 1.1.",
+        "xwalk:row25": "Official crosswalk row 25: CSF 2.0 GV.SC-03 (Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes) -> CSF 1.1 ID.SC-2 (Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process); mapping_type=mapped; comments=",
+        "xwalk:row26": "Official crosswalk row 26: CSF 2.0 GV.SC-03 (Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes) -> CSF 1.1 NO REFERENCE (); mapping_type=new_in_2_0; comments=Conceptually new in 2.0"
+      },
+      "generation": {
+        "abstention_reason": null,
+        "answer": {
+          "abstained": false,
+          "abstention_reason": null,
+          "answer": "According to the official crosswalk, CSF 2.0 subcategory GV.SC-03 maps to CSF 1.1 subcategory ID.SC-2. However, the official workbook also contains a separate entry indicating that GV.SC-03 is 'conceptually new in 2.0' with no corresponding CSF 1.1 reference. Both entries are present in the official records.",
+          "citations": [
+            "xwalk:row25",
+            "xwalk:row26",
+            "chunk:csf2.0:subcategory:GV.SC-03",
+            "chunk:csf1.1:subcategory:ID.SC-2"
+          ],
+          "key_changes": [
+            {
+              "citations": [
+                "xwalk:row25"
+              ],
+              "statement": "CSF 2.0 GV.SC-03 is mapped to CSF 1.1 ID.SC-2 in the official crosswalk."
+            },
+            {
+              "citations": [
+                "xwalk:row26"
+              ],
+              "statement": "CSF 2.0 GV.SC-03 is also listed as 'conceptually new in 2.0' with no CSF 1.1 reference in the official crosswalk."
+            }
+          ],
+          "mappings": [
+            {
+              "citations": [
+                "xwalk:row25"
+              ],
+              "focal_id": "GV.SC-03",
+              "note": "Official crosswalk row 25 maps GV.SC-03 to ID.SC-2.",
+              "reference_id": "ID.SC-2"
+            },
+            {
+              "citations": [
+                "xwalk:row26"
+              ],
+              "focal_id": "GV.SC-03",
+              "note": "Official crosswalk row 26 lists GV.SC-03 as 'new_in_2_0' with the comment 'Conceptually new in 2.0' and no reference ID.",
+              "reference_id": null
+            }
+          ],
+          "uncertainties": [
+            "The official crosswalk contains conflicting entries for GV.SC-03: one mapping it to ID.SC-2 and another marking it as conceptually new in 2.0 with no 1.1 reference. Both are reported as per pipeline findings."
+          ],
+          "unresolved_questions": []
+        },
+        "attempts": 1,
+        "rejection": [],
+        "status": "answered",
+        "system_uncertainties": [],
+        "warnings": []
+      },
+      "judgment": {
+        "attempts": 0,
+        "batches": [],
+        "derived": null,
+        "errors": [],
+        "judge": {
+          "model": null,
+          "name": null,
+          "rubric_version": "1"
+        },
+        "limitations": [],
+        "mode": "single_call",
+        "output": null,
+        "reason": "no judge configured",
+        "seconds": null,
+        "status": "skipped",
+        "units": []
+      },
+      "latency_s": {
+        "end_to_end": 76.863,
+        "generation": 76.863,
+        "judge": 0.0
+      },
+      "question": "How does GV.SC-03 map to CSF 1.1?",
+      "tokens": {
+        "generation": {
+          "output_tokens": 576,
+          "prompt_tokens": 3141,
+          "reasoning_tokens": 0,
+          "total_tokens": 3717
+        },
+        "judge": null
+      }
+    },
+    "H02": {
+      "category": "abstention",
+      "deterministic": {
+        "all_passed": true,
+        "checks": [
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "schema_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citation_ids_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citations_in_bundle",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "abstention_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "mapping_pairs_official",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "mapping_cites_matching_row",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "versions_correct",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "expected_rows_covered",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "expected_controls_referenced",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "conflict_preserved",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "new_control_no_reference",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "no_forbidden_mappings",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "no_unsupported_removal",
+            "status": "n/a"
+          },
+          {
+            "detail": "answer abstained",
+            "level": "deterministic_factual",
+            "name": "no_uncited_claims",
+            "status": "n/a"
+          }
+        ]
+      },
+      "evidence_supplied": {
+        "chunk:csf1.1:category:PR.AC": "Identity Management, Authentication and Access Control (PR.AC): Access to physical and logical assets and associated facilities is limited to authorized users, processes, and devices, and is managed consistent with the assessed risk of unauthorized access to authorized activities and transactions.",
+        "chunk:csf1.1:subcategory:PR.AC-2": "PR.AC-2: Physical access to assets is managed and protected",
+        "chunk:csf1.1:subcategory:PR.AC-6": "PR.AC-6: Identities are proofed and bound to credentials and asserted in interactions",
+        "chunk:csf1.1:subcategory:PR.AC-7": "PR.AC-7: Users, devices, and other assets are authenticated (e.g., single-factor, multi-factor) commensurate with the risk of the transaction (e.g., individuals’ security and privacy risks and other organizational risks)",
+        "chunk:csf1.1:text:5f324aa8fadc": "A new section on self- Added Section 4.0 Self-Assessing Cybersecurity Risk with the assessment Framework to explain how the Framework can be used by organizations to understand and assess their cybersecurity risk, including the use of measurements. Greatly expanded An expanded Section 3.3 Communicating Cybersecurity explanation of using Requirements with Stakeholders helps users better understand Framework for Cyber Cyber Supply Chain Risk Management (SCRM), while a new Supply Chain Risk Section 3.4 Buying Decisions highlights use of the Framework Management purposes in understanding risk associated with commercial off-the-shelf products and services. Additional Cyber SCRM criteria were added to the Implementation Tiers. Finally, a Supply Chain Risk Management Category, including multiple Subcategories, has been added to the Framework Core. Refinements to better The language of the Access Control Category has been refined account for authentication, to better account for authentication, authorization, and identity authorization, and identity proofing. This included adding one Subcategory each for proofing Authentication and Identity Proofing. Also, the Category has been renamed to Identity Management and Access Control (PR.AC) to better represent the scope of the Category and corresponding Subcategories.",
+        "chunk:csf2.0:text:792797730b74": "This document describes what desirable outcomes an organization can aspire to achieve. It does not prescribe outcomes nor how they may be achieved. Descriptions of how an organization can achieve those outcomes are provided in a suite of online resources that complement the CSF and are available through the NIST CSF website. These resources offer additional guidance on practices and controls that could be used to achieve outcomes and are intended to help an organization understand, adopt, and use the CSF. They include:\n• Informative References that point to sources of guidance on each outcome from existing global standards, guidelines, frameworks, regulations, policies, etc.\n• Implementation Examples that illustrate potential ways to achieve each outcome\n• Quick-Start Guides that give actionable guidance on using the CSF and its online resources, including transitioning from previous CSF versions to version 2.0\n• Community Profiles and Organizational Profile Templates that help an organization put the CSF into practice and set priorities for managing cybersecurity risks\nAn organization can use the CSF Core, Profiles, and Tiers with the supplementary resources to understand, assess, prioritize, and communicate cybersecurity risks.\n• Understand and Assess: Describe the current or target cybersecurity posture of part or all of an organization, determine gaps, and assess progress toward addressing those gaps.",
+        "chunk:csf2.0:text:7bd323c1a541": "This document is version 2.0 of the NIST Cybersecurity Framework (Framework or CSF). It includes the following components:\n• CSF Core, the nucleus of the CSF, which is a taxonomy of high-level cybersecurity outcomes that can help any organization manage its cybersecurity risks. The CSF Core components are a hierarchy of Functions, Categories, and Subcategories that detail each outcome. These outcomes can be understood by a broad audience, including executives, managers, and practitioners, regardless of their cybersecurity expertise. Because the outcomes are sector-, country-, and technology-neutral, they provide an organization with the flexibility needed to address its unique risks, technologies, and mission considerations.\n• CSF Organizational Profiles, which are a mechanism for describing an organization’s current and/or target cybersecurity posture in terms of the CSF Core’s outcomes.\n• CSF Tiers, which can be applied to CSF Organizational Profiles to characterize the rigor of an organization’s cybersecurity risk governance and management practices. Tiers can also provide context for how an organization views cybersecurity risks and the processes in place to manage those risks.",
+        "chunk:csf2.0:text:b38e21279ced": "Building on previous versions, CSF 2.0 contains new features that highlight the importance of governance and supply chains. Special attention is paid to the QSGs to ensure that the CSF is relevant and readily accessible by smaller organizations as well as their larger counterparts. NIST now provides Implementation Examples and Informative References, which are available online and updated regularly. Creating current and target state Organizational Profiles helps organizations to compare where they are versus where they want or need to be and allows them to implement and assess security controls more quickly.\nCybersecurity risks are expanding constantly, and managing those risks must be a continuous process. This is true regardless of whether an organization is just beginning to confront its cybersecurity challenges or whether it has been active for many years with a sophisticated, well-resourced cybersecurity team. The CSF is designed to be valuable for any type of organization and is expected to provide appropriate guidance over a long time.",
+        "chunk:csf2.0:text:d79f84dd4aeb": "The CSF is the result of a multi-year collaborative effort across industry, academia, and government in the United States and around the world. NIST acknowledges and thanks all of those who have contributed to this revised CSF. Information on the CSF development process can be found on the NIST CSF website. Lessons learned about the use of the CSF can always be shared with NIST at cyberframework@nist.gov.\nTable of Contents\nList of Figures\nPreface\nThe Cybersecurity Framework (CSF) 2.0 is designed to help organizations of all sizes and sectors — including industry, government, academia, and nonprofit — to manage and reduce their cybersecurity risks. It is useful regardless of the maturity level and technical sophistication of an organization’s cybersecurity programs. Nevertheless, the CSF does not embrace a one-size-fits-all approach. Each organization has both common and unique risks, as well as varying risk appetites and tolerances, specific missions, and objectives to achieve those missions. By necessity, the way organizations implement the CSF will vary.\nIdeally, the CSF will be used to address cybersecurity risks alongside other risks of the enterprise, including those that are financial, privacy, supply chain, reputational, technological, or physical in nature.",
+        "chunk:csf2.0:text:e4b22429b8ae": "The CSF describes desired outcomes that are intended to be understood by a broad audience, including executives, managers, and practitioners, regardless of their cybersecurity expertise. Because these outcomes are sector-, country-, and technology-neutral, they provide an organization with the flexibility needed to address their unique risks, technologies, and mission considerations. Outcomes are mapped directly to a list of potential security controls for immediate consideration to mitigate cybersecurity risks.\nAlthough not prescriptive, the CSF assists its users in learning about and selecting specific outcomes. Suggestions for how specific outcomes may be achieved are provided in an expanding suite of online resources that complement the CSF, including a series of Quick Start Guides (QSGs). Also, various tools offer downloadable formats to help organizations that choose to automate some of their processes. The QSGs suggest initial ways to use the CSF and invite the reader to explore the CSF and related resources in greater depth. Available through the NIST CSF website, the CSF and these supplementary resources from NIST and others should be viewed as a “CSF portfolio” to help manage and reduce risks. Regardless of how it is applied, the CSF prompts its users to consider their cybersecurity posture in context and then adapt the CSF to their specific needs."
+      },
+      "generation": {
+        "abstention_reason": "The supplied evidence does not contain any reference to quantum-safe cryptography or any control requiring it.",
+        "answer": {
+          "abstained": true,
+          "abstention_reason": "The supplied evidence does not contain any reference to quantum-safe cryptography or any control requiring it.",
+          "answer": "The provided evidence does not contain any CSF control that requires quantum-safe cryptography. The available passages describe general framework purposes, authentication, and identity management, but do not mention quantum-safe cryptography.",
+          "citations": [],
+          "key_changes": [],
+          "mappings": [],
+          "uncertainties": [
+            "The evidence provided is limited to general descriptions of CSF 1.1 and 2.0 and specific access control subcategories (PR.AC-2, PR.AC-6, PR.AC-7). It does not include the full text of the CSF Core or specific cryptographic controls (such as those in the PR.DS or PR.PT categories in CSF 1.1 or the Protect function in CSF 2.0) where such requirements might be located."
+          ],
+          "unresolved_questions": [
+            "Does any specific subcategory in CSF 1.1 or CSF 2.0 explicitly mandate quantum-safe cryptography?"
+          ]
+        },
+        "attempts": 1,
+        "rejection": [],
+        "status": "abstained",
+        "system_uncertainties": [],
+        "warnings": []
+      },
+      "judgment": null,
+      "latency_s": {
+        "end_to_end": 76.21,
+        "generation": 76.21,
+        "judge": 0.0
+      },
+      "question": "Which CSF control requires quantum-safe cryptography?",
+      "tokens": {
+        "generation": {
+          "output_tokens": 242,
+          "prompt_tokens": 2958,
+          "reasoning_tokens": 0,
+          "total_tokens": 3200
+        }
+      }
+    }
+  },
+  "questions_requested": [
+    "C01",
+    "F01",
+    "E01",
+    "H02"
+  ],
+  "rubric_version": "1",
+  "semantic_faithfulness": "requires_human_review",
+  "status": "complete",
+  "stopped_reason": null,
+  "subset": "C01,F01,E01,H02 (generation only; no judge)",
+  "warnings": [
+    "Sample too small to be a statistically meaningful accuracy benchmark."
+  ]
+}

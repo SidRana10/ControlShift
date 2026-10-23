@@ -20,9 +20,11 @@ from .judge import (
     RUBRIC_VERSION,
     JudgeSettings,
     aggregate_judgments,
+    answer_units,
     independence_note,
     judge_answer,
 )
+from .judge_segments import judge_answer_segmented
 
 SUBSET_SIX = ["A01", "B01", "C01", "F01", "E01", "H02"]  # one per required question type
 LIVE_PROVIDERS = {"gemini", "groq", "mistral"}
@@ -32,14 +34,29 @@ class BudgetExhausted(ProviderFailure):
     code = "request_budget_exhausted"
 
 
+class Pacer:
+    """Waits `pause` seconds before every provider request after the first one (generator AND judge share one pacer), so
+    consecutive requests - including the generator-to-judge transition - stay apart for per-minute token limits.
+    It never adds a request and never sleeps before a request that will not be sent."""
+
+    def __init__(self, pause: float = 0.0, sleep: Callable[[float], None] = time.sleep):
+        self.pause, self.sleep, self.sent = pause, sleep, False
+
+    def wait(self) -> None:
+        if self.sent and self.pause > 0:
+            self.sleep(self.pause)
+        self.sent = True
+
+
 class Budgeted:
     """Counts requests to a provider and refuses to exceed the budget (budget 0 = never call)."""
 
-    def __init__(self, provider: LLMProvider | None, budget: int):
-        self.provider, self.budget, self.made = provider, budget, 0
+    def __init__(self, provider: LLMProvider | None, budget: int, pacer: Pacer | None = None):
+        self.provider, self.budget, self.made, self.pacer = provider, budget, 0, pacer
         self.name = getattr(provider, "name", None)
         self.model = getattr(provider, "model", None)
         self.resolved_models: list[str] = []  # model ids the API actually reported (distinct, in order)
+        self.last_usage: dict | None = None
         self.usage_log: list[dict] = []  # token counts per successful response
 
     def tokens_since(self, n: int) -> dict | None:
@@ -49,13 +66,33 @@ class Budgeted:
     def generate(self, system: str, prompt: str) -> str:
         if self.provider is None or self.made >= self.budget:
             raise BudgetExhausted("request budget exhausted; no request was sent")
+        if self.pacer:
+            self.pacer.wait()
         self.made += 1
         text = self.provider.generate(system, prompt)
+        return self._record(text)
+
+    def generate_structured(self, system: str, prompt: str, schema: dict, name: str) -> str:
+        """Budgeted, paced call with a per-call strict schema (falls back to generate() for providers without one)."""
+        if self.provider is None or self.made >= self.budget:
+            raise BudgetExhausted("request budget exhausted; no request was sent")
+        if self.pacer:
+            self.pacer.wait()
+        self.made += 1
+        if hasattr(self.provider, "generate_structured"):
+            text = self.provider.generate_structured(system, prompt, schema, name)
+        else:
+            text = self.provider.generate(system, prompt)
+        return self._record(text)
+
+    def _record(self, text: str) -> str:
+        self.last_usage = None
         served = getattr(self.provider, "last_model", None)
         if served and served not in self.resolved_models:
             self.resolved_models.append(served)
         if getattr(self.provider, "last_usage", None):
-            self.usage_log.append(dict(self.provider.last_usage))
+            self.last_usage = dict(self.provider.last_usage)
+            self.usage_log.append(self.last_usage)
         return text
 
 
@@ -98,16 +135,19 @@ def run_judged_evaluation(questions: list[dict], assembler: EvidenceAssembler, s
                           judge: LLMProvider | None, settings: Settings, judge_settings: JudgeSettings,
                           max_generation_requests: int, max_judge_requests: int,
                           clock: Callable[[], float] = time.perf_counter, pause_seconds: float = 0.0,
-                          sleep: Callable[[float], None] = time.sleep) -> dict:
-    gen, jdg = Budgeted(generator, max_generation_requests), Budgeted(judge, max_judge_requests)
+                          sleep: Callable[[float], None] = time.sleep, judge_mode: str = "single",
+                          segment_threshold: int = 8, segment_batch_size: int = 4) -> dict:
+    """judge_mode: 'single' (one judge call per answer, the default), 'segmented' (always batch) or 'auto' (batch answers with
+    more than `segment_threshold` units). Segmented judging makes several judge requests per answer, all counted against the
+    judge budget; if the budget or a provider fails, that answer's judgment is 'incomplete' and the run stops."""
+    pacer = Pacer(pause_seconds, sleep)
+    gen, jdg = Budgeted(generator, max_generation_requests, pacer), Budgeted(judge, max_judge_requests, pacer)
     gen_meta = {"name": gen.name, "model": gen.model}
     jdg_meta = {"name": jdg.name, "model": jdg.model}
     records: dict[str, dict] = {}
     stopped = None
-    for n, g in enumerate(questions):
+    for g in questions:
         qid = g["question_id"]
-        if n and pause_seconds > 0 and not stopped:
-            sleep(pause_seconds)  # spreads requests out to respect per-minute token limits (no extra requests)
         if stopped:
             records[qid] = {"category": g["category"], "question": g["question"], "generation": {
                 "status": "not_attempted", "reason": stopped}, "deterministic": None, "judgment": None}
@@ -140,12 +180,18 @@ def run_judged_evaluation(questions: list[dict], assembler: EvidenceAssembler, s
         j_s = 0.0
         if res.status == "answered":
             tj = clock()
-            jud = judge_answer(jdg if judge is not None else None, g["question"], g, res.answer,
-                               _evidence_texts(bundle, ctx), judge_settings.max_attempts)
+            texts = _evidence_texts(bundle, ctx)
+            segmented = judge is not None and (judge_mode == "segmented" or (
+                judge_mode == "auto" and len(answer_units(res.answer)) > segment_threshold))
+            if segmented:
+                jud = judge_answer_segmented(jdg, g["question"], g, res.answer, texts, batch_size=segment_batch_size)
+            else:
+                jud = judge_answer(jdg if judge is not None else None, g["question"], g, res.answer, texts,
+                                   judge_settings.max_attempts)
             j_s = clock() - tj
             rec["judgment"] = jud.to_dict()
             rec["tokens"]["judge"] = jdg.tokens_since(j_n)
-            if jud.status == "provider_error":
+            if jud.status == "provider_error" or any(b["status"] == "provider_error" for b in jud.batches):
                 stopped = f"judge provider error on {qid}"
         rec["latency_s"] = {"generation": round(gen_s, 3), "judge": round(j_s, 3),
                             "end_to_end": round(gen_s + j_s, 3)}

@@ -538,15 +538,78 @@ Remaining work: run the live subset; human review of gold labels, answers and ju
   does not show semantic faithfulness (not verified) or general accuracy.
 - **Still unverified live:** behaviour on the other question types, and the judge's token limit (see above).
 
-### Phase 5B — open items
-- [ ] Re-run the live `/ask` check once Gemini capacity recovers
+### Phase 5B, step 6 — Segmented judging for long answers  (offline-tested; ONE live batch verified)
+- **Problem:** in the first six-question run (Qwen generator, GPT-OSS judge) the judge failed on B01 (17 answer units) with Groq HTTP 400 `json_validate_failed`,
+  and again in a single-call retry using strict structured output (`eval/live_runs/`). The 400's cause is not proven. A conservative offline estimate
+  puts one B01 judge request at ~14.9k tokens (prompt + schema + expected output) against the 8,000 tokens/minute limit Groq reported for the model, which fits an
+  output cut-off, but that remains an inference. Rubric, schema and scoring were not changed.
+- **Method (`evaluation/judge_segments.py`, opt-in via `--judge-mode segmented|auto`, default `single`):** the deterministic answer units are grouped into
+  ordered batches (<=4 units and an estimated <=6,500 tokens); each batch call sees the question, ONLY its units and the relevance-selected subset of
+  the evidence the generator was given (never anything else, never the gold facts), and returns claims, non-factual declarations and citation assessments
+  (each cited id assessed in exactly one batch). One final holistic call sees the whole answer and gold facts and scores relevance, factual correctness,
+  completeness and citation support (not averages of batches; citation support is scored from the batch citation verdicts). Merged output goes through the
+  unchanged `validate_judgment` and `derive_scores`. Any failed or rejected call => the judgment is `incomplete` (no scores, nothing imputed); completed
+  batches can be reused on a later invocation. Every judgment records `mode` and its limitations. Every segmented request counts against the judge budget
+  and is paced like any other request. Limitations: batches see only a subset of the evidence and cannot see each other; segmented and single-call scores
+  are not directly comparable.
+- **B01 plan:** 5 batches (S1-S4, S5+K1, K2+K3+M1+M2, M3-M6, M7-M9) + 1 holistic call = **6 judge requests** to finish B01.
+- **Live check (ONE request):** batch B1 (S1-S4) of the saved B01 answer, strict `judge_batch` schema: HTTP 200 in 4.3 s, valid JSON and schema, all four
+  units assessed (all `supported`), both assigned citations `supports`; 3,401 prompt + 1,851 output (1,113 reasoning) = 5,252 tokens (estimate was 6,401).
+  Groq reported 4,274 of 8,000 tokens left afterwards, so batches must be spaced (>= ~30 s, the planned 75 s is safe). One batch is NOT a judgment of B01:
+  its status is `incomplete`; no scores exist. Record: `eval/live_runs/2026-10-22_B01_segmented_batch_B1_smoke.json`.
+- B01's missing official row 22 is a retrieval-stage omission (the row was never in the evidence bundle); the deterministic failure is kept as is.
 
-- [ ] Answer-faithfulness / abstention evaluation of generation (needs a configured LLM provider)
-- [ ] Held-out question set for any future retrieval tuning
+### Phase 5B, step 7 — B01 retrieval fix: category-aware evidence for broad comparisons  (one live retest; see `eval/b01_before_after.md`)
+- **Six-question baseline (2026-10-22, Qwen generator, deterministic checks only for C01/F01/E01/H02):** A01, C01, F01, E01, H02 passed all applicable checks;
+  B01 failed `expected_rows_covered` (official row 22 never cited) and said CSF 1.1 had "two subcategories" (ID.SC-1, ID.SC-2); CSF 1.1 ID.SC actually has five. Report:
+  `eval/live_answer_review.md` (human review PENDING; no judge used). Baseline artifacts are unchanged.
+- **Root cause (verified in the stored records):** ingestion was fine (ID.SC-1..5, both category chunks and row 22 exist in the DB and index). Retrieval takes the top 5 hits
+  per version: in 1.1 the ID.SC category chunk ranked 6th and ID.SC-3 10th; in 2.0 all five hits were narrative text (GV.SC category 7th). Official mappings were attached
+  only for the top few retrieved *controls*, so row 22 and the ID.SC-3/4/5 rows never entered the bundle. Planning (cross-version comparison) and the context budget were not
+  the cause (the budget only dropped narrative passages).
+- **Fix (general, no B01 specifics; `evidence/assemble.py`):** for CROSS_VERSION questions only, when >=2 retrieved hits of a version fall in one category, add the category
+  record and the official crosswalk rows of the category and all its subcategories, and expand the category the crosswalk pairs with it in the other version. (Superseded by step 8: the
+  budget is now enforced once, in the context builder.) One sentence added to the generator
+  rules: never call a control list complete/limited ("only", "exactly N") unless a cited block says so. Narrow questions (exact control, mapping) are byte-identical to before
+  (test). Existing test `test_cross_version_comparison_gathers_...` was updated (rows may now come via `category_expansion`; row 22 is expected).
+- **Retest (ONE Qwen request, 0 judge/Gemini/Mistral; `eval/live_runs/2026-10-22_B01_retest_after_category_expansion.json`):** answered; ALL applicable deterministic checks pass,
+  including row 22; the false "two subcategories" claim is gone; 13 official mappings (incl. the GV.SC-03 conflict rows 25/26); tokens 4,223 + 1,984. Remaining gaps: the answer
+  does not state "ID.SC-1..5" explicitly nor describe ID.SC-3/4/5, and no longer mentions GV.RM-05 / ID.RA-10. This is a post-hoc repair check on one question, NOT a benchmark;
+  human review PENDING. Tests: 507 passed, 2 skipped; ruff clean.
 
-## Phase 6 — API & UI
-- [ ] FastAPI endpoints (search, compare, mapping lookup)
-- [ ] Streamlit UI in `ui/`
+### Phase 5B, step 8 — Definitions-first evidence priority and a strict context budget  (LAST planned backend iteration; one final live B01 retest)
+- **Findings:** the first fix carried crosswalk rows but dropped the canonical definitions of ID.SC-3/4/5 and GV.SC-xx, so the corrected B01 answer listed mappings without saying what
+  those subcategories cover; its serialized evidence was 12,138 chars vs the 12,000 budget (separators/merge markers were not counted) and a second budget knob existed in the assembler.
+- **Changes:** (1) `EvidenceAssembler` no longer knows a budget; category expansion adds every subcategory record plus official rows to the (complete) structured bundle. (2)
+  `generation/context.py::build_context` is the single place that enforces `Settings.context_chars` (from `GENERATION_CONTEXT_CHARS`) on the FINAL text: blocks, attributes, merge markers and
+  newline separators; official records are never cut, and low-priority ones are omitted deterministically. Priority (selection only; emission order is unchanged): category definitions ->
+  subcategory definitions of the compared categories -> category-level mappings -> conflicting rows -> other mappings inside the compared categories -> mappings reaching outside ->
+  other control records -> passages. Narrow bundles (no category records) keep controls first and are unchanged. (3) `GroundedGenerator` appends `official_records_omitted_for_context_budget`
+  to `missing_evidence` (once) and a warning, so the structured result and the model both see the gap. (4) A previously pinned test ("official records are never displaced even at budget=1")
+  was replaced with the strict-budget contract.
+- **Tests:** 516 passed, 2 skipped, ruff clean (new: definitions, strict budget at several sizes, priority under shrinking budgets, explicit omissions, configuration propagation, three other
+  category pairs, narrow-question serialization, no hardcoding).
+- **Final B01 retest (ONE Qwen request; 0 judge/Gemini/Mistral; `eval/live_runs/2026-10-22_B01_final_retest_budget_priority.json`):** answered; all applicable deterministic checks pass; serialized evidence
+  11,963 of 12,000 chars; 4,455 + 1,979 = 6,434 tokens; 7.7 s. The answer now enumerates ID.SC-1..5, moves Identify -> Govern with row 22 and preserves the GV.SC-03 conflict, and says records were
+  omitted for the budget. **Remaining limitations (documented, not optimised further):** it does not explain what ID.SC-3/4/5 cover even though their definitions were supplied, it omits mapping rows
+  24/31/32 and the rows mapping other categories into the compared one (they did not fit), and it frames mapped GV.SC items as "new concepts". Three-way comparison: `eval/b01_before_after.md`
+  (post-hoc repair criteria, not a benchmark; human review PENDING). Next phase: Streamlit frontend.
+
+### Phase 5 — closure summary  ✅ (exploratory scope; COMPLETE WITH DOCUMENTED LIMITATIONS)
+- **Retrieval benchmark (5A):** complete (`eval/report.md`; 39 AI-labelled questions; unchanged).
+- **Six-question live-answer evaluation:** complete with Groq `qwen/qwen3.8-27b` (generator) and `openai/gpt-oss-120b` (judge). Report: `eval/final_evaluation_report.md` (supersedes `eval/final_evaluation_draft.md`,
+  kept for traceability); supporting: `eval/human_review_packet.md`, `eval/human_verification_checklist.md` (blank, optional), `eval/b01_before_after.md`, `eval/live_answer_review.md`. Raw records: `eval/live_runs/`, failures `eval/failed_runs/`.
+- **Deterministic validation:** original A01, C01, F01, E01, H02 pass every applicable check; original B01 fails `expected_rows_covered` (official row 22 never retrieved) and also made an incorrect claim (CSF 1.1 has five ID.SC subcategories, not two).
+- **Judge results (GPT-OSS; opinions, unvalidated):** A01, C01, E01, F01 judged (faithfulness/relevance/correctness/completeness 5; citation support 5, 2, 4, 3 for A01, C01, E01, F01). Original B01: unjudged (two failed single-call attempts, one partial segmented batch). H02: abstention, not judged. No aggregate score is reported.
+- **B01:** failure investigation (retrieval top-k scattered the category; mappings were attached only to a few retrieved controls) -> category-aware expansion -> definitions-first priority and a strict 12,000-character final-text budget. Both repairs are post-hoc, preserved separately, and pass the deterministic checks; the final answer still does not explain ID.SC-3/4/5 and may overstate novelty.
+- **AI-assisted source verification:** the original workbook rows (4, 5, 22, 25, 26, 28, 31, 32, 46) and PDF text were read directly from `data/raw/`. The workbook has **no `mapping_type` column**; `mapped`/`new_in_2_0` are ControlShift-derived labels. A literal search of both PDFs and the workbook found no "quantum"/"cryptograph"/"encrypt"/"crypto" text (H02's abstention was appropriate; this does not prove no related concept exists). F01's rows 25 and 26 are an apparent dual-entry ambiguity, not a proven NIST error.
+- **Human verification:** NOT performed. The developer approved closing the phase without a completed checklist; `eval/judge_calibration.json` is all `pending`; no judge/human agreement exists.
+- **Known limitations retained:** six questions only (no accuracy claim); AI-curated, unreviewed gold labels (B01 expects only row 22); generator and judge share Groq; judge blind spot for retrieval-induced false completeness; citation-support definition (claim-level vs per-citation precision) unresolved; free-tier 8,000 tokens/minute limits; Gemini 503s; ControlShift is not production-deployed.
+- Superseded open items: live `/ask` recheck, answer-faithfulness evaluation (done exploratorily), held-out retrieval question set (still open, not needed for Phase 6).
+
+## Phase 6 — Frontend  (NEXT; not started)
+- [ ] Discuss and select the frontend architecture before implementing (no framework chosen yet).
+- Backend FastAPI service (`/health`, `/ask`, `/compare`) already exists from Phase 4B.
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes

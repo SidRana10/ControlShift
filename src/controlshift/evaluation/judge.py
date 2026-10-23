@@ -161,6 +161,32 @@ class JudgeOutput(_M):
         return self
 
 
+def _obj(props: dict) -> dict:
+    return {"type": "object", "properties": props, "required": list(props), "additionalProperties": False}
+
+
+_STR = {"type": "string"}
+_STRS = {"type": "array", "items": _STR}
+_DIM = _obj({"score": {"type": "integer", "enum": [1, 2, 3, 4, 5]}, "justification": _STR})
+
+
+def judge_json_schema() -> dict:
+    """JSON Schema of `JudgeOutput` in the form Groq's STRICT structured outputs accept: every property required,
+    additionalProperties false, only types/enums/arrays. It describes the same fields as the pydantic model; the
+    pydantic model plus `validate_judgment` remain the authoritative checks (non-empty text, supported-needs-evidence,
+    coverage, valid ids), so strict decoding changes only how the JSON is produced, not the rubric or scoring."""
+    return _obj({
+        "claims": {"type": "array", "items": _obj({
+            "claim": _STR, "unit_ids": _STRS, "evidence_ids": _STRS,
+            "verdict": {"type": "string", "enum": ["supported", "unsupported", "unclear"]}, "justification": _STR})},
+        "non_factual_units": {"type": "array", "items": _obj({"unit_id": _STR, "justification": _STR})},
+        "answer_relevance": _DIM, "factual_correctness": _DIM, "completeness": _DIM, "citation_support": _DIM,
+        "citation_assessments": {"type": "array", "items": _obj({
+            "citation_id": _STR, "verdict": {"type": "string", "enum": ["supports", "does_not_support", "unclear"]},
+            "justification": _STR})},
+    })
+
+
 def _short(exc: Exception) -> str:
     return re.sub(r"\s+", " ", str(exc))[:200]
 
@@ -270,7 +296,7 @@ def judge_provider(s: JudgeSettings) -> LLMProvider | None:
     if s.provider == "gemini":
         return GeminiProvider(s.api_key, s.model, s.timeout_seconds)
     if s.provider == "groq":
-        return GroqProvider(s.api_key, s.model, s.timeout_seconds)
+        return GroqProvider(s.api_key, s.model, s.timeout_seconds, json_schema=judge_json_schema(), schema_name="judge_output")
     return None
 
 
@@ -336,6 +362,9 @@ class Judgment:
     attempts: int = 0
     seconds: float | None = None
     judge: dict = field(default_factory=dict)
+    mode: str = "single_call"  # or "segmented" (see judge_segments.py)
+    batches: list = field(default_factory=list)
+    limitations: list = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return self.__dict__.copy()

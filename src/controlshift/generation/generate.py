@@ -95,6 +95,13 @@ class GroundedGenerator:
         warnings = [f"Passage {f['citation_id']} contains text resembling an instruction "
                     f"({f['match']!r}); it was passed to the model as untrusted data."
                     for f in ctx.injection_flags]
+        if ctx.omitted_records:  # official records that did not fit: say so in the findings the model (and caller) see
+            if not any(m.get("kind") == "official_records_omitted_for_context_budget" for m in bundle.missing_evidence):
+                bundle.missing_evidence.append({
+                    "kind": "official_records_omitted_for_context_budget", "citations": sorted(ctx.omitted_records),
+                    "detail": "these records are in the structured evidence but were left out of the generator's context to respect "
+                              "the evidence budget; coverage of the compared categories is therefore incomplete"})
+            warnings.append(f"{len(ctx.omitted_records)} official record(s) were left out of the prompt for space.")
         if ctx.omitted:
             warnings.append(f"{len(ctx.omitted)} lower-ranked passage(s) were left out of the "
                             "prompt for space.")

@@ -1,0 +1,811 @@
+{
+  "budgets": {
+    "automatic_retries": false,
+    "generation_requests_made": 2,
+    "judge_requests_made": 2,
+    "max_generation_requests": 6,
+    "max_judge_requests": 6
+  },
+  "deterministic_aggregate": {
+    "failed_questions": [
+      "B01"
+    ],
+    "n_questions": 2,
+    "per_category": {
+      "comparison": {
+        "all_passed": 0,
+        "questions": 1
+      },
+      "exact_control": {
+        "all_passed": 1,
+        "questions": 1
+      }
+    },
+    "per_check": {
+      "abstention_correct": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "citation_ids_valid": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "citations_in_bundle": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "conflict_preserved": {
+        "applicable": 0,
+        "failed": 0,
+        "pass_rate": null,
+        "passed": 0
+      },
+      "expected_controls_referenced": {
+        "applicable": 1,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 1
+      },
+      "expected_rows_covered": {
+        "applicable": 1,
+        "failed": 1,
+        "pass_rate": 0.0,
+        "passed": 0
+      },
+      "mapping_cites_matching_row": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "mapping_pairs_official": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "new_control_no_reference": {
+        "applicable": 0,
+        "failed": 0,
+        "pass_rate": null,
+        "passed": 0
+      },
+      "no_forbidden_mappings": {
+        "applicable": 0,
+        "failed": 0,
+        "pass_rate": null,
+        "passed": 0
+      },
+      "no_uncited_claims": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "no_unsupported_removal": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "schema_valid": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      },
+      "versions_correct": {
+        "applicable": 2,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2
+      }
+    },
+    "questions_all_checks_passed": 1
+  },
+  "generator": {
+    "model": "qwen/qwen3.8-27b",
+    "name": "groq",
+    "resolved_models": [
+      "qwen/qwen3.8-27b"
+    ]
+  },
+  "independence_note": "Generator and judge are different model families (different model vendors) but are served by the SAME provider infrastructure (shared platform, API account and rate limits). Family-level bias is reduced, not removed, and the judge's opinion is still not ground truth; calibrate with human review.",
+  "judge": {
+    "model": "openai/gpt-oss-120b",
+    "name": "groq",
+    "resolved_models": [
+      "openai/gpt-oss-120b"
+    ]
+  },
+  "judge_aggregate": {
+    "citation_verdicts": {
+      "supports": 1
+    },
+    "claims": {
+      "supported": 1,
+      "supported_rate": 1.0,
+      "total": 1,
+      "unclear": 0,
+      "unsupported": 0
+    },
+    "dimensions": {
+      "answer_relevance": {
+        "distribution": {
+          "5": 1
+        },
+        "mean": 5.0,
+        "n": 1
+      },
+      "citation_support": {
+        "distribution": {
+          "5": 1
+        },
+        "mean": 5.0,
+        "n": 1
+      },
+      "completeness": {
+        "distribution": {
+          "5": 1
+        },
+        "mean": 5.0,
+        "n": 1
+      },
+      "factual_correctness": {
+        "distribution": {
+          "5": 1
+        },
+        "mean": 5.0,
+        "n": 1
+      },
+      "faithfulness": {
+        "distribution": {
+          "5": 1
+        },
+        "mean": 5.0,
+        "n": 1
+      }
+    },
+    "judged": 1,
+    "not_applicable": {
+      "answer_relevance": 0,
+      "citation_support": 0,
+      "completeness": 0,
+      "factual_correctness": 0,
+      "faithfulness": 0
+    },
+    "questions": 6,
+    "status_counts": {
+      "absent": 4,
+      "judged": 1,
+      "provider_error": 1
+    },
+    "units": {
+      "factual_units": 2,
+      "supported": 2,
+      "supported_rate": 1.0,
+      "unclear": 0,
+      "unsupported": 0
+    }
+  },
+  "judge_kind": "live_llm_judge",
+  "kind": "real_generator",
+  "latency": {
+    "end_to_end": {
+      "max_s": 161.726,
+      "mean_s": 121.536,
+      "median_s": 121.536,
+      "n": 2
+    },
+    "generation": {
+      "max_s": 79.629,
+      "mean_s": 41.8545,
+      "median_s": 41.8545,
+      "n": 2
+    },
+    "judge": {
+      "max_s": 77.266,
+      "mean_s": 77.266,
+      "median_s": 77.266,
+      "n": 1
+    }
+  },
+  "per_question": {
+    "A01": {
+      "category": "exact_control",
+      "deterministic": {
+        "all_passed": true,
+        "checks": [
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "schema_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citation_ids_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citations_in_bundle",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "abstention_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_pairs_official",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_cites_matching_row",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "versions_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_rows_covered",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_controls_referenced",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "conflict_preserved",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "new_control_no_reference",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_forbidden_mappings",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_unsupported_removal",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_uncited_claims",
+            "status": "pass"
+          }
+        ]
+      },
+      "evidence_supplied": {
+        "chunk:csf2.0:subcategory:GV.SC-01": "GV.SC-01: A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders",
+        "chunk:csf2.0:subcategory:GV.SC-02": "GV.SC-02: Cybersecurity roles and responsibilities for suppliers, customers, and partners are established, communicated, and coordinated internally and externally",
+        "chunk:csf2.0:subcategory:GV.SC-03": "GV.SC-03: Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes",
+        "chunk:csf2.0:subcategory:GV.SC-08": "GV.SC-08: Relevant suppliers and other third parties are included in incident planning, response, and recovery activities",
+        "chunk:csf2.0:subcategory:GV.SC-10": "GV.SC-10: Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement"
+      },
+      "generation": {
+        "abstention_reason": null,
+        "answer": {
+          "abstained": false,
+          "abstention_reason": null,
+          "answer": "In NIST CSF 2.0, GV.SC-03 requires that cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes.",
+          "citations": [
+            "chunk:csf2.0:subcategory:GV.SC-03"
+          ],
+          "key_changes": [
+            {
+              "citations": [
+                "chunk:csf2.0:subcategory:GV.SC-03"
+              ],
+              "statement": "GV.SC-03 (CSF 2.0) mandates the integration of cybersecurity supply chain risk management into broader organizational risk management, assessment, and improvement processes."
+            }
+          ],
+          "mappings": [],
+          "uncertainties": [],
+          "unresolved_questions": []
+        },
+        "attempts": 1,
+        "rejection": [],
+        "status": "answered",
+        "system_uncertainties": [],
+        "warnings": []
+      },
+      "judgment": {
+        "attempts": 1,
+        "derived": {
+          "answer_relevance": 5,
+          "citation_support": 5,
+          "citation_support_rate": 1.0,
+          "citation_verdicts": {
+            "supports": 1
+          },
+          "completeness": 5,
+          "factual_correctness": 5,
+          "faithfulness": {
+            "claims": 1,
+            "factual_units": 2,
+            "non_factual_units": 0,
+            "rate": 1.0,
+            "score_1_5": 5,
+            "status": "evaluated",
+            "supported": 1,
+            "supported_units": 2,
+            "unclear": 0,
+            "unclear_units": 0,
+            "unit_verdicts": {
+              "K1": "supported",
+              "S1": "supported"
+            },
+            "unsupported": 0,
+            "unsupported_units": 0
+          }
+        },
+        "errors": [],
+        "judge": {
+          "model": "openai/gpt-oss-120b",
+          "name": "groq",
+          "rubric_version": "1"
+        },
+        "output": {
+          "answer_relevance": {
+            "justification": "Directly answers the question by stating what GV.SC-03 requires.",
+            "score": 5
+          },
+          "citation_assessments": [
+            {
+              "citation_id": "chunk:csf2.0:subcategory:GV.SC-03",
+              "justification": "Evidence text matches the claim about integration of supply chain risk management.",
+              "verdict": "supports"
+            }
+          ],
+          "citation_support": {
+            "justification": "The single citation directly supports the claim.",
+            "score": 5
+          },
+          "claims": [
+            {
+              "claim": "GV.SC-03 requires that cybersecurity supply chain risk management be integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes.",
+              "evidence_ids": [
+                "chunk:csf2.0:subcategory:GV.SC-03"
+              ],
+              "justification": "The evidence text explicitly states that GV.SC-03 integrates cybersecurity supply chain risk management into cybersecurity and enterprise risk management, risk assessment, and improvement processes.",
+              "unit_ids": [
+                "S1",
+                "K1"
+              ],
+              "verdict": "supported"
+            }
+          ],
+          "completeness": {
+            "justification": "All expected information about GV.SC-03 is provided.",
+            "score": 5
+          },
+          "factual_correctness": {
+            "justification": "The claim matches the gold fact describing GV.SC-03's integration requirement.",
+            "score": 5
+          },
+          "non_factual_units": []
+        },
+        "reason": "",
+        "seconds": 77.264,
+        "status": "judged",
+        "units": [
+          {
+            "kind": "sentence",
+            "text": "In NIST CSF 2.0, GV.SC-03 requires that cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes.",
+            "unit_id": "S1"
+          },
+          {
+            "kind": "key_change",
+            "text": "GV.SC-03 (CSF 2.0) mandates the integration of cybersecurity supply chain risk management into broader organizational risk management, assessment, and improvement processes.",
+            "unit_id": "K1"
+          }
+        ]
+      },
+      "latency_s": {
+        "end_to_end": 81.346,
+        "generation": 4.08,
+        "judge": 77.266
+      },
+      "question": "What does GV.SC-03 require?",
+      "tokens": {
+        "generation": {
+          "output_tokens": 203,
+          "prompt_tokens": 1217,
+          "reasoning_tokens": 0,
+          "total_tokens": 1420
+        },
+        "judge": {
+          "output_tokens": 877,
+          "prompt_tokens": 1759,
+          "reasoning_tokens": 616,
+          "total_tokens": 2636
+        }
+      }
+    },
+    "B01": {
+      "category": "comparison",
+      "deterministic": {
+        "all_passed": false,
+        "checks": [
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "schema_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citation_ids_valid",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "structural",
+            "name": "citations_in_bundle",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "abstention_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_pairs_official",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "mapping_cites_matching_row",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "versions_correct",
+            "status": "pass"
+          },
+          {
+            "detail": "official rows not cited: [22]",
+            "level": "deterministic_factual",
+            "name": "expected_rows_covered",
+            "status": "fail"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "expected_controls_referenced",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "conflict_preserved",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "new_control_no_reference",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_forbidden_mappings",
+            "status": "n/a"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_unsupported_removal",
+            "status": "pass"
+          },
+          {
+            "detail": "",
+            "level": "deterministic_factual",
+            "name": "no_uncited_claims",
+            "status": "pass"
+          }
+        ]
+      },
+      "evidence_supplied": {
+        "chunk:csf1.1:subcategory:ID.SC-1": "ID.SC-1: Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders",
+        "chunk:csf1.1:subcategory:ID.SC-2": "ID.SC-2: Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process",
+        "chunk:csf1.1:text:e2a14c45b7f5": "• External Participation - The organization understands its role, dependencies, and dependents in the larger ecosystem and contributes to the community’s broader understanding of risks. It receives, generates, and reviews prioritized information that informs continuous analysis of its risks as the threat and technology landscapes evolve. The organization shares that information internally and externally with other collaborators. The organization uses real-time or near real-time information to understand and consistently act upon cyber supply chain risks associated with the products and services it provides and that it uses. Additionally, it communicates proactively, using formal (e.g. agreements) and informal mechanisms to develop and maintain strong supply chain relationships.",
+        "chunk:csf2.0:subcategory:GV.OC-02": "GV.OC-02: Internal and external stakeholders are understood, and their needs and expectations regarding cybersecurity risk management are understood and considered",
+        "chunk:csf2.0:subcategory:GV.RM-05": "GV.RM-05: Lines of communication across the organization are established for cybersecurity risks, including risks from suppliers and other third parties",
+        "chunk:csf2.0:subcategory:GV.SC-01": "GV.SC-01: A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders",
+        "chunk:csf2.0:subcategory:GV.SC-03": "GV.SC-03: Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes",
+        "chunk:csf2.0:subcategory:GV.SC-04": "GV.SC-04: Suppliers are known and prioritized by criticality",
+        "chunk:csf2.0:subcategory:GV.SC-06": "GV.SC-06: Planning and due diligence are performed to reduce risks before entering into formal supplier or other third-party relationships",
+        "chunk:csf2.0:subcategory:GV.SC-07": "GV.SC-07: The risks posed by a supplier, their products and services, and other third parties are understood, recorded, prioritized, assessed, responded to, and monitored over the course of the relationship",
+        "chunk:csf2.0:subcategory:GV.SC-09": "GV.SC-09: Supply chain security practices are integrated into cybersecurity and enterprise risk management programs, and their performance is monitored throughout the technology product and service life cycle",
+        "chunk:csf2.0:subcategory:GV.SC-10": "GV.SC-10: Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement",
+        "chunk:csf2.0:subcategory:ID.RA-10": "ID.RA-10: Critical suppliers are assessed prior to acquisition",
+        "chunk:csf2.0:text:65a38d02bf94": "This appendix describes the Functions, Categories, and Subcategories of the CSF Core. Table 1 lists the CSF 2.0 Core Function and Category names and unique alphabetic identifiers. Each Function name in the table is linked to its portion of the appendix. The order of Functions, Categories, and Subcategories of the Core is not alphabetical; it is intended to resonate most with those charged with operationalizing risk management within an organization. The numbering of the Subcategories is intentionally not sequential; gaps in numbering indicate CSF 1.1 Subcategories that were relocated in CSF 2.0.\nTable 1. CSF 2.0 Core Function and Category names and identifiers\nFunction Category Category Identifier\nGovern (GV) Organizational Context GV.OC\nRisk Management Strategy GV.RM\nRoles, Responsibilities, and Authorities GV.RR\nPolicy GV.PO\nOversight GV.OV\nCybersecurity Supply Chain Risk Management GV.SC\nIdentify (ID) Asset Management ID.AM\nRisk Assessment ID.RA\nImprovement ID.IM\nProtect (PR) Identity Management, Authentication, and Access Control PR.AA\nAwareness and Training PR.AT\nData Security PR.DS\nPlatform Security PR.PS\nTechnology Infrastructure Resilience PR.IR\nDetect (DE) Continuous Monitoring DE.CM\nAdverse Event Analysis DE.AE\nRespond (RS) Incident Management RS.MA\nIncident Analysis RS.AN\nIncident Response Reporting and Communication RS.CO\nIncident Mitigation RS.MI\nRecover (RC) Incident Recovery Plan Execution RC.RP\nIncident Recovery Communication RC.CO",
+        "xwalk:row19": "Official crosswalk row 19: CSF 2.0 GV.RM-05 (Lines of communication across the organization are established for cybersecurity risks, including risks from suppliers and other third parties) -> CSF 1.1 ID.SC-1 (Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders); mapping_type=mapped; comments=",
+        "xwalk:row23": "Official crosswalk row 23: CSF 2.0 GV.SC-01 (A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders) -> CSF 1.1 ID.SC-1 (Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders); mapping_type=mapped; comments=",
+        "xwalk:row25": "Official crosswalk row 25: CSF 2.0 GV.SC-03 (Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes) -> CSF 1.1 ID.SC-2 (Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process); mapping_type=mapped; comments=",
+        "xwalk:row27": "Official crosswalk row 27: CSF 2.0 GV.SC-04 (Suppliers are known and prioritized by criticality) -> CSF 1.1 ID.SC-2 (Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process); mapping_type=mapped; comments=",
+        "xwalk:row29": "Official crosswalk row 29: CSF 2.0 GV.SC-06 (Planning and due diligence are performed to reduce risks before entering into formal supplier or other third-party relationships) -> CSF 1.1 ID.SC-1 (Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders); mapping_type=mapped; comments=",
+        "xwalk:row30": "Official crosswalk row 30: CSF 2.0 GV.SC-07 (The risks posed by a supplier, their products and services, and other third parties are understood, recorded, prioritized, assessed, responded to, and monitored over the course of the relationship) -> CSF 1.1 ID.SC-2 (Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process); mapping_type=mapped; comments=",
+        "xwalk:row33": "Official crosswalk row 33: CSF 2.0 GV.SC-09 (Supply chain security practices are integrated into cybersecurity and enterprise risk management programs, and their performance is monitored throughout the technology product and service life cycle) -> CSF 1.1 ID.SC-1 (Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders); mapping_type=mapped; comments=",
+        "xwalk:row34": "Official crosswalk row 34: CSF 2.0 GV.SC-10 (Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement) -> CSF 1.1 ID.SC-1 (Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders); mapping_type=mapped; comments=",
+        "xwalk:row6": "Official crosswalk row 6: CSF 2.0 GV.OC-02 (Internal and external stakeholders are understood, and their needs and expectations regarding cybersecurity risk management are understood and considered) -> CSF 1.1 ID.SC-2 (Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process); mapping_type=mapped; comments=",
+        "xwalk:row77": "Official crosswalk row 77: CSF 2.0 ID.RA-10 (Critical suppliers are assessed prior to acquisition) -> CSF 1.1 ID.SC-2 (Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process); mapping_type=mapped; comments="
+      },
+      "generation": {
+        "abstention_reason": null,
+        "answer": {
+          "abstained": false,
+          "abstention_reason": null,
+          "answer": "In CSF 1.1, supply chain risk management is primarily addressed under the Identify function with two subcategories: ID.SC-1 (processes identified and established) and ID.SC-2 (suppliers identified, prioritized, and assessed). In CSF 2.0, this focus is significantly expanded and restructured. A new category, Cybersecurity Supply Chain Risk Management (GV.SC), is introduced under the Govern function, containing multiple subcategories (GV.SC-01 through GV.SC-10) that cover program establishment, integration with enterprise risk management, supplier prioritization, due diligence, lifecycle monitoring, and post-contract activities. Additionally, CSF 2.0 includes GV.RM-05 for communication lines regarding supplier risks and ID.RA-10 for assessing critical suppliers prior to acquisition. The official crosswalk maps these new CSF 2.0 subcategories back to the two CSF 1.1 subcategories, indicating a shift from a limited identification focus to a comprehensive governance and lifecycle management approach.",
+          "citations": [
+            "chunk:csf1.1:subcategory:ID.SC-1",
+            "chunk:csf1.1:subcategory:ID.SC-2",
+            "chunk:csf2.0:subcategory:GV.RM-05",
+            "chunk:csf2.0:subcategory:GV.SC-01",
+            "chunk:csf2.0:subcategory:GV.SC-03",
+            "chunk:csf2.0:subcategory:GV.SC-04",
+            "chunk:csf2.0:subcategory:GV.SC-06",
+            "chunk:csf2.0:subcategory:GV.SC-07",
+            "chunk:csf2.0:subcategory:GV.SC-09",
+            "chunk:csf2.0:subcategory:GV.SC-10",
+            "chunk:csf2.0:subcategory:ID.RA-10",
+            "chunk:csf2.0:text:65a38d02bf94",
+            "xwalk:row19",
+            "xwalk:row23",
+            "xwalk:row25",
+            "xwalk:row27",
+            "xwalk:row29",
+            "xwalk:row30",
+            "xwalk:row33",
+            "xwalk:row34",
+            "xwalk:row77"
+          ],
+          "key_changes": [
+            {
+              "citations": [
+                "chunk:csf2.0:text:65a38d02bf94",
+                "chunk:csf1.1:subcategory:ID.SC-1",
+                "chunk:csf1.1:subcategory:ID.SC-2"
+              ],
+              "statement": "CSF 2.0 introduces a dedicated 'Cybersecurity Supply Chain Risk Management' category (GV.SC) under the Govern function, whereas CSF 1.1 only had subcategories under the Identify function (ID.SC)."
+            },
+            {
+              "citations": [
+                "chunk:csf2.0:subcategory:GV.SC-01",
+                "chunk:csf2.0:subcategory:GV.SC-03",
+                "chunk:csf2.0:subcategory:GV.SC-06",
+                "chunk:csf2.0:subcategory:GV.SC-09",
+                "chunk:csf2.0:subcategory:GV.SC-10"
+              ],
+              "statement": "CSF 2.0 expands the scope to include specific governance activities such as establishing a program/strategy (GV.SC-01), integrating with enterprise risk management (GV.SC-03, GV.SC-09), performing due diligence before relationships (GV.SC-06), and planning for post-contract activities (GV.SC-10), which are not explicitly detailed as separate subcategories in CSF 1.1."
+            },
+            {
+              "citations": [
+                "chunk:csf2.0:subcategory:ID.RA-10",
+                "chunk:csf2.0:subcategory:GV.RM-05"
+              ],
+              "statement": "CSF 2.0 adds specific requirements for assessing critical suppliers prior to acquisition (ID.RA-10) and establishing lines of communication for supplier risks (GV.RM-05)."
+            }
+          ],
+          "mappings": [
+            {
+              "citations": [
+                "xwalk:row19"
+              ],
+              "focal_id": "GV.RM-05",
+              "note": "Official crosswalk maps GV.RM-05 to ID.SC-1.",
+              "reference_id": "ID.SC-1"
+            },
+            {
+              "citations": [
+                "xwalk:row23"
+              ],
+              "focal_id": "GV.SC-01",
+              "note": "Official crosswalk maps GV.SC-01 to ID.SC-1.",
+              "reference_id": "ID.SC-1"
+            },
+            {
+              "citations": [
+                "xwalk:row25"
+              ],
+              "focal_id": "GV.SC-03",
+              "note": "Official crosswalk maps GV.SC-03 to ID.SC-2.",
+              "reference_id": "ID.SC-2"
+            },
+            {
+              "citations": [
+                "xwalk:row27"
+              ],
+              "focal_id": "GV.SC-04",
+              "note": "Official crosswalk maps GV.SC-04 to ID.SC-2.",
+              "reference_id": "ID.SC-2"
+            },
+            {
+              "citations": [
+                "xwalk:row29"
+              ],
+              "focal_id": "GV.SC-06",
+              "note": "Official crosswalk maps GV.SC-06 to ID.SC-1.",
+              "reference_id": "ID.SC-1"
+            },
+            {
+              "citations": [
+                "xwalk:row30"
+              ],
+              "focal_id": "GV.SC-07",
+              "note": "Official crosswalk maps GV.SC-07 to ID.SC-2.",
+              "reference_id": "ID.SC-2"
+            },
+            {
+              "citations": [
+                "xwalk:row33"
+              ],
+              "focal_id": "GV.SC-09",
+              "note": "Official crosswalk maps GV.SC-09 to ID.SC-1.",
+              "reference_id": "ID.SC-1"
+            },
+            {
+              "citations": [
+                "xwalk:row34"
+              ],
+              "focal_id": "GV.SC-10",
+              "note": "Official crosswalk maps GV.SC-10 to ID.SC-1.",
+              "reference_id": "ID.SC-1"
+            },
+            {
+              "citations": [
+                "xwalk:row77"
+              ],
+              "focal_id": "ID.RA-10",
+              "note": "Official crosswalk maps ID.RA-10 to ID.SC-2.",
+              "reference_id": "ID.SC-2"
+            }
+          ],
+          "uncertainties": [
+            "The evidence does not provide a complete list of all CSF 2.0 subcategories under GV.SC, only specific ones (01, 03, 04, 06, 07, 09, 10).",
+            "The evidence does not explicitly state if any CSF 1.1 supply chain controls were removed, only that they were mapped to new CSF 2.0 controls."
+          ],
+          "unresolved_questions": [
+            "What are the specific descriptions of the missing GV.SC subcategories (e.g., GV.SC-02, GV.SC-05, GV.SC-08) in CSF 2.0?"
+          ]
+        },
+        "attempts": 1,
+        "rejection": [],
+        "status": "answered",
+        "system_uncertainties": [
+          "Some retrieved passages were omitted from the prompt for space; the answer may not reflect them."
+        ],
+        "warnings": [
+          "6 lower-ranked passage(s) were left out of the prompt for space."
+        ]
+      },
+      "judgment": {
+        "attempts": 1,
+        "derived": null,
+        "errors": [],
+        "judge": {
+          "model": "openai/gpt-oss-120b",
+          "name": "groq",
+          "rubric_version": "1"
+        },
+        "output": null,
+        "reason": "provider_error: Groq returned HTTP 400 (json_validate_failed)",
+        "seconds": 82.096,
+        "status": "provider_error",
+        "units": []
+      },
+      "latency_s": {
+        "end_to_end": 161.726,
+        "generation": 79.629,
+        "judge": 82.097
+      },
+      "question": "What are the differences between CSF 1.1 and 2.0 for supply chain risk management?",
+      "tokens": {
+        "generation": {
+          "output_tokens": 1857,
+          "prompt_tokens": 3945,
+          "reasoning_tokens": 0,
+          "total_tokens": 5802
+        },
+        "judge": null
+      }
+    },
+    "C01": {
+      "category": "official_mapping",
+      "deterministic": null,
+      "generation": {
+        "reason": "judge provider error on B01",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "How does GV.OC-01 map to CSF 1.1?"
+    },
+    "E01": {
+      "category": "conceptually_new",
+      "deterministic": null,
+      "generation": {
+        "reason": "judge provider error on B01",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "How does GV.OV-01 map to CSF 1.1?"
+    },
+    "F01": {
+      "category": "conflict",
+      "deterministic": null,
+      "generation": {
+        "reason": "judge provider error on B01",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "How does GV.SC-03 map to CSF 1.1?"
+    },
+    "H02": {
+      "category": "abstention",
+      "deterministic": null,
+      "generation": {
+        "reason": "judge provider error on B01",
+        "status": "not_attempted"
+      },
+      "judgment": null,
+      "question": "Which CSF control requires quantum-safe cryptography?"
+    }
+  },
+  "questions_requested": [
+    "A01",
+    "B01",
+    "C01",
+    "F01",
+    "E01",
+    "H02"
+  ],
+  "rubric_version": "1",
+  "semantic_faithfulness": "requires_human_review",
+  "status": "stopped_on_provider_error",
+  "stopped_reason": "judge provider error on B01",
+  "subset": "six",
+  "warnings": [
+    "Sample too small to be a statistically meaningful accuracy benchmark."
+  ]
+}

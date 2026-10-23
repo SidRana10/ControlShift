@@ -314,13 +314,18 @@ def test_comparison_keeps_both_versions_under_a_tight_budget(assembler):
     assert ctx.chars <= 6000 or ctx.mandatory_over_budget
 
 
-def test_exact_records_and_official_mappings_are_never_displaced(assembler):
+def test_official_records_take_priority_over_passages_and_the_budget_is_strict(assembler):
     bundle = assembler.assemble("How does GV.OC-01 map to CSF 1.1?")
-    ctx = build_context(bundle, budget_chars=1)  # absurdly small budget
     must = [r["citation_id"] for r in bundle.control_records + bundle.crosswalk_records]
-    assert all(c in ctx.included for c in must)
+    ctx = build_context(bundle, budget_chars=6000)
+    assert all(c in ctx.included for c in must) and not ctx.omitted_records and ctx.chars <= 6000
+    tight = build_context(bundle, budget_chars=1500)                      # too small for everything: passages go first
     passages = {p["citation_id"] for p in bundle.passages}
-    assert passages and not (passages & set(ctx.included)) and set(ctx.omitted) == passages
+    assert tight.chars <= 1500 and not (passages & set(tight.included))
+    assert set(tight.omitted) == passages
+    absurd = build_context(bundle, budget_chars=1)                        # nothing fits: nothing is cut, all reported
+    assert absurd.text == "" and absurd.chars == 0 and set(absurd.omitted_records) == set(must)
+    assert absurd.mandatory_over_budget and not absurd.allowed_citations
 
 
 def test_budget_scales_with_setting(assembler):

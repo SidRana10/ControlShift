@@ -12,19 +12,28 @@ Edit `eval/judge_calibration.json` (not this file): set `status` to `reviewed`, 
 
 **Gemini answer**
 
-_Not generated (no live run)._
+In NIST CSF 2.0, GV.SC-03 requires that cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes.
+
+- citations: ['chunk:csf2.0:subcategory:GV.SC-03']
+- mappings: []
 
 **Source evidence cited**
 
-_none_
+- `chunk:csf2.0:subcategory:GV.SC-03`: GV.SC-03: Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes
 
 **Deterministic results**
 
-_not run_
+schema_valid=pass, citation_ids_valid=pass, citations_in_bundle=pass, abstention_correct=pass, mapping_pairs_official=pass, mapping_cites_matching_row=pass, versions_correct=pass, expected_rows_covered=n/a, expected_controls_referenced=pass, conflict_preserved=n/a, new_control_no_reference=n/a, no_forbidden_mappings=n/a, no_unsupported_removal=pass, no_uncited_claims=pass
 
 **LLM judge**
 
-_not run_
+- scores (1-5): faithfulness=5, answer_relevance=5, factual_correctness=5, completeness=5, citation_support=5
+- judge: groq/openai/gpt-oss-120b; independence: Generator and judge are different model families (different model vendors) but are served by the SAME provider infrastructure (shared platform, API account and rate limits). Family-level bias is reduced, not removed, and the judge's opinion is still not ground truth; calibrate with human review.
+- faithfulness units: {'S1': 'supported', 'K1': 'supported'} (non-factual: 0)
+
+| Claim | Units | Evidence | Verdict | Justification |
+|---|---|---|---|---|
+| GV.SC-03 requires that cybersecurity supply chain risk management be integrated  | S1, K1 | chunk:csf2.0:subcategory:GV.SC-03 | supported | The evidence text explicitly states that GV.SC-03 integrates cybersecurity suppl |
 
 **Human review**
 
@@ -47,19 +56,42 @@ _not run_
 
 **Gemini answer**
 
-_Not generated (no live run)._
+In CSF 1.1, supply chain risk management is primarily addressed under the Identify function with two subcategories: ID.SC-1 (processes identified and established) and ID.SC-2 (suppliers identified, prioritized, and assessed). In CSF 2.0, this focus is significantly expanded and restructured. A new category, Cybersecurity Supply Chain Risk Management (GV.SC), is introduced under the Govern function, containing multiple subcategories (GV.SC-01 through GV.SC-10) that cover program establishment, integration with enterprise risk management, supplier prioritization, due diligence, lifecycle monitoring, and post-contract activities. Additionally, CSF 2.0 includes GV.RM-05 for communication lines regarding supplier risks and ID.RA-10 for assessing critical suppliers prior to acquisition. The official crosswalk maps these new CSF 2.0 subcategories back to the two CSF 1.1 subcategories, indicating a shift from a limited identification focus to a comprehensive governance and lifecycle management approach.
+
+- citations: ['chunk:csf1.1:subcategory:ID.SC-1', 'chunk:csf1.1:subcategory:ID.SC-2', 'chunk:csf2.0:subcategory:GV.RM-05', 'chunk:csf2.0:subcategory:GV.SC-01', 'chunk:csf2.0:subcategory:GV.SC-03', 'chunk:csf2.0:subcategory:GV.SC-04', 'chunk:csf2.0:subcategory:GV.SC-06', 'chunk:csf2.0:subcategory:GV.SC-07', 'chunk:csf2.0:subcategory:GV.SC-09', 'chunk:csf2.0:subcategory:GV.SC-10', 'chunk:csf2.0:subcategory:ID.RA-10', 'chunk:csf2.0:text:65a38d02bf94', 'xwalk:row19', 'xwalk:row23', 'xwalk:row25', 'xwalk:row27', 'xwalk:row29', 'xwalk:row30', 'xwalk:row33', 'xwalk:row34', 'xwalk:row77']
+- mappings: [('GV.RM-05', 'ID.SC-1', ['xwalk:row19']), ('GV.SC-01', 'ID.SC-1', ['xwalk:row23']), ('GV.SC-03', 'ID.SC-2', ['xwalk:row25']), ('GV.SC-04', 'ID.SC-2', ['xwalk:row27']), ('GV.SC-06', 'ID.SC-1', ['xwalk:row29']), ('GV.SC-07', 'ID.SC-2', ['xwalk:row30']), ('GV.SC-09', 'ID.SC-1', ['xwalk:row33']), ('GV.SC-10', 'ID.SC-1', ['xwalk:row34']), ('ID.RA-10', 'ID.SC-2', ['xwalk:row77'])]
 
 **Source evidence cited**
 
-_none_
+- `chunk:csf1.1:subcategory:ID.SC-1`: ID.SC-1: Cyber supply chain risk management processes are identified, established, assessed, managed, and agreed to by organizational stakeholders
+- `chunk:csf1.1:subcategory:ID.SC-2`: ID.SC-2: Suppliers and third party partners of information systems, components, and services are identified, prioritized, and assessed using a cyber supply chain risk assessment process
+- `chunk:csf2.0:subcategory:GV.RM-05`: GV.RM-05: Lines of communication across the organization are established for cybersecurity risks, including risks from suppliers and other third parties
+- `chunk:csf2.0:subcategory:GV.SC-01`: GV.SC-01: A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders
+- `chunk:csf2.0:subcategory:GV.SC-03`: GV.SC-03: Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes
+- `chunk:csf2.0:subcategory:GV.SC-04`: GV.SC-04: Suppliers are known and prioritized by criticality
+- `chunk:csf2.0:subcategory:GV.SC-06`: GV.SC-06: Planning and due diligence are performed to reduce risks before entering into formal supplier or other third-party relationships
+- `chunk:csf2.0:subcategory:GV.SC-07`: GV.SC-07: The risks posed by a supplier, their products and services, and other third parties are understood, recorded, prioritized, assessed, responded to, and monitored over the course of the relationship
+- `chunk:csf2.0:subcategory:GV.SC-09`: GV.SC-09: Supply chain security practices are integrated into cybersecurity and enterprise risk management programs, and their performance is monitored throughout the technology product and service life cycle
+- `chunk:csf2.0:subcategory:GV.SC-10`: GV.SC-10: Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement
+- `chunk:csf2.0:subcategory:ID.RA-10`: ID.RA-10: Critical suppliers are assessed prior to acquisition
+- `chunk:csf2.0:text:65a38d02bf94`: This appendix describes the Functions, Categories, and Subcategories of the CSF Core. Table 1 lists the CSF 2.0 Core Function and Category names and unique alphabetic identifiers. Each Function name in the table is linked to its portion of the appendix. The order of Functions, Categories, and Subcat
+- `xwalk:row19`: GV.RM-05 -> ID.SC-1 [mapped]
+- `xwalk:row23`: GV.SC-01 -> ID.SC-1 [mapped]
+- `xwalk:row25`: GV.SC-03 -> ID.SC-2 [mapped]
+- `xwalk:row27`: GV.SC-04 -> ID.SC-2 [mapped]
+- `xwalk:row29`: GV.SC-06 -> ID.SC-1 [mapped]
+- `xwalk:row30`: GV.SC-07 -> ID.SC-2 [mapped]
+- `xwalk:row33`: GV.SC-09 -> ID.SC-1 [mapped]
+- `xwalk:row34`: GV.SC-10 -> ID.SC-1 [mapped]
+- `xwalk:row77`: ID.RA-10 -> ID.SC-2 [mapped]
 
 **Deterministic results**
 
-_not run_
+schema_valid=pass, citation_ids_valid=pass, citations_in_bundle=pass, abstention_correct=pass, mapping_pairs_official=pass, mapping_cites_matching_row=pass, versions_correct=pass, expected_rows_covered=fail, expected_controls_referenced=n/a, conflict_preserved=n/a, new_control_no_reference=n/a, no_forbidden_mappings=n/a, no_unsupported_removal=pass, no_uncited_claims=pass
 
 **LLM judge**
 
-_not run_
+_provider_error: provider_error: Groq returned HTTP 400 (json_validate_failed)_
 
 **Human review**
 
@@ -83,7 +115,7 @@ _not run_
 
 **Gemini answer**
 
-_Not generated (no live run)._
+_No answer (not_attempted)._
 
 **Source evidence cited**
 
@@ -120,7 +152,7 @@ _not run_
 
 **Gemini answer**
 
-_Not generated (no live run)._
+_No answer (not_attempted)._
 
 **Source evidence cited**
 
@@ -155,7 +187,7 @@ _not run_
 
 **Gemini answer**
 
-_Not generated (no live run)._
+_No answer (not_attempted)._
 
 **Source evidence cited**
 
@@ -190,7 +222,7 @@ _not run_
 
 **Gemini answer**
 
-_Not generated (no live run)._
+_No answer (not_attempted)._
 
 **Source evidence cited**
 

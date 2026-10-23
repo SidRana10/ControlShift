@@ -59,7 +59,12 @@ def main() -> int:
     ap.add_argument("--max-generation-requests", type=int, default=6)
     ap.add_argument("--max-judge-requests", type=int, default=6)
     ap.add_argument("--pause-seconds", type=float, default=0.0,
-                    help="wait between questions (e.g. 60) to stay under per-minute token limits; adds no requests")
+                    help="wait this long before EVERY provider request after the first (generator->judge included), to stay under "
+                         "per-minute token limits; adds no requests")
+    ap.add_argument("--judge-mode", choices=["single", "segmented", "auto"], default="single",
+                    help="single: one judge call per answer (default); segmented: batches + a holistic call (several judge requests "
+                         "per answer, all counted in --max-judge-requests); auto: segmented for answers with more than 8 units")
+    ap.add_argument("--segment-batch-size", type=int, default=4)
     ap.add_argument("--retrieval", choices=["bm25", "hybrid", "hybrid_rerank"], default="hybrid")
     ap.add_argument("--judge-same-as-generator", action="store_true",
                     help="use the generator's model as judge (self-evaluation; labelled as not independent)")
@@ -116,7 +121,8 @@ def main() -> int:
                 questions, EvidenceAssembler(store, retriever, label), store, gen, judge, settings, jset,
                 min(args.max_generation_requests, run_plan["max_generation_requests"]),
                 min(args.max_judge_requests, run_plan["max_judge_requests"]),
-                pause_seconds=args.pause_seconds)
+                pause_seconds=args.pause_seconds, judge_mode=args.judge_mode,
+                segment_batch_size=args.segment_batch_size)
         live["subset"] = args.subset
         (args.out_dir / "judge_results_live.json").write_text(
             json.dumps(live, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")

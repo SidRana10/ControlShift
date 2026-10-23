@@ -665,12 +665,13 @@ def test_report_labels_same_model_and_same_family_and_shows_not_applicable(assem
     assert "independence:" in ws and "SAME model" in ws and "faithfulness units:" in ws
 
 
-SECRET_RE = r"AIza[0-9A-Za-z_\-]{20,}|gsk_[0-9A-Za-z]{20,}|x-goog-api-key|Bearer |[Aa]uthorization"
+SECRET_RE = r"AIza[0-9A-Za-z_\-]{20,}|gsk_[0-9A-Za-z]{20,}|x-goog-api-key|Bearer [A-Za-z0-9._-]{8,}|[Aa]uthorization\s*['\"]?\s*:"
 
 
 def test_no_secrets_or_live_artifacts_in_the_repo_state():
     # runtime artifacts (a real run's judge_results_live.json, if present) and preserved failure records
-    for f in [EVAL / "judge_results_live.json", *sorted((EVAL / "failed_runs").glob("*.json"))]:
+    for f in [EVAL / "judge_results_live.json", *sorted((EVAL / "failed_runs").glob("*.json")),
+              *sorted((EVAL / "live_runs").glob("*.json"))]:
         if f.exists():
             assert not re.search(SECRET_RE, f.read_text()), f.name
 
@@ -910,7 +911,7 @@ def test_run_records_generator_and_judge_models_separately_and_paces_requests(as
     res = run_judged_evaluation([by_id["A01"], by_id["B01"]], assembler, store, gen, jud, Settings(), jg.JudgeSettings(),
                                 2, 2, pause_seconds=7.5, sleep=sleeps.append)
     assert res["generator"]["model"] == "qwen/qwen3.8-27b" and res["judge"]["model"] == "openai/gpt-oss-120b"
-    assert sleeps == [7.5]                                                  # between the two questions only
+    assert sleeps == [7.5] * 3          # before every request after the first: gen->judge and judge->next gen included
     assert "different model families" in res["independence_note"] and "SAME provider infrastructure" in res["independence_note"]
     assert res["budgets"]["generation_requests_made"] == 2 and res["budgets"]["judge_requests_made"] == 2
 
@@ -923,3 +924,109 @@ def test_pacing_never_sleeps_after_a_provider_error_or_by_default(assembler, sto
     assert res["status"] == "stopped_on_provider_error" and sleeps == []
     res, _, _ = run_mock(assembler, store, conn, by_id, ["A01", "B01"])
     assert res["status"] == "complete"                                      # default pause is 0: no waiting
+
+
+# ======================================================================================================================
+# Strict structured outputs for the Groq judge (mocked HTTP only)
+# ======================================================================================================================
+ALLOWED_KEYS = {"type", "properties", "required", "additionalProperties", "items", "enum"}
+
+
+def _walk(schema, path="$"):
+    assert set(schema) <= ALLOWED_KEYS, (path, set(schema) - ALLOWED_KEYS)           # no min/max/pattern/format keywords
+    if schema["type"] == "object":
+        assert schema["additionalProperties"] is False and schema["required"] == list(schema["properties"]), path
+        for k, v in schema["properties"].items():
+            _walk(v, f"{path}.{k}")
+    if schema["type"] == "array":
+        _walk(schema["items"], path + "[]")
+
+
+def test_judge_json_schema_is_strict_compatible_and_mirrors_the_model():
+    sch = jg.judge_json_schema()
+    _walk(sch)
+    assert set(sch["properties"]) == set(jg.JudgeOutput.model_fields)
+    for name, model in (("claims", jg.ClaimAssessment), ("citation_assessments", jg.CitationAssessment),
+                        ("non_factual_units", jg.NonFactualUnit)):
+        assert set(sch["properties"][name]["items"]["properties"]) == set(model.model_fields), name
+    for d in ("answer_relevance", "factual_correctness", "completeness", "citation_support"):
+        assert set(sch["properties"][d]["properties"]) == set(jg.DimScore.model_fields)
+        assert sch["properties"][d]["properties"]["score"]["enum"] == [1, 2, 3, 4, 5]
+    verdicts = sch["properties"]["claims"]["items"]["properties"]["verdict"]["enum"]
+    assert verdicts == ["supported", "unsupported", "unclear"]
+
+
+def test_groq_judge_sends_strict_schema_and_the_generator_does_not():
+    seen = []
+
+    def handler(request):
+        seen.append(json.loads(request.content))
+        return httpx.Response(200, json=chat_ok("{}"))
+
+    judge = jg.judge_provider(jg.JudgeSettings(provider="groq", model="openai/gpt-oss-120b", api_key=SECRET))
+    judge._client = httpx.Client(transport=httpx.MockTransport(handler))
+    judge.generate("S", "P")
+    rf = seen[0]["response_format"]
+    assert rf["type"] == "json_schema" and rf["json_schema"]["strict"] is True and rf["json_schema"]["name"] == "judge_output"
+    assert rf["json_schema"]["schema"] == jg.judge_json_schema() and "max_completion_tokens" not in seen[0]
+    gen = GroqProvider(SECRET, "qwen/qwen3.8-27b", 5, client=httpx.Client(transport=httpx.MockTransport(handler)))
+    gen.generate("S", "P")
+    assert seen[1]["response_format"] == {"type": "json_object"}               # generator unchanged
+    capped = GroqProvider(SECRET, "m", 5, max_completion_tokens=1234, client=httpx.Client(transport=httpx.MockTransport(handler)))
+    capped.generate("S", "P")
+    assert seen[2]["max_completion_tokens"] == 1234
+
+
+def test_valid_strict_output_is_scored_by_the_unchanged_judging_logic():
+    dim = {"score": 5, "justification": "ok"}
+    out = {"claims": [
+        {"claim": "GV.SC-03 maps to ID.SC-2", "unit_ids": ["S1", "M1"], "evidence_ids": ["xwalk:row25"], "verdict": "supported",
+         "justification": "row 25"},
+        {"claim": "also new in 2.0", "unit_ids": ["S2", "K1"], "evidence_ids": ["xwalk:row26"], "verdict": "supported",
+         "justification": "row 26"}],
+        "non_factual_units": [{"unit_id": "S3", "justification": "hedge"}],
+        "answer_relevance": dim, "factual_correctness": dim, "completeness": dim, "citation_support": dim,
+        "citation_assessments": [{"citation_id": "xwalk:row25", "verdict": "supports", "justification": "j"},
+                                 {"citation_id": "xwalk:row26", "verdict": "supports", "justification": "j"}]}
+    j = jg.judge_answer(groq(lambda r: httpx.Response(200, json=chat_ok(json.dumps(out)))), "q?", {"expected_facts": []},
+                        MULTI, MULTI_EVID, max_attempts=1)
+    assert j.status == "judged" and j.derived["faithfulness"]["score_1_5"] == 5
+    assert j.derived["faithfulness"]["supported_units"] == 4 and j.derived["citation_support"] == 5
+
+
+def test_json_validate_failed_is_reported_safely_and_stops_without_repair():
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return httpx.Response(400, json={"error": {"message": f"Failed to generate JSON {SECRET} {{raw model text}}",
+                                                   "type": "invalid_request_error", "code": "json_validate_failed",
+                                                   "failed_generation": "SENSITIVE RAW OUTPUT"}})
+
+    j = jg.judge_answer(groq(handler), "q?", {"expected_facts": []}, MULTI, MULTI_EVID, max_attempts=1)
+    assert j.status == "provider_error" and "json_validate_failed" in j.reason and len(calls) == 1
+    assert SECRET not in j.reason and "SENSITIVE" not in j.reason and "raw model text" not in j.reason
+
+
+# ---- segmented judging inside the runner (SegSmartJudge: see test_judge_segments.py) ----
+from test_judge_segments import SmartJudge as SegSmartJudge
+
+
+def test_runner_segmented_mode_stops_on_a_429_and_never_retries(assembler, store, conn, by_id):
+    gen = NamedFake("fake", "g", ans.reference_fixture(by_id["B01"], conn)[0], ans.reference_fixture(by_id["C01"], conn)[0])
+    judge = SegSmartJudge(fail_on_call=2)
+    res = run_judged_evaluation([by_id["B01"], by_id["C01"]], assembler, store, gen, judge, Settings(), jg.JudgeSettings(),
+                                2, 10, judge_mode="segmented", segment_batch_size=2)
+    assert res["status"] == "stopped_on_provider_error" and judge.calls == 2
+    j = res["per_question"]["B01"]["judgment"]
+    assert j["status"] == "incomplete" and j["mode"] == "segmented"
+    assert res["per_question"]["C01"]["generation"]["status"] == "not_attempted"
+    assert res["judge_aggregate"]["judged"] == 0
+
+
+def test_single_mode_is_the_default_and_unchanged(assembler, store, conn, by_id):
+    gen = NamedFake("fake", "g", ans.reference_fixture(by_id["A01"], conn)[0])
+    res = run_judged_evaluation([by_id["A01"]], assembler, store, gen, NamedFake("fake", "j", dynamic_judge()), Settings(),
+                                jg.JudgeSettings(), 1, 1)
+    j = res["per_question"]["A01"]["judgment"]
+    assert j["mode"] == "single_call" and j["batches"] == [] and j["status"] == "judged"

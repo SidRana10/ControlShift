@@ -139,7 +139,8 @@ def test_cross_version_comparison_gathers_both_versions_and_official_links(assem
                            "risk management?")
     assert b.query_type == "cross_version_comparison" and b.searched_versions == ["1.1", "2.0"]
     assert {p["version"] for p in b.passages} == {"1.1", "2.0"}
-    assert b.crosswalk_records and all(r["via"][0].startswith("retrieved:") for r in b.crosswalk_records)
+    assert b.crosswalk_records and all(r["via"][0].startswith(("retrieved:", "category_expansion:")) for r in b.crosswalk_records)
+    assert 22 in {r["excel_row"] for r in b.crosswalk_records}      # the category-level official row (see test_category_expansion)
     assert len(b.conflicts) <= 1 and b.unresolved_questions == []
 
 

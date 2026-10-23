@@ -111,9 +111,12 @@ class GroqProvider:
 
     def __init__(self, api_key: str, model: str, timeout: float = 60.0,
                  base_url: str = GROQ_BASE_URL, client: httpx.Client | None = None,
-                 reasoning_format: str | None = None):
+                 reasoning_format: str | None = None, json_schema: dict | None = None,
+                 schema_name: str = "output", max_completion_tokens: int | None = None):
         if not api_key or not model:
             raise ProviderNotConfigured("a Groq API key and model must both be set")
+        # With a schema the request uses Groq's STRICT structured outputs (constrained decoding) instead of plain JSON mode.
+        self.json_schema, self.schema_name, self.max_completion_tokens = json_schema, schema_name, max_completion_tokens
         self._key, self.model, self.timeout, self.base_url = api_key, model, timeout, base_url
         self.reasoning_format = reasoning_format  # sent only when set (e.g. 'hidden' for reasoning models)
         self._client = client  # injectable for tests (httpx.MockTransport)
@@ -129,9 +132,19 @@ class GroqProvider:
                    reasoning_format=s.groq_reasoning_format)
 
     def generate(self, system: str, prompt: str) -> str:
-        body = {"model": self.model, "temperature": 0,
-                "response_format": {"type": "json_object"},
+        return self._post(system, prompt, self.json_schema, self.schema_name)
+
+    def generate_structured(self, system: str, prompt: str, schema: dict, name: str) -> str:
+        """Like generate(), but constrained to an explicit strict JSON Schema for this one call."""
+        return self._post(system, prompt, schema, name)
+
+    def _post(self, system: str, prompt: str, schema: dict | None, schema_name: str) -> str:
+        fmt = ({"type": "json_schema", "json_schema": {"name": schema_name, "strict": True, "schema": schema}}
+               if schema else {"type": "json_object"})
+        body = {"model": self.model, "temperature": 0, "response_format": fmt,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]}
+        if self.max_completion_tokens:
+            body["max_completion_tokens"] = self.max_completion_tokens
         if self.reasoning_format:
             body["reasoning_format"] = self.reasoning_format
         url = f"{self.base_url}/chat/completions"

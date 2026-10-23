@@ -1,0 +1,569 @@
+{
+  "label": "GPT-OSS judgments of SAVED answers (no generation). LLM opinions, not ground truth; human review pending.",
+  "date": "2026-10-22",
+  "judge": {
+    "model": "openai/gpt-oss-120b",
+    "rubric_version": "1",
+    "format": "strict json_schema"
+  },
+  "limit_tokens_per_minute": 8000,
+  "decision_cap_estimated_tokens": 7500,
+  "questions": {
+    "C01": {
+      "units": 5,
+      "estimated_total_tokens": 6282,
+      "decision": "judged",
+      "latency_s": 4.241,
+      "http_status": 200,
+      "token_usage": {
+        "prompt_tokens": 4291,
+        "output_tokens": 1802,
+        "reasoning_tokens": 1204,
+        "total_tokens": 6093
+      },
+      "rate_limit_headers": {
+        "x-ratelimit-limit-requests": "1000",
+        "x-ratelimit-limit-tokens": "8000",
+        "x-ratelimit-remaining-requests": "999",
+        "x-ratelimit-remaining-tokens": "3313",
+        "x-ratelimit-reset-requests": "1m26.4s",
+        "x-ratelimit-reset-tokens": "35.152s"
+      },
+      "judgment": {
+        "status": "judged",
+        "reason": "",
+        "output": {
+          "claims": [
+            {
+              "claim": "According to the official crosswalk, the CSF 2.0 subcategory GV.OC-01 maps to two CSF 1.1 subcategories: ID.BE-2 and ID.BE-3.",
+              "unit_ids": [
+                "S1"
+              ],
+              "evidence_ids": [
+                "xwalk:row4",
+                "xwalk:row5"
+              ],
+              "verdict": "supported",
+              "justification": "Both crosswalk rows explicitly state the mappings."
+            },
+            {
+              "claim": "GV.OC-01 (CSF 2.0) is mapped to ID.BE-2 (CSF 1.1).",
+              "unit_ids": [
+                "K1",
+                "M1"
+              ],
+              "evidence_ids": [
+                "xwalk:row4"
+              ],
+              "verdict": "supported",
+              "justification": "Crosswalk row 4 shows this mapping."
+            },
+            {
+              "claim": "GV.OC-01 (CSF 2.0) is mapped to ID.BE-3 (CSF 1.1).",
+              "unit_ids": [
+                "K2",
+                "M2"
+              ],
+              "evidence_ids": [
+                "xwalk:row5"
+              ],
+              "verdict": "supported",
+              "justification": "Crosswalk row 5 shows this mapping."
+            }
+          ],
+          "non_factual_units": [],
+          "answer_relevance": {
+            "score": 5,
+            "justification": "The answer directly states how GV.OC-01 maps to CSF 1.1 subcategories, fully addressing the question."
+          },
+          "factual_correctness": {
+            "score": 5,
+            "justification": "All statements match the gold facts about the official crosswalk rows."
+          },
+          "completeness": {
+            "score": 5,
+            "justification": "Both expected mappings (ID.BE-2 and ID.BE-3) are provided; no expected fact is missing."
+          },
+          "citation_support": {
+            "score": 2,
+            "justification": "Only the two crosswalk citations support the mapping claims; the three chunk citations do not directly support the mapping."
+          },
+          "citation_assessments": [
+            {
+              "citation_id": "chunk:csf1.1:subcategory:ID.BE-2",
+              "verdict": "does_not_support",
+              "justification": "Provides the definition of ID.BE-2 but does not show the mapping."
+            },
+            {
+              "citation_id": "chunk:csf1.1:subcategory:ID.BE-3",
+              "verdict": "does_not_support",
+              "justification": "Provides the definition of ID.BE-3 but does not show the mapping."
+            },
+            {
+              "citation_id": "chunk:csf2.0:subcategory:GV.OC-01",
+              "verdict": "does_not_support",
+              "justification": "Provides the definition of GV.OC-01 but does not show the mapping."
+            },
+            {
+              "citation_id": "xwalk:row4",
+              "verdict": "supports",
+              "justification": "Explicitly states GV.OC-01 maps to ID.BE-2."
+            },
+            {
+              "citation_id": "xwalk:row5",
+              "verdict": "supports",
+              "justification": "Explicitly states GV.OC-01 maps to ID.BE-3."
+            }
+          ]
+        },
+        "derived": {
+          "faithfulness": {
+            "status": "evaluated",
+            "factual_units": 5,
+            "supported_units": 5,
+            "unsupported_units": 0,
+            "unclear_units": 0,
+            "non_factual_units": 0,
+            "unit_verdicts": {
+              "S1": "supported",
+              "K1": "supported",
+              "K2": "supported",
+              "M1": "supported",
+              "M2": "supported"
+            },
+            "claims": 3,
+            "supported": 3,
+            "unsupported": 0,
+            "unclear": 0,
+            "rate": 1.0,
+            "score_1_5": 5
+          },
+          "answer_relevance": 5,
+          "factual_correctness": 5,
+          "completeness": 5,
+          "citation_support": 2,
+          "citation_verdicts": {
+            "does_not_support": 3,
+            "supports": 2
+          },
+          "citation_support_rate": 0.4
+        },
+        "errors": [],
+        "units": [
+          {
+            "unit_id": "S1",
+            "kind": "sentence",
+            "text": "According to the official crosswalk, the CSF 2.0 subcategory GV.OC-01 maps to two CSF 1.1 subcategories: ID.BE-2 and ID.BE-3."
+          },
+          {
+            "unit_id": "K1",
+            "kind": "key_change",
+            "text": "GV.OC-01 (CSF 2.0) is mapped to ID.BE-2 (CSF 1.1)."
+          },
+          {
+            "unit_id": "K2",
+            "kind": "key_change",
+            "text": "GV.OC-01 (CSF 2.0) is mapped to ID.BE-3 (CSF 1.1)."
+          },
+          {
+            "unit_id": "M1",
+            "kind": "mapping",
+            "text": "Mapping claim: GV.OC-01 -> ID.BE-2. Official crosswalk mapping from CSF 2.0 to CSF 1.1."
+          },
+          {
+            "unit_id": "M2",
+            "kind": "mapping",
+            "text": "Mapping claim: GV.OC-01 -> ID.BE-3. Official crosswalk mapping from CSF 2.0 to CSF 1.1."
+          }
+        ],
+        "attempts": 1,
+        "seconds": 4.237,
+        "judge": {
+          "name": "groq",
+          "model": "openai/gpt-oss-120b",
+          "rubric_version": "1"
+        },
+        "mode": "single_call",
+        "batches": [],
+        "limitations": []
+      },
+      "scores": {
+        "faithfulness": 5,
+        "answer_relevance": 5,
+        "factual_correctness": 5,
+        "completeness": 5,
+        "citation_support": 2
+      }
+    },
+    "E01": {
+      "units": 4,
+      "estimated_total_tokens": 5848,
+      "decision": "judged",
+      "latency_s": 3.446,
+      "http_status": 200,
+      "token_usage": {
+        "prompt_tokens": 3940,
+        "output_tokens": 1413,
+        "reasoning_tokens": 770,
+        "total_tokens": 5353
+      },
+      "rate_limit_headers": {
+        "x-ratelimit-limit-requests": "1000",
+        "x-ratelimit-limit-tokens": "8000",
+        "x-ratelimit-remaining-requests": "998",
+        "x-ratelimit-remaining-tokens": "3621",
+        "x-ratelimit-reset-requests": "2m52.8s",
+        "x-ratelimit-reset-tokens": "32.842s"
+      },
+      "judgment": {
+        "status": "judged",
+        "reason": "",
+        "output": {
+          "claims": [
+            {
+              "claim": "GV.OV-01 does not map to any CSF 1.1 element.",
+              "unit_ids": [
+                "S1"
+              ],
+              "evidence_ids": [
+                "xwalk:row46"
+              ],
+              "verdict": "supported",
+              "justification": "The crosswalk row 46 explicitly states that GV.OV-01 has no CSF 1.1 reference (mapping_type=new_in_2_0)."
+            },
+            {
+              "claim": "The official crosswalk identifies GV.OV-01 as \"new_in_2_0\" with the comment \"Conceptually new in 2.0\", indicating there is no corresponding CSF 1.1 reference element.",
+              "unit_ids": [
+                "S2"
+              ],
+              "evidence_ids": [
+                "xwalk:row46"
+              ],
+              "verdict": "supported",
+              "justification": "Row 46 contains the mapping_type and comment that directly match this description."
+            },
+            {
+              "claim": "GV.OV-01 is a new subcategory in CSF 2.0 with no direct equivalent in CSF 1.1.",
+              "unit_ids": [
+                "K1"
+              ],
+              "evidence_ids": [
+                "xwalk:row46"
+              ],
+              "verdict": "supported",
+              "justification": "The crosswalk marks GV.OV-01 as conceptually new in 2.0 with no CSF 1.1 reference."
+            },
+            {
+              "claim": "Mapping claim: GV.OV-01 -> no CSF 1.1 reference. Official crosswalk marks this element as conceptually new in CSF 2.0 with no CSF 1.1 reference.",
+              "unit_ids": [
+                "M1"
+              ],
+              "evidence_ids": [
+                "xwalk:row46"
+              ],
+              "verdict": "supported",
+              "justification": "Row 46 provides the official mapping indicating no CSF 1.1 reference."
+            }
+          ],
+          "non_factual_units": [],
+          "answer_relevance": {
+            "score": 5,
+            "justification": "The answer directly addresses the question by stating that GV.OV-01 has no mapping to CSF 1.1 and explains why."
+          },
+          "factual_correctness": {
+            "score": 5,
+            "justification": "All statements align with the gold facts that GV.OV-01 is conceptually new in CSF 2.0 and has no CSF 1.1 reference."
+          },
+          "completeness": {
+            "score": 5,
+            "justification": "The answer covers the only expected fact: that there is no CSF 1.1 mapping for GV.OV-01."
+          },
+          "citation_support": {
+            "score": 4,
+            "justification": "The crosswalk citation fully supports the claims; the CSF 2.0 subcategory citation does not contribute to the mapping claim."
+          },
+          "citation_assessments": [
+            {
+              "citation_id": "chunk:csf2.0:subcategory:GV.OV-01",
+              "verdict": "does_not_support",
+              "justification": "Provides only the definition of GV.OV-01 and does not address its mapping to CSF 1.1."
+            },
+            {
+              "citation_id": "xwalk:row46",
+              "verdict": "supports",
+              "justification": "Explicitly states that GV.OV-01 has no CSF 1.1 reference and is conceptually new in 2.0."
+            }
+          ]
+        },
+        "derived": {
+          "faithfulness": {
+            "status": "evaluated",
+            "factual_units": 4,
+            "supported_units": 4,
+            "unsupported_units": 0,
+            "unclear_units": 0,
+            "non_factual_units": 0,
+            "unit_verdicts": {
+              "S1": "supported",
+              "S2": "supported",
+              "K1": "supported",
+              "M1": "supported"
+            },
+            "claims": 4,
+            "supported": 4,
+            "unsupported": 0,
+            "unclear": 0,
+            "rate": 1.0,
+            "score_1_5": 5
+          },
+          "answer_relevance": 5,
+          "factual_correctness": 5,
+          "completeness": 5,
+          "citation_support": 4,
+          "citation_verdicts": {
+            "does_not_support": 1,
+            "supports": 1
+          },
+          "citation_support_rate": 0.5
+        },
+        "errors": [],
+        "units": [
+          {
+            "unit_id": "S1",
+            "kind": "sentence",
+            "text": "GV.OV-01 does not map to any CSF 1.1 element."
+          },
+          {
+            "unit_id": "S2",
+            "kind": "sentence",
+            "text": "The official crosswalk identifies GV.OV-01 as 'new_in_2_0' with the comment 'Conceptually new in 2.0', indicating there is no corresponding CSF 1.1 reference element."
+          },
+          {
+            "unit_id": "K1",
+            "kind": "key_change",
+            "text": "GV.OV-01 is a new subcategory in CSF 2.0 with no direct equivalent in CSF 1.1."
+          },
+          {
+            "unit_id": "M1",
+            "kind": "mapping",
+            "text": "Mapping claim: GV.OV-01 -> no CSF 1.1 reference. Official crosswalk marks this element as conceptually new in CSF 2.0 with no CSF 1.1 reference."
+          }
+        ],
+        "attempts": 1,
+        "seconds": 3.444,
+        "judge": {
+          "name": "groq",
+          "model": "openai/gpt-oss-120b",
+          "rubric_version": "1"
+        },
+        "mode": "single_call",
+        "batches": [],
+        "limitations": []
+      },
+      "scores": {
+        "faithfulness": 5,
+        "answer_relevance": 5,
+        "factual_correctness": 5,
+        "completeness": 5,
+        "citation_support": 4
+      }
+    },
+    "F01": {
+      "units": 7,
+      "estimated_total_tokens": 7147,
+      "decision": "judged",
+      "latency_s": 4.341,
+      "http_status": 200,
+      "token_usage": {
+        "prompt_tokens": 4611,
+        "output_tokens": 1887,
+        "reasoning_tokens": 1292,
+        "total_tokens": 6498
+      },
+      "rate_limit_headers": {
+        "x-ratelimit-limit-requests": "1000",
+        "x-ratelimit-limit-tokens": "8000",
+        "x-ratelimit-remaining-requests": "997",
+        "x-ratelimit-remaining-tokens": "2934",
+        "x-ratelimit-reset-requests": "4m19.2s",
+        "x-ratelimit-reset-tokens": "37.995s"
+      },
+      "judgment": {
+        "status": "judged",
+        "reason": "",
+        "output": {
+          "claims": [
+            {
+              "claim": "GV.SC-03 maps to CSF 1.1 subcategory ID.SC-2 according to the official crosswalk.",
+              "unit_ids": [
+                "S1",
+                "K1",
+                "M1"
+              ],
+              "evidence_ids": [
+                "xwalk:row25"
+              ],
+              "verdict": "supported",
+              "justification": "Evidence xwalk:row25 explicitly states the mapping GV.SC-03 -> ID.SC-2."
+            },
+            {
+              "claim": "GV.SC-03 is listed as conceptually new in CSF 2.0 with no CSF 1.1 reference.",
+              "unit_ids": [
+                "S2",
+                "K2",
+                "M2"
+              ],
+              "evidence_ids": [
+                "xwalk:row26"
+              ],
+              "verdict": "supported",
+              "justification": "Evidence xwalk:row26 states GV.SC-03 has no reference and is marked as new_in_2_0 (conceptually new)."
+            },
+            {
+              "claim": "Both entries (row25 and row26) are present in the official records.",
+              "unit_ids": [
+                "S3"
+              ],
+              "evidence_ids": [
+                "xwalk:row25",
+                "xwalk:row26"
+              ],
+              "verdict": "supported",
+              "justification": "Both crosswalk rows are provided in the evidence set."
+            }
+          ],
+          "non_factual_units": [],
+          "answer_relevance": {
+            "score": 5,
+            "justification": "The answer directly addresses how GV.SC-03 maps to CSF 1.1, providing the mapping and noting the conflicting entry."
+          },
+          "factual_correctness": {
+            "score": 5,
+            "justification": "All statements align with the gold facts about the official crosswalk rows and the conceptual\u2011new status."
+          },
+          "completeness": {
+            "score": 5,
+            "justification": "The answer includes both the mapping to ID.SC-2 and the note that GV.SC-03 is also listed as conceptually new with no 1.1 reference, covering all expected facts."
+          },
+          "citation_support": {
+            "score": 3,
+            "justification": "Two of the four cited items (the crosswalk rows) directly support the claims; the other two provide background but do not substantiate the mapping claims."
+          },
+          "citation_assessments": [
+            {
+              "citation_id": "chunk:csf1.1:subcategory:ID.SC-2",
+              "verdict": "does_not_support",
+              "justification": "Provides a description of ID.SC-2 but does not evidence the mapping."
+            },
+            {
+              "citation_id": "chunk:csf2.0:subcategory:GV.SC-03",
+              "verdict": "does_not_support",
+              "justification": "Provides a description of GV.SC-03 but does not evidence the mapping or new\u2011in\u20112.0 status."
+            },
+            {
+              "citation_id": "xwalk:row25",
+              "verdict": "supports",
+              "justification": "Explicitly states the mapping GV.SC-03 -> ID.SC-2."
+            },
+            {
+              "citation_id": "xwalk:row26",
+              "verdict": "supports",
+              "justification": "Explicitly states GV.SC-03 has no CSF 1.1 reference and is conceptually new."
+            }
+          ]
+        },
+        "derived": {
+          "faithfulness": {
+            "status": "evaluated",
+            "factual_units": 7,
+            "supported_units": 7,
+            "unsupported_units": 0,
+            "unclear_units": 0,
+            "non_factual_units": 0,
+            "unit_verdicts": {
+              "S1": "supported",
+              "S2": "supported",
+              "S3": "supported",
+              "K1": "supported",
+              "K2": "supported",
+              "M1": "supported",
+              "M2": "supported"
+            },
+            "claims": 3,
+            "supported": 3,
+            "unsupported": 0,
+            "unclear": 0,
+            "rate": 1.0,
+            "score_1_5": 5
+          },
+          "answer_relevance": 5,
+          "factual_correctness": 5,
+          "completeness": 5,
+          "citation_support": 3,
+          "citation_verdicts": {
+            "does_not_support": 2,
+            "supports": 2
+          },
+          "citation_support_rate": 0.5
+        },
+        "errors": [],
+        "units": [
+          {
+            "unit_id": "S1",
+            "kind": "sentence",
+            "text": "According to the official crosswalk, CSF 2.0 subcategory GV.SC-03 maps to CSF 1.1 subcategory ID.SC-2."
+          },
+          {
+            "unit_id": "S2",
+            "kind": "sentence",
+            "text": "However, the official workbook also contains a separate entry indicating that GV.SC-03 is 'conceptually new in 2.0' with no corresponding CSF 1.1 reference."
+          },
+          {
+            "unit_id": "S3",
+            "kind": "sentence",
+            "text": "Both entries are present in the official records."
+          },
+          {
+            "unit_id": "K1",
+            "kind": "key_change",
+            "text": "CSF 2.0 GV.SC-03 is mapped to CSF 1.1 ID.SC-2 in the official crosswalk."
+          },
+          {
+            "unit_id": "K2",
+            "kind": "key_change",
+            "text": "CSF 2.0 GV.SC-03 is also listed as 'conceptually new in 2.0' with no CSF 1.1 reference in the official crosswalk."
+          },
+          {
+            "unit_id": "M1",
+            "kind": "mapping",
+            "text": "Mapping claim: GV.SC-03 -> ID.SC-2. Official crosswalk row 25 maps GV.SC-03 to ID.SC-2."
+          },
+          {
+            "unit_id": "M2",
+            "kind": "mapping",
+            "text": "Mapping claim: GV.SC-03 -> no CSF 1.1 reference. Official crosswalk row 26 lists GV.SC-03 as 'new_in_2_0' with the comment 'Conceptually new in 2.0' and no reference ID."
+          }
+        ],
+        "attempts": 1,
+        "seconds": 4.34,
+        "judge": {
+          "name": "groq",
+          "model": "openai/gpt-oss-120b",
+          "rubric_version": "1"
+        },
+        "mode": "single_call",
+        "batches": [],
+        "limitations": []
+      },
+      "scores": {
+        "faithfulness": 5,
+        "answer_relevance": 5,
+        "factual_correctness": 5,
+        "completeness": 5,
+        "citation_support": 3
+      }
+    }
+  },
+  "groq_judge_requests": 3,
+  "qwen_gemini_mistral_requests": 0
+}

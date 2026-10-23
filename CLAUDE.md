@@ -6,7 +6,7 @@ Version-aware RAG over NIST CSF 1.1 vs 2.0. Python 3.11+, src layout (`src/contr
 - Activate: `source venv/bin/activate`
 - Tests: `pytest`
 - Ingest: `controlshift-ingest` (reads data/raw, writes data/processed)
-- API: `controlshift-serve` (needs data/processed/controlshift.db and data/indexes; GEMINI_* optional)
+- API: `controlshift-serve` (needs data/processed/controlshift.db and data/indexes; LLM_PROVIDER plus that provider's API key/model optional)
 - Lint: `ruff check .`
 
 ## Rules
