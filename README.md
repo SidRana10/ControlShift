@@ -1,30 +1,104 @@
-# ControlShift — Version-Aware Enterprise RAG
+# ControlShift — Version-Aware Enterprise RAG over NIST CSF 1.1 and 2.0
 
-Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybrid
-retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
-mapping between versions, and evidence-grounded answers with verifiable citations.
+ControlShift helps you compare the NIST Cybersecurity Framework 1.1 and 2.0 without losing track of what NIST actually says. It combines a SQLite store of the official framework records and the official transition workbook, hybrid retrieval, evidence-grounded answers with checked citations, and a web application that keeps **official NIST text**, **ControlShift-derived labels** and **AI-generated text** visibly apart.
 
-**Status:** the backend (ingestion, SQLite store, hybrid retrieval + reranking, evidence bundles, grounded generation, FastAPI, retrieval benchmark) and the web application (Overview, Ask ControlShift, Control Explorer, Compare Frameworks, in `frontend/`) are implemented. ControlShift has not been deployed; see *Deployment readiness* below and [PROGRESS.md](PROGRESS.md).
+![Overview page](docs/assets/overview.png)
 
-## What the application does
+## What makes it different from an ordinary RAG demo
 
-- **Ask ControlShift** - questions answered from retrieved NIST evidence with checked citations (needs an LLM provider; without one it shows the evidence only).
-- **Control Explorer** - official CSF 1.1 / 2.0 records, provenance and the crosswalk rows for each record. No LLM.
-- **Compare Frameworks** - the official transition workbook rows (`GET /crosswalk`), searchable, side by side. No LLM.
-- Official NIST text, ControlShift-derived labels and AI-generated text are always labelled differently.
+- **Version-aware evidence, not a bag of chunks.** A query planner detects control IDs and framework versions; exact records come from SQLite, and passages come from retrieval per version, so a CSF 1.1 answer is not built from CSF 2.0 text by accident.
+- **Official mappings are never inferred.** Relationships between 1.1 and 2.0 come only from the 205 rows of NIST's transition workbook, kept as individual rows (direction CSF 2.0 → CSF 1.1). Similarity search supplies passages, never mappings; a missing reference is never described as "removed".
+- **Answers must cite, and may abstain.** Generation is constrained to a supplied evidence bundle; cited IDs must exist in it, mappings must match a cited workbook row, and unsupported "removed/deprecated" claims are rejected. With no usable evidence the system abstains instead of answering.
+- **Honest verification limits.** Citation validation is **structural**: it proves the cited chunk or workbook row exists and its version, page, section and mapping endpoints match the database. It does **not** prove the answer's statements are faithful to the cited text, and no model confidence is reported.
+- **Two deterministic workflows need no LLM at all** (Explorer and Compare), so the authoritative data is browsable on its own.
+- **Evaluation evidence is kept, including failures** (see [Evaluation](#evaluation)).
 
-## Setup
+> ControlShift is a portfolio/research project. It is not affiliated with or endorsed by NIST and has not been deployed.
 
-```bash
-python3.12 -m venv venv
-source venv/bin/activate
-pip install -e ".[dev]"        # full deps (downloads torch; large)
-pip install -e ".[dev,ui]"     # plus Streamlit
-cp .env.example .env
-pytest
+## The three workflows
+
+| | What it does | LLM |
+|---|---|---|
+| **Ask ControlShift** | Natural-language questions answered from retrieved NIST evidence. Citations are interactive and open an Evidence Inspector with source file, page, version and section. Outcomes: `answered`, `abstained`, `evidence_only` (no provider configured), `rejected` (answer failed validation, nothing shown). | Optional |
+| **Control Explorer** | Browse and search every function, category and subcategory of both versions as verbatim NIST text, with provenance, informative references and the crosswalk rows for each record. | None |
+| **Compare Frameworks** | Search the transition workbook (`GET /crosswalk`) and inspect a CSF 2.0 element beside the CSF 1.1 element(s) it references, forward and reverse. One-to-many rows and rows with no reference element stay separate; ControlShift's ingest labels are tagged *Derived*. | None |
+
+![Ask ControlShift with the Evidence Inspector](docs/assets/ask-evidence-inspector.png)
+
+*Illustrative test result: this answer was produced by a scripted fake LLM over real NIST retrieval to exercise the interface. It is not a verified live-model answer.*
+
+![Control Explorer record](docs/assets/explorer-record.png)
+
+![Compare Frameworks, side by side](docs/assets/compare-side-by-side.png)
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph SRC["NIST sources (local files, not in Git)"]
+    PDF["CSF 1.1 and CSF 2.0 PDFs"]
+    XLS["Transition workbook (.xlsx)"]
+  end
+  SRC --> ING["controlshift-ingest<br/>chunks.jsonl, crosswalk.jsonl"]
+  ING --> DB[("SQLite<br/>controlshift.db")]
+  DB --> IDX[("BM25 and dense (FAISS) indexes<br/>controlshift-retrieve build-index")]
+
+  subgraph API["FastAPI backend"]
+    CAT["GET /catalog/*, GET /crosswalk, GET /health<br/>read-only, deterministic"]
+    subgraph ASK["POST /ask (LLM-backed)"]
+      PLAN["Query planner"] --> EVID["Evidence assembly<br/>exact records, workbook rows, retrieved passages"]
+      EVID --> GEN["Grounded generation<br/>Gemini, Mistral or Groq"]
+      GEN --> VAL["Structural citation and mapping validation"]
+    end
+  end
+  DB --> CAT
+  DB --> EVID
+  IDX --> EVID
+  CAT --> PROXY
+  VAL --> PROXY
+  PROXY["Next.js route handlers<br/>read-only allowlist + /ask"] --> UI["Frontend: Overview, Ask, Explorer, Compare"]
 ```
 
-## Ingestion
+Key decisions: SQLite is the source of truth for records and crosswalk rows; retrieval (BM25 + dense MiniLM fused with RRF, optional cross-encoder rerank) only finds passages; the generator sees a budgeted evidence context and its output is validated deterministically before anything is returned; the browser talks only to same-origin Next.js route handlers, which forward a fixed set of paths and never see provider keys.
+
+## Quick start
+
+Requirements: **Python 3.11+** (developed on 3.12) and **Node 20.9+** (developed on Node 26).
+
+```bash
+# 1. backend
+python3 -m venv venv && source venv/bin/activate
+pip install -e ".[dev]"          # full deps (downloads torch; large)
+cp .env.example .env             # all optional; variables are listed under Deployment readiness
+
+# 2. NIST data (not in Git): see "NIST source documents" below, then
+controlshift-ingest && controlshift-db build && controlshift-db validate
+controlshift-retrieve build-index                  # downloads all-MiniLM-L6-v2 on first run
+
+# 3. run
+controlshift-serve                                 # http://127.0.0.1:8000
+cd frontend && npm ci && npm run dev               # http://localhost:3000
+```
+
+Without LLM credentials the API still works: Ask returns `evidence_only` and Explorer and Compare are unaffected. `RETRIEVAL_MODE=none` or `bm25` in `.env` avoids loading any model.
+
+## NIST source documents
+
+ControlShift needs three official NIST files, saved under these exact names in `data/raw/` (git-ignored; nothing from NIST is committed):
+
+| Local filename | Official source |
+|---|---|
+| `nist_csf_1_1.pdf` | [The NIST Cybersecurity Framework 1.1 (CSWP 04162018)](https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf) |
+| `nist_csf_2_0.pdf` | [The NIST Cybersecurity Framework 2.0 (CSWP 29)](https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf) |
+| `nist_csf_transition.xlsx` | [CSFv1.1_to_CSFv2.0_CROSSWALK_20240220.xlsx](https://csrc.nist.gov/csrc/media/Projects/olir/documents/submissions/CSFv1.1_to_CSFv2.0_CROSSWALK_20240220.xlsx), the OLIR crosswalk linked from the [NIST CSF FAQ](https://www.nist.gov/cyberframework/faqs); the `Relationships` sheet (205 rows) is what ControlShift ingests |
+
+These URLs were checked on 2026-10-23: files downloaded from them are byte-identical (SHA-256) to the files ControlShift was built and evaluated with (`data/processed/manifest.json` records the hashes of whatever you ingest, and the API exposes them in `/catalog/versions`). NIST may move files later; check the [CSF 2.0 resources](https://www.nist.gov/cyberframework/csf-20-resources) page if a link breaks.
+
+*Attribution:* the framework text and workbook content shown by ControlShift come from NIST publications (NIST CSWP 29, NIST CSWP 04162018 and the NIST OLIR CSF 1.1 to 2.0 crosswalk). ControlShift is an independent project, **not affiliated with or endorsed by NIST**; see NIST's own terms for reuse of its content.
+
+## Reference
+
+### Ingestion
 
 Place the three NIST files in `data/raw/` (`nist_csf_1_1.pdf`, `nist_csf_2_0.pdf`,
 `nist_csf_transition.xlsx`), then:
@@ -33,9 +107,9 @@ Place the three NIST files in `data/raw/` (`nist_csf_1_1.pdf`, `nist_csf_2_0.pdf
 controlshift-ingest            # writes data/processed/{chunks.jsonl,crosswalk.jsonl,manifest.json}
 ```
 
-Phase 1 needs only `pymupdf`, `pandas`, `openpyxl` (plus `pytest`, `ruff` for dev).
+Ingestion needs only `pymupdf`, `pandas` and `openpyxl`. Source files and expected names: see *NIST source documents* above.
 
-## Knowledge store
+### Knowledge store
 
 ```bash
 controlshift-db build      # data/processed/*.jsonl -> data/processed/controlshift.db
@@ -46,7 +120,7 @@ controlshift-db map ID.BE-2 --version 1.1      # reverse lookup over the same ro
 controlshift-db unmapped [--direction no-later|flagged-new] [--level subcategory]
 ```
 
-## Retrieval
+### Retrieval
 
 ```bash
 controlshift-retrieve build-index                  # downloads all-MiniLM-L6-v2 on first run
@@ -58,17 +132,17 @@ controlshift-retrieve search "manage supplier risk" --mode hybrid_rerank --debug
 On macOS, dense search uses an exact NumPy product over the FAISS-stored vectors (faiss-cpu and torch ship
 conflicting OpenMP runtimes); see `src/controlshift/retrieval/dense.py` and `--dense-backend`.
 
-## Evidence bundles (no LLM)
+### Evidence bundles (no LLM)
 
 ```bash
 controlshift-evidence "How does GV.SC-03 map to CSF 1.1?"            # JSON: records, official mappings, passages, citations
 controlshift-evidence "What changed for supply chain risk management?" --retrieval bm25
 ```
 
-## Grounded answers and API (Phase 4B)
+### Grounded answers and API
 
 ```bash
-cp .env.example .env              # set LLM_PROVIDER (gemini|mistral) and that provider's API key and model to enable generation
+cp .env.example .env              # set LLM_PROVIDER (gemini|mistral|groq) and that provider's API key and model to enable generation
 controlshift-serve                # or: uvicorn controlshift.api.app:app_factory --factory
 curl -s localhost:8000/health
 curl -s localhost:8000/ask -H 'content-type: application/json' \
@@ -85,6 +159,8 @@ The generator is chosen by `LLM_PROVIDER` (`gemini` is the default; `mistral` an
 A live-provider smoke test is opt-in: `RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... GEMINI_MODEL=... pytest tests/test_live_provider.py`.
 
 ## Evaluation
+
+> **Exploratory, not an accuracy claim.** The retrieval benchmark uses 39 AI-labelled questions (chunk ranking only); the live-answer evaluation covers **six questions**; the LLM judge has **not** been validated against human reviewers and no independent human review was completed. Read [`eval/README.md`](eval/README.md) and `eval/final_evaluation_report.md` for what each artifact does and does not show. No figures are quoted here on purpose.
 
 ```bash
 python eval/build_questions.py     # validates the curated labels against SQLite, writes eval/questions.jsonl + audit sheet
@@ -123,7 +199,7 @@ ControlShift is two processes: the FastAPI backend (Python >= 3.11) and the Next
 
 ```bash
 # backend
-python3.12 -m venv venv && source venv/bin/activate && pip install -e .
+python3 -m venv venv && source venv/bin/activate && pip install -e .
 # the three NIST files are NOT in the repository: place them in data/raw/ first (see Ingestion)
 controlshift-ingest && controlshift-db build && controlshift-db validate
 controlshift-retrieve build-index      # not needed for RETRIEVAL_MODE=none; downloads all-MiniLM-L6-v2 on first run
@@ -167,11 +243,29 @@ CONTROLSHIFT_API_URL=http://127.0.0.1:8000 npm run start      # port 3000; PORT=
 - Generation quality has only been explored on six questions (see the evaluation notes above); the UI never reports model confidence.
 - `npm audit` shows development-only advisories (see `frontend/README.md`); `npm audit --omit=dev` is clean.
 
-## Layout
+## Testing
 
-- `src/controlshift/` — package
-- `tests/` — pytest suite
-- `data/raw/` — source PDFs/Excel (gitignored)
-- `eval/` — retrieval benchmarks
-- `ui/` — Streamlit app (legacy prototype; the web application is `frontend/`)
-- `frontend/` — Next.js web application (see `frontend/README.md`)
+- Backend: `pytest` (559 tests collected, a few opt-in or data-dependent ones skipped by default; no model downloads or network calls except opt-in live tests) and `ruff check .`. Several tests build the database from the real NIST files, so run ingestion first.
+- Frontend (from `frontend/`): `npm test` (162 Vitest tests using recorded API fixtures), `npm run lint`, `npm run typecheck`, `npm run build`.
+- The Ask interface was exercised in a browser against real NIST retrieval with a **scripted fake LLM**; live-model behaviour in the UI has not been tested.
+
+## Limitations
+
+- Citation checks are structural only; answer faithfulness is not verified automatically and no confidence score is produced.
+- The evaluation below is a small exploratory sample, not an accuracy benchmark.
+- No authentication or rate limiting; not production-deployed (see *Deployment readiness*).
+- English-language NIST CSF 1.1 / 2.0 only; search in Explorer is substring matching, not semantic.
+- Official crosswalk rows are shown as recorded; a row is not an assertion of perfect equivalence.
+
+## Repository layout
+
+- `src/controlshift/` - backend package (ingest, store, retrieval, evidence, generation, api, evaluation)
+- `tests/` - backend test suite
+- `frontend/` - Next.js web application (see `frontend/README.md`)
+- `docs/` - `frontend-design-spec.md` (design reference) and `assets/` (README screenshots)
+- `eval/` - evaluation scripts, results and reports (start at [`eval/README.md`](eval/README.md))
+- `data/raw/` - where you place the NIST files (git-ignored)
+- `PROGRESS.md` - the project's running development log, milestone by milestone
+- `CLAUDE.md` - working instructions for Claude Code, the AI coding assistant used throughout development
+
+**AI-assisted development.** ControlShift was built with Claude Code under the direction and review of the repository owner. `CLAUDE.md` and `PROGRESS.md` are kept in the repository for transparency. The retrieval relevance labels in `eval/` were also written by an AI assistant and have not been human-reviewed (stated in the reports).

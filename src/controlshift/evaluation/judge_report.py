@@ -32,7 +32,7 @@ def render_judge_report(retrieval: dict | None, offline: dict | None, live: dict
          "## 0. Result types (kept separate)", ""]
     L += _table(["Result type", "What it is", "Present in this report"], [
         ["Offline fixture", "Deterministic checks of the evidence pipeline and of the validator on synthetic data; no model", "yes" if offline else "no"],
-        ["Real generator", "Gemini-generated answers checked by the deterministic validators", "yes" if real else "no (not run)"],
+        ["Real generator", "Answers from the configured generator (provider and model are listed in section 3) checked by the deterministic validators", "yes" if real else "no (not run)"],
         ["LLM judge", "A judge model's 1-5 scores and claim verdicts; an opinion, not ground truth", "yes" if judged_live else "no (not run)"],
         ["Human-reviewed", "Scores entered by a human reviewer; judge/human agreement", "yes" if agreement and agreement["reviewed_and_judged"] else "no (none reviewed)"]])
     L += ["## 1. Retrieval effectiveness (offline benchmark)", ""]
