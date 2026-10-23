@@ -268,4 +268,4 @@ CONTROLSHIFT_API_URL=http://127.0.0.1:8000 npm run start      # port 3000; PORT=
 - `PROGRESS.md` - the project's running development log, milestone by milestone
 - `CLAUDE.md` - working instructions for Claude Code, the AI coding assistant used throughout development
 
-**AI-assisted development.** ControlShift was built with Claude Code under the direction and review of the repository owner. `CLAUDE.md` and `PROGRESS.md` are kept in the repository for transparency. The retrieval relevance labels in `eval/` were also written by an AI assistant and have not been human-reviewed (stated in the reports).
+**AI-assisted development.** ControlShift was built with Claude Code under the direction and review of the repository owner. `CLAUDE.md` and `PROGRESS.md` are kept in the repository for transparency.
