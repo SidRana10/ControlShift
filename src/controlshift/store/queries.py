@@ -130,3 +130,49 @@ class KnowledgeStore:
             "SELECT e.* FROM element e WHERE e.version=? AND EXISTS ("
             " SELECT 1 FROM crosswalk_mapping m WHERE m.focal_element_id=e.element_id"
             " AND m.mapping_type='new_in_2_0') ORDER BY e.element_id", (FOCAL_VERSION,)))
+
+    # -- catalog (browse/search) --------------------------------------------------------
+    def list_versions(self) -> list[dict]:
+        """Framework versions with their source PDF and per-level element counts."""
+        out = []
+        for v in _rows(self.conn.execute(
+                "SELECT f.version, f.name, f.source_file, d.kind, d.sha256, d.bytes, d.pages"
+                " FROM framework_version f JOIN source_document d USING (source_file)"
+                " ORDER BY f.version")):
+            counts = dict(self.conn.execute(
+                "SELECT level, COUNT(*) FROM element WHERE version=? GROUP BY level",
+                (v["version"],)).fetchall())
+            out.append({**v, "counts": {k: counts.get(k, 0)
+                                        for k in ("function", "category", "subcategory")}})
+        return out
+
+    def list_elements(self, *, version: str | None = None, level: str | None = None,
+                      function_id: str | None = None, category_id: str | None = None,
+                      q: str | None = None) -> list[dict]:
+        """Elements ordered by (version, element_id). `q` is a case-insensitive substring match
+        over element_id, original_id, name and description (LIKE wildcards are escaped)."""
+        where, args = [], []
+        for col, val in (("version", version), ("level", level), ("function_id", function_id),
+                         ("category_id", category_id)):
+            if val is not None:
+                where.append(f"{col}=?")
+                args.append(val)
+        if q:
+            pat = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+            where.append("(" + " OR ".join(
+                f"COALESCE({c}, '') LIKE ? ESCAPE '\\'"
+                for c in ("element_id", "original_id", "name", "description")) + ")")
+            args += [pat] * 4
+        sql = "SELECT * FROM element" + (" WHERE " + " AND ".join(where) if where else "")
+        return _rows(self.conn.execute(sql + " ORDER BY version, element_id", args))
+
+    def list_children(self, element_id: str, version: str) -> list[dict]:
+        """Direct children (category -> subcategories, function -> categories)."""
+        return _rows(self.conn.execute(
+            "SELECT * FROM element WHERE version=? AND parent_id=? ORDER BY element_id",
+            (version, normalize_control_id(element_id))))
+
+    def get_source_document(self, source_file: str) -> dict | None:
+        row = self.conn.execute("SELECT * FROM source_document WHERE source_file=?",
+                                (source_file,)).fetchone()
+        return dict(row) if row else None

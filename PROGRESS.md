@@ -593,7 +593,7 @@ Remaining work: run the live subset; human review of gold labels, answers and ju
   11,963 of 12,000 chars; 4,455 + 1,979 = 6,434 tokens; 7.7 s. The answer now enumerates ID.SC-1..5, moves Identify -> Govern with row 22 and preserves the GV.SC-03 conflict, and says records were
   omitted for the budget. **Remaining limitations (documented, not optimised further):** it does not explain what ID.SC-3/4/5 cover even though their definitions were supplied, it omits mapping rows
   24/31/32 and the rows mapping other categories into the compared one (they did not fit), and it frames mapped GV.SC items as "new concepts". Three-way comparison: `eval/b01_before_after.md`
-  (post-hoc repair criteria, not a benchmark; human review PENDING). Next phase: Streamlit frontend.
+  (post-hoc repair criteria, not a benchmark; human review PENDING). Next phase: Next.js frontend (Phase 6).
 
 ### Phase 5 — closure summary  ✅ (exploratory scope; COMPLETE WITH DOCUMENTED LIMITATIONS)
 - **Retrieval benchmark (5A):** complete (`eval/report.md`; 39 AI-labelled questions; unchanged).
@@ -607,9 +607,25 @@ Remaining work: run the live subset; human review of gold labels, answers and ju
 - **Known limitations retained:** six questions only (no accuracy claim); AI-curated, unreviewed gold labels (B01 expects only row 22); generator and judge share Groq; judge blind spot for retrieval-induced false completeness; citation-support definition (claim-level vs per-citation precision) unresolved; free-tier 8,000 tokens/minute limits; Gemini 503s; ControlShift is not production-deployed.
 - Superseded open items: live `/ask` recheck, answer-faithfulness evaluation (done exploratorily), held-out retrieval question set (still open, not needed for Phase 6).
 
-## Phase 6 — Frontend  (NEXT; not started)
-- [ ] Discuss and select the frontend architecture before implementing (no framework chosen yet).
-- Backend FastAPI service (`/health`, `/ask`, `/compare`) already exists from Phase 4B.
+## Phase 6 — Frontend  (IN PROGRESS: backend catalog API done; no frontend code yet)
+Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customized shadcn/ui, with a same-origin proxy to the FastAPI service (so no CORS middleware). Planned experiences: Control Explorer (first), Compare Frameworks, Ask ControlShift. Authoritative structured data is shown independently of LLM generation.
+
+### Phase 6A - Backend discovery and read-only Catalog API  ✅
+- **Discovery audit (read-only, no code changes):** documented the `/health`, `/ask`, `/compare` contracts, the SQLite model and the gaps for a browsing frontend. Findings: no browse/search/detail routes existed; subcategories have no `name` (the description is the title); the five CSF 1.1 functions have no description; the crosswalk covers functions, categories and subcategories (134 distinct CSF 2.0 elements).
+- **New read-only endpoints** (`src/controlshift/api/catalog.py`, no LLM, no retrieval, no new data source):
+  - `GET /catalog/versions` - version name, source document (file, sha256, bytes, pages) and per-level element counts, derived from the database.
+  - `GET /catalog/elements` - typed element summaries; optional `version`, `level`, `function`, `category`, `q` (case-insensitive substring over IDs, names, descriptions; LIKE wildcards escaped); parameterized SQL, ordered by (version, element_id); no pagination (270 elements); invalid filters return the existing 422 envelope.
+  - `GET /catalog/elements/{version}/{element_id}` - identity, parent/children, informative references, source-document and page provenance, and every official crosswalk row for the element. Accepts original (`PR.AT-1`) and normalized (`PR.AT-01`) spellings; unknown IDs return the established 404 `not_found` envelope.
+- **Reuse:** existing `KnowledgeStore` methods (`get_control`, `get_evidence`, `mappings_2_0_to_1_1`, `mappings_1_1_to_2_0`) plus four small read-only additions (`list_versions`, `list_elements`, `list_children`, `get_source_document`). `/ask`, `/compare`, `/health`, retrieval, generation and evaluation are unchanged.
+- **Crosswalk fidelity:** every original workbook row is returned unmerged and individually identifiable (`excel_row`, sheet, source file); direction is stated (CSF 2.0 focal -> CSF 1.1 reference); 2.0 elements use a forward lookup, 1.1 elements a reverse lookup; one-to-many mappings stay as separate rows. `mapping_type` is a ControlShift ingest label, not a workbook column.
+- **Derived summary:** each element's `crosswalk.summary` is marked `derived: true` and uses `mapped_only`, `new_in_2_0_only`, `mapped_and_new_in_2_0`, `no_crosswalk_reference` or `unclassified`. Absence of a row is never described as removal.
+- **GV.SC-03:** row 25 maps to ID.SC-02 and row 26 has no reference with the comment "Conceptually new in 2.0"; both are returned, with summary `mapped_and_new_in_2_0` (1 mapped, 1 new, rows [25, 26]) and neither preferred.
+- **Deferred:** the summary logic in `catalog.py` mirrors the "mapped and new" detection in `evidence/assemble.py` rather than sharing a helper (a shared extraction would touch evidence code); a `/crosswalk` listing route; pagination.
+- **Verification:** 24 new tests in `tests/test_catalog_api.py`; full suite 540 passed, 2 skipped; Ruff clean; no external provider calls.
+
+### Phase 6B - Frontend design and Control Explorer  (NEXT)
+- [ ] High-fidelity Next.js frontend design (light-first enterprise UI, persistent desktop sidebar, responsive mobile layouts), then Control Explorer implementation.
+- [ ] Compare Frameworks and Ask ControlShift experiences afterwards.
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes
