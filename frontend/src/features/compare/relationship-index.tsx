@@ -13,7 +13,7 @@ import { Highlight } from "@/features/explorer/highlight";
 import { useDelayedFlag } from "@/features/explorer/use-delayed-flag";
 import type { CrosswalkEntry, CrosswalkList, MappingType } from "@/lib/api/types";
 import { loadCrosswalk } from "@/lib/compare/cache";
-import { MAX_Q, compareHref, hasFilters, type CompareState } from "@/lib/compare/url";
+import { MAX_Q, TYPE_LABEL, compareHref, hasFilters, type CompareState } from "@/lib/compare/url";
 import { useLoader } from "@/lib/explorer/use-loader";
 import { cn } from "@/lib/utils";
 
@@ -106,7 +106,7 @@ function TypeFilter({ value, counts, onChange }: { value: MappingType | undefine
   const options: [MappingType | undefined, string, number | undefined][] = [
     [undefined, "All rows", total],
     ...TYPE_ORDER.filter((t) => t !== "unmapped" || (counts?.unmapped ?? 0) > 0 || value === "unmapped").map(
-      (t): [MappingType, string, number | undefined] => [t, t, counts?.[t]],
+      (t): [MappingType, string, number | undefined] => [t, TYPE_LABEL[t], counts?.[t]],
     ),
   ];
   return (
@@ -120,11 +120,11 @@ function TypeFilter({ value, counts, onChange }: { value: MappingType | undefine
             key={label}
             type="button"
             aria-pressed={value === t}
+            title={t ? `Exact ingest value: ${t}` : undefined}
             onClick={() => onChange(t)}
             className={cn(
               "inline-flex min-h-11 items-center gap-1.5 rounded-md border px-2.5 text-ui-sm font-medium min-[900px]:min-h-7",
               value === t ? "border-cobalt bg-cobalt-soft text-fg-1" : "border-border-strong bg-surface text-fg-2 hover:bg-surface-hover",
-              t && "font-mono text-id",
             )}
           >
             {label}{" "}
@@ -171,7 +171,7 @@ export function RelationshipIndex({
 
   const meta = data
     ? q || type
-      ? `${data.total} workbook ${data.total === 1 ? "row matches" : "rows match"}${q ? ` “${q}”` : ""}${type ? ` · ${type}` : ""}`
+      ? `${data.total} workbook ${data.total === 1 ? "row matches" : "rows match"}${q ? ` “${q}”` : ""}${type ? ` · ${TYPE_LABEL[type]}` : ""}`
       : `${data.total} workbook rows`
     : "Loading workbook rows…";
 

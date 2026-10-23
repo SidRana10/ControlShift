@@ -9,8 +9,19 @@ import { Connector } from "@/features/explorer/crosswalk-entry";
 import { DerivedSummary } from "@/features/explorer/crosswalk-section";
 import type { Crosswalk, CrosswalkEntry } from "@/lib/api/types";
 import { isLongText } from "@/lib/explorer/crosswalk";
-import { compareHref, type CompareState } from "@/lib/compare/url";
+import { TYPE_LABEL, compareHref, type CompareState } from "@/lib/compare/url";
 import { cn } from "@/lib/utils";
+
+/** Human-readable ingest label with the exact stored value kept visible when it differs. */
+export function IngestLabel({ type }: { type: CrosswalkEntry["mapping_type"] }) {
+  const label = TYPE_LABEL[type] ?? type;
+  return (
+    <span>
+      <span className="font-medium text-fg-1">{label}</span>
+      {label !== type && <span className="ml-1 font-mono text-id text-fg-3">({type})</span>}
+    </span>
+  );
+}
 
 /** The workbook row that supplies the relationship between the two cards, in official direction. */
 export function RowConnector({ entry }: { entry: CrosswalkEntry }) {
@@ -100,7 +111,7 @@ export function RelationshipDetails({
           <DerivedTag /> Derived by ControlShift
         </h4>
         <p className="mt-2 flex flex-wrap items-center gap-2 text-ui-sm text-fg-2">
-          Ingest label: <span className="font-mono text-id">{entry.mapping_type}</span>
+          Ingest label: <IngestLabel type={entry.mapping_type} />
         </p>
         <div className="mt-2">
           <DerivedSummary summary={summary} />
@@ -203,7 +214,7 @@ export function RowItem({
         </p>
       )}
       <p className="mt-1 flex flex-wrap items-center gap-2 text-caption text-fg-2">
-        Ingest label: <span className="font-mono text-id">{entry.mapping_type}</span>
+        Ingest label: <IngestLabel type={entry.mapping_type} />
         <DerivedTag />
       </p>
     </li>

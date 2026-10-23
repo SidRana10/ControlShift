@@ -4,7 +4,14 @@ Analyzes differences between NIST Cybersecurity Framework 1.1 and 2.0 using hybr
 retrieval (dense + BM25 + RRF + cross-encoder reranking), a SQLite-backed control
 mapping between versions, and evidence-grounded answers with verifiable citations.
 
-**Status:** Phases 1-5A complete (ingestion, SQLite store, hybrid retrieval + reranking, evidence bundles, grounded generation, FastAPI, retrieval benchmark). See [PROGRESS.md](PROGRESS.md).
+**Status:** the backend (ingestion, SQLite store, hybrid retrieval + reranking, evidence bundles, grounded generation, FastAPI, retrieval benchmark) and the web application (Overview, Ask ControlShift, Control Explorer, Compare Frameworks, in `frontend/`) are implemented. ControlShift has not been deployed; see *Deployment readiness* below and [PROGRESS.md](PROGRESS.md).
+
+## What the application does
+
+- **Ask ControlShift** - questions answered from retrieved NIST evidence with checked citations (needs an LLM provider; without one it shows the evidence only).
+- **Control Explorer** - official CSF 1.1 / 2.0 records, provenance and the crosswalk rows for each record. No LLM.
+- **Compare Frameworks** - the official transition workbook rows (`GET /crosswalk`), searchable, side by side. No LLM.
+- Official NIST text, ControlShift-derived labels and AI-generated text are always labelled differently.
 
 ## Setup
 
@@ -108,10 +115,63 @@ answers passed every applicable deterministic check; the original B01 did not (a
 See `eval/report.md` for retrieval results and limitations. The relevance labels are AI-curated and source-checked, **not
 human-reviewed**; review them in `eval/questions_audit.md`.
 
+## Deployment readiness
+
+ControlShift is two processes: the FastAPI backend (Python >= 3.11) and the Next.js frontend (Node >= 20.9; developed on Node 26). The browser only talks to the frontend; the frontend server proxies a fixed set of paths to the backend.
+
+**Build from a clean checkout**
+
+```bash
+# backend
+python3.12 -m venv venv && source venv/bin/activate && pip install -e .
+# the three NIST files are NOT in the repository: place them in data/raw/ first (see Ingestion)
+controlshift-ingest && controlshift-db build && controlshift-db validate
+controlshift-retrieve build-index      # not needed for RETRIEVAL_MODE=none; downloads all-MiniLM-L6-v2 on first run
+# frontend
+cd frontend && npm ci && npm run build
+```
+
+`data/raw`, `data/processed`, `data/indexes`, `.env` and every `*.db` are git-ignored, so a deployment must produce (or mount) `data/processed/controlshift.db` and, for retrieval modes other than `none`, `data/indexes/` (about 2.5 MB together).
+
+**Run**
+
+```bash
+# backend (reads .env; API_HOST defaults to 127.0.0.1, API_PORT to 8000)
+controlshift-serve
+# frontend (from frontend/)
+CONTROLSHIFT_API_URL=http://127.0.0.1:8000 npm run start      # port 3000; PORT=... to change
+```
+
+**Configuration**
+
+| Variable | Where | Meaning |
+|---|---|---|
+| `CONTROLSHIFT_API_URL` | frontend server | Backend base URL. Read at request time (not at build), never sent to the browser. Default `http://127.0.0.1:8000`. |
+| `SQLITE_PATH`, `INDEX_DIR` | backend | Relative paths resolve against the backend's working directory: start it from the repository root or set absolute paths. |
+| `RETRIEVAL_MODE` | backend | `none` (structured records only), `bm25` (index only, no model), `dense`, `hybrid` (default), `hybrid_rerank`. Dense and hybrid modes load sentence-transformers models at start-up, so the model cache must be available (first run downloads from Hugging Face). |
+| `LLM_PROVIDER`, `<PROVIDER>_API_KEY`, `<PROVIDER>_MODEL` | backend | Optional. Without a configured provider `/ask` returns `evidence_only`. Keys live only in the backend environment (`.env` or the host's secret store); the frontend never receives them. |
+| `API_HOST`, `API_PORT`, `LLM_TIMEOUT_SECONDS`, `REQUEST_TIMEOUT_SECONDS` | backend | Bind address (use `0.0.0.0` only behind a private network or proxy) and time limits (the frontend waits up to 100s for `/ask`). |
+
+**Health and troubleshooting**
+
+- `GET /health` on the backend (also `/api/backend/health` through the frontend) returns database counts, retrieval mode and `llm.configured`; the sidebar status reads it.
+- Sidebar shows "API unreachable": check `CONTROLSHIFT_API_URL` and that `controlshift-serve` is running; the proxy answers 502 when it cannot reach the backend.
+- Backend exits at start-up: a missing database ("run `controlshift-db build`"), a stale or missing index (`controlshift-retrieve build-index`), or a model that cannot be downloaded (use `RETRIEVAL_MODE=bm25` or `none`).
+- Ask says "No language model is configured": expected without provider credentials.
+
+**Constraints and concerns before a public deployment**
+
+- **No authentication or rate limiting.** Anyone who can reach the frontend can call `POST /api/backend/ask`, which spends LLM provider credit when a provider is configured. Put the app behind access control or a rate limit first, and keep the backend (which also serves `/docs` and the LLM-backed `POST /compare`) on a private network; the frontend proxy forwards only `/ask` and the read-only catalog, crosswalk and health GETs.
+- The backend loads its models and runs retrieval in one process (retrieval is serialised by a lock); run a single worker.
+- NIST source files must be obtained separately; they are not distributed with the repository.
+- Generation quality has only been explored on six questions (see the evaluation notes above); the UI never reports model confidence.
+- `npm audit` shows development-only advisories (see `frontend/README.md`); `npm audit --omit=dev` is clean.
+
 ## Layout
 
 - `src/controlshift/` — package
 - `tests/` — pytest suite
 - `data/raw/` — source PDFs/Excel (gitignored)
 - `eval/` — retrieval benchmarks
-- `ui/` — Streamlit app
+- `ui/` — Streamlit app (legacy prototype; the web application is `frontend/`)
+- `frontend/` — Next.js web application (see `frontend/README.md`)

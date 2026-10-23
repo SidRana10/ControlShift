@@ -664,8 +664,17 @@ Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customi
 - **Verification:** 17 new backend tests (full suite passes, Ruff clean); 142 frontend tests pass; ESLint, `tsc` and production build pass; browser-verified against the real local API and database at 1600/1440/1024/390px with no horizontal overflow and no provider credentials or LLM calls.
 - **Known limitations:** no index scroll restoration on mobile Back; no arrow-key navigation in the index; a deep link without `row` selects the first row without highlighting it in the index; workbook rows carry no level, so none is shown.
 
+### Phase 6B.6 - Final integration, Overview and deployment readiness  ✅
+- **Cross-feature integration:** Explorer records link to Compare ("Compare side by side", `focal` for CSF 2.0, `ref` for CSF 1.1); crosswalk evidence in Ask links to the matching Compare row; Compare, Explorer and Ask evidence all link to Explorer records. Compare's index now marks the inspected element's first row for control-only URLs, and Compare shows readable ingest labels ("Mapped", "New in 2.0") with the exact stored value and the Derived tag kept. No "Soon" / "In development" labels remain.
+- **Overview:** product landing page with a plain statement of purpose, live framework counts from `GET /catalog/versions`, the ingested workbook row count from `/health` (rows, not controls), three workflow cards, four real "Start exploring" links, an Ask status line driven by `llm.configured`, and the NIST / Derived / AI-generated legend. No invented metrics.
+- **Runtime backend proxy:** the build-time Next rewrites were replaced by route handlers that read `CONTROLSHIFT_API_URL` per request (one build works with any backend). A catch-all handler forwards only health, `/crosswalk`, `/catalog/versions`, `/catalog/elements` and `/catalog/elements/{version}/{id}` (GET); every other path is 404 and other methods 405 (no `/docs`, `/openapi.json` or `POST /compare`); `POST /ask` keeps its own validated handler. Unreachable backend -> plain 502 (UI shows "API unreachable").
+- **UI and accessibility:** tighter Ask spacing on mobile; 44px targets, headings, focus and landmarks checked across the four destinations.
+- **Verification:** 162 frontend tests, backend suite and Ruff pass, ESLint / `tsc` / production build pass, `npm audit --omit=dev` reports 0; 27 scripted browser checks pass against the production build (real backend in evidence-only mode plus a scripted fake LLM over real NIST retrieval) covering navigation, Back/Forward/refresh, version switching, the four Ask outcomes and mobile navigation, with no console errors or horizontal overflow at 1920/1440/1024/768/390px. No external LLM/provider calls; live-model behavior is untested.
+- **Deployment prerequisites** (see README, *Deployment readiness*): Python >= 3.11, Node >= 20.9; NIST source files supplied separately; `data/processed` and `data/indexes` built, not committed; `CONTROLSHIFT_API_URL` for the frontend; provider keys only in the backend environment; model cache or `RETRIEVAL_MODE=bm25|none`.
+- **Remaining blockers / concerns:** no authentication or rate limiting (`POST /api/backend/ask` spends provider credit once a key is configured); the backend (which serves `/docs` and the LLM-backed `POST /compare`) must stay on a private network; single backend worker; generation quality only explored on six questions; hybrid/rerank retrieval not exercised through the UI; mobile Back does not restore index scroll position.
+
 ### Next
-- [ ] Final integration, polish and deployment readiness.
+- [ ] Deployment planning and controlled live-model verification.
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes

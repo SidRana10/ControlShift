@@ -44,8 +44,8 @@ describe("initial browsing", () => {
     expect(within(index()).getByRole("status")).toHaveTextContent("205 workbook rows");
     const rows = indexRows();
     expect(rows[0]).toHaveTextContent("ROW 2");
-    expect(within(index()).getByRole("button", { name: /^mapped 185$/ })).toBeInTheDocument();
-    expect(within(index()).getByRole("button", { name: /^new_in_2_0 20$/ })).toBeInTheDocument();
+    expect(within(index()).getByRole("button", { name: /^Mapped 185$/ })).toBeInTheDocument();
+    expect(within(index()).getByRole("button", { name: /^New in 2\.0 20$/ })).toBeInTheDocument();
     expect(within(index()).queryByRole("button", { name: /unmapped/ })).toBeNull(); // zero in this data
     expect(await screen.findByText(/205 workbook rows from/)).toBeInTheDocument();
     expect(screen.getByText(/A row is not a unique control/)).toBeInTheDocument();
@@ -86,10 +86,10 @@ describe("search and filters", () => {
     const user = userEvent.setup();
     mount();
     await waitFor(() => expect(indexRows()).toHaveLength(205));
-    await user.click(within(index()).getByRole("button", { name: /^new_in_2_0 20$/ }));
+    await user.click(within(index()).getByRole("button", { name: /^New in 2\.0 20$/ }));
     await waitFor(() => expect(indexRows()).toHaveLength(20));
     expect(currentUrl()).toBe("/compare?type=new_in_2_0");
-    expect(within(index()).getByRole("button", { name: /^mapped 185$/ })).toBeInTheDocument();
+    expect(within(index()).getByRole("button", { name: /^Mapped 185$/ })).toBeInTheDocument();
     expect(within(index()).getByText("Derived")).toBeInTheDocument();
     await user.click(within(index()).getByRole("button", { name: "Clear" }));
     await waitFor(() => expect(indexRows()).toHaveLength(205));
@@ -195,9 +195,10 @@ describe("GV.SC-03: rows 25 and 26, side by side", () => {
     expect(within(official).getByText("NIST")).toBeInTheDocument();
     expect(within(official).getByText("nist_csf_transition.xlsx")).toBeInTheDocument();
     expect(within(official).getByText("Relationships")).toBeInTheDocument();
-    expect(within(official).queryByText("new_in_2_0")).toBeNull();
+    expect(within(official).queryByText(/new_in_2_0/)).toBeNull();
     const derived = within(inspector()).getByText("Derived by ControlShift").closest("div")!;
-    expect(within(derived).getByText("new_in_2_0")).toBeInTheDocument();
+    expect(within(derived).getByText("New in 2.0")).toBeInTheDocument();
+    expect(within(derived).getByText("(new_in_2_0)")).toBeInTheDocument(); // exact stored value stays visible
     expect(within(derived).getByRole("button", { name: /Derived classification: mapped and new in 2\.0/ })).toBeInTheDocument();
     expect(within(derived).getByText(/not a measure of how closely/)).toBeInTheDocument();
   });
@@ -325,7 +326,7 @@ describe("responsive structure and accessibility", () => {
     const wrap = within(inspector()).getByRole("article", { name: "CSF 2.0 record GV.SC-03" }).parentElement!;
     expect(wrap.className).toMatch(/flex-col/);
     expect(wrap.className).toMatch(/min-\[1480px\]:grid/);
-    expect(within(index()).getByRole("button", { name: /^mapped/ }).className).toMatch(/min-h-11/);
+    expect(within(index()).getByRole("button", { name: /^Mapped/ }).className).toMatch(/min-h-11/);
     expect(within(index()).getByRole("searchbox").className).toMatch(/h-11/);
   });
 
@@ -335,6 +336,18 @@ describe("responsive structure and accessibility", () => {
     const levels = within(inspector()).getAllByRole("heading").map((h) => Number(h.tagName[1]));
     expect(levels[0]).toBe(2);
     for (let i = 1; i < levels.length; i++) expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("index selection", () => {
+  it("marks the inspected element's first row in the index for a control-only URL", async () => {
+    mount("/compare?focal=GV.SC-03");
+    await within(inspector()).findByRole("heading", { level: 2, name: "GV.SC-03" });
+    await waitFor(() => {
+      const row = within(index()).getByRole("link", { name: /^Row 25:/ });
+      expect(row).toHaveAttribute("aria-current", "true");
+    });
+    expect(within(index()).getByRole("link", { name: /^Row 26:/ })).not.toHaveAttribute("aria-current");
   });
 });
 

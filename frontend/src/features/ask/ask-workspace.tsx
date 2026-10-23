@@ -119,13 +119,13 @@ export function AskWorkspace() {
 
   return (
     <div className={cn("min-h-full", showEvidence && "min-[1360px]:grid min-[1360px]:grid-cols-[minmax(0,1fr)_440px]")}>
-      <div className="px-4 py-6 min-[900px]:px-10 min-[900px]:py-8">
+      <div className="px-4 py-4 min-[900px]:px-10 min-[900px]:py-8">
         <div className="mx-auto w-full max-w-[720px]">
           <p className="text-body text-fg-2">
             Ask about NIST CSF 1.1, CSF 2.0 and the official transition workbook. Answers are written from
             retrieved NIST text, and every answer lists the evidence behind it.
           </p>
-          <div className="mt-6">
+          <div className="mt-4 min-[900px]:mt-6">
             <QuestionForm
               question={question}
               onQuestionChange={setQuestion}

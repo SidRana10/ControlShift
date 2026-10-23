@@ -3,7 +3,7 @@
  * the two fields the UI uses, the upstream call has its own timeout, and failures come back in the
  * API's error envelope. Provider credentials live in the FastAPI process and never reach this layer.
  */
-const API_URL = (process.env.CONTROLSHIFT_API_URL ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
+const apiUrl = () => (process.env.CONTROLSHIFT_API_URL ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
 /** Longer than the backend's own REQUEST_TIMEOUT_SECONDS default (90s), so FastAPI's 504 wins. */
 const UPSTREAM_TIMEOUT_MS = 100_000;
 const MAX_QUESTION_LENGTH = 2000;
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const upstream = await fetch(`${API_URL}/ask`, {
+    const upstream = await fetch(`${apiUrl()}/ask`, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({ question, ...(body.version ? { version: body.version } : {}) }),

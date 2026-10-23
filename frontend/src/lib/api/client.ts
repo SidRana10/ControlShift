@@ -12,7 +12,7 @@ import type {
   VersionList,
 } from "./types";
 
-/** Same-origin prefix; next.config.ts rewrites it to the FastAPI service. */
+/** Same-origin prefix; the route handlers in src/app/api/backend proxy it to the FastAPI service. */
 export const API_PREFIX = "/api/backend";
 
 export type ApiErrorKind =

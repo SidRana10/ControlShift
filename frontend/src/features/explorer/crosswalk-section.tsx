@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { Crosswalk, ElementDetail } from "@/lib/api/types";
 import { describeEntry, isLongText, statusLabel } from "@/lib/explorer/crosswalk";
+import { compareHref } from "@/lib/compare/url";
 import { recordHref } from "@/lib/explorer/url";
+import Link from "next/link";
 import { CrosswalkEntryRow } from "./crosswalk-entry";
 import { useExplorer } from "./explorer-provider";
 
@@ -86,8 +88,14 @@ export function CrosswalkSection({ detail }: { detail: ElementDetail }) {
           </Button>
         )}
       </div>
-      <div className="mt-2">
+      <div className="mt-2 flex flex-wrap items-center gap-x-4">
         <DerivedSummary summary={summary} />
+        <Link
+          href={compareHref(reverse ? { ref: detail.element_id } : { focal: detail.element_id })}
+          className="inline-flex min-h-11 items-center text-ui-sm font-medium text-cobalt hover:underline min-[900px]:min-h-7"
+        >
+          Compare side by side<span className="sr-only"> in Compare Frameworks</span>
+        </Link>
       </div>
 
       {summary.status === "mapped_and_new_in_2_0" && (

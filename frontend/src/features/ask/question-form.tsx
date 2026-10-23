@@ -81,7 +81,7 @@ export function QuestionForm({
         )}
       </p>
 
-      <fieldset className="mt-4" disabled={loading}>
+      <fieldset className="mt-3 min-[900px]:mt-4" disabled={loading}>
         <legend className="text-ui-sm font-medium text-fg-1">Version scope</legend>
         <div className="mt-1 inline-flex rounded-md border border-border-strong bg-surface p-0.5">
           {SCOPES.map((s) => (
@@ -111,7 +111,7 @@ export function QuestionForm({
         </p>
       </fieldset>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2 min-[900px]:mt-4">
         <Button type="submit" disabled={!canSubmit} className="min-h-11 px-5 min-[900px]:min-h-8">
           {loading ? (
             <>

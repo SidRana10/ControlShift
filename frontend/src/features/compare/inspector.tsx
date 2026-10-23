@@ -12,7 +12,7 @@ import { DerivedSummary } from "@/features/explorer/crosswalk-section";
 import { useDelayedFlag } from "@/features/explorer/use-delayed-flag";
 import type { ElementDetail, FrameworkVersion } from "@/lib/api/types";
 import { loadCrosswalk } from "@/lib/compare/cache";
-import { compareHref, type CompareState } from "@/lib/compare/url";
+import { TYPE_LABEL, compareHref, type CompareState } from "@/lib/compare/url";
 import { loadDetail, loadElements } from "@/lib/explorer/catalog-cache";
 import { describeEntry } from "@/lib/explorer/crosswalk";
 import { listHref } from "@/lib/explorer/url";
@@ -54,7 +54,7 @@ export function Orientation() {
           {(["mapped", "new_in_2_0", "unmapped"] as const).filter((t) => d.type_counts[t] > 0).map((t, i) => (
             <span key={t}>
               {i > 0 && ", "}
-              <span className="font-mono text-id">{t}</span> {d.type_counts[t]}
+              {TYPE_LABEL[t]} <span className="font-mono text-id text-fg-3">({t})</span> {d.type_counts[t]}
             </span>
           ))}
           .
@@ -86,7 +86,7 @@ export function Orientation() {
         <li>
           <Link href={compareHref({ type: "new_in_2_0" })} className="flex min-h-11 flex-wrap items-baseline gap-x-3 px-3 py-2 hover:bg-surface-hover">
             <span className="text-ui-sm font-medium text-cobalt">Rows with no reference element</span>
-            <span className="text-ui-sm text-fg-2">filter by the new_in_2_0 ingest label</span>
+            <span className="text-ui-sm text-fg-2">filter by the “New in 2.0” ingest label</span>
           </Link>
         </li>
       </ul>

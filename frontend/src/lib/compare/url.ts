@@ -50,10 +50,11 @@ export function compareHref(s: CompareState): string {
 export const hasSubject = (s: CompareState) => Boolean(s.focal || s.ref || s.row);
 export const hasFilters = (s: CompareState) => Boolean(s.q || s.type);
 
+/** Reading labels for the ControlShift ingest classification; the exact stored value stays visible alongside. */
 export const TYPE_LABEL: Record<MappingType, string> = {
-  mapped: "mapped",
-  new_in_2_0: "new_in_2_0",
-  unmapped: "unmapped",
+  mapped: "Mapped",
+  new_in_2_0: "New in 2.0",
+  unmapped: "Unmapped",
 };
 
 export const subjectVersion = (s: CompareState): FrameworkVersion | null =>

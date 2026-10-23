@@ -14,6 +14,7 @@ import type {
   EvidenceItem,
   PassageEvidence,
 } from "@/lib/ask/types";
+import { compareHref } from "@/lib/compare/url";
 import { recordHref } from "@/lib/explorer/url";
 import { cn } from "@/lib/utils";
 
@@ -238,6 +239,12 @@ function CrosswalkBody({ item, expanded, onToggle }: { item: CrosswalkEvidence; 
       <div className="flex flex-wrap gap-x-4">
         <ExplorerLink version={item.focal_version} id={item.focal_id} />
         {item.reference_id && <ExplorerLink version={item.reference_version} id={item.reference_id} />}
+        <Link
+          href={compareHref({ focal: item.focal_id, row: item.excel_row })}
+          className="inline-flex min-h-11 items-center gap-1 text-ui-sm font-medium text-cobalt hover:underline min-[900px]:min-h-7"
+        >
+          Compare row {item.excel_row} side by side
+        </Link>
       </div>
     </>
   );

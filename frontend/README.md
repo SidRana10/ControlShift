@@ -26,8 +26,9 @@ a retryable error.
 
 ## API proxy
 
-The browser calls only same-origin `/api/backend/*` paths. `next.config.ts` rewrites exactly five
-read-only endpoints to FastAPI (`CONTROLSHIFT_API_URL`, default `http://127.0.0.1:8000`):
+The browser calls only same-origin `/api/backend/*` paths. a catch-all route handler
+(`src/app/api/backend/[...path]/route.ts`) forwards exactly five read-only GET endpoints to FastAPI (`CONTROLSHIFT_API_URL`, default `http://127.0.0.1:8000`);
+any other path is a 404, any other method a 405:
 
 | Browser path | FastAPI |
 |---|---|
@@ -37,10 +38,9 @@ read-only endpoints to FastAPI (`CONTROLSHIFT_API_URL`, default `http://127.0.0.
 | `/api/backend/catalog/elements` | `GET /catalog/elements` |
 | `/api/backend/catalog/elements/{version}/{element_id}` | `GET /catalog/elements/{version}/{element_id}` |
 
-`POST /api/backend/ask` is a route handler (`src/app/api/backend/ask/route.ts`), not a rewrite: it accepts only
+`POST /api/backend/ask` has its own handler (`src/app/api/backend/ask/route.ts`): it accepts only
 `question` (1-2000 characters) and optional `version`, forwards them to `POST /ask`, applies a 100s upstream timeout and answers
-failures in the API's error envelope. The LLM-backed `POST /compare` is not proxied (the Compare page uses `GET /crosswalk`). No CORS is needed. The variable is read when the Next.js
-server starts (`next build` for `next start`), so rebuild after changing it.
+failures in the API's error envelope. The LLM-backed `POST /compare` is not proxied (the Compare page uses `GET /crosswalk`). No CORS is needed. `CONTROLSHIFT_API_URL` is read per request by both handlers, so one `npm run build` serves any backend and changing the variable needs only a restart. Production: `npm run build && CONTROLSHIFT_API_URL=... npm run start`; see the root README, *Deployment readiness*.
 
 ## Layout
 
