@@ -17,15 +17,17 @@ function FilterSelect({
   onChange,
   children,
   disabled,
+  grow = 1,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   children: React.ReactNode;
   disabled?: boolean;
+  grow?: number;
 }) {
   return (
-    <div className="relative min-w-0 flex-1">
+    <div className="relative min-w-0 basis-0" style={{ flexGrow: grow }}>
       <select
         aria-label={label}
         value={value}
@@ -77,6 +79,7 @@ export function FilterBar() {
       <div className="flex gap-1.5" role="group" aria-label={`Filters for CSF ${version}`}>
         <FilterSelect
           label="Level"
+          grow={1.5}
           value={ctx.level ?? ""}
           onChange={(v) => updateContext({ level: isLevel(v) ? v : undefined })}
         >

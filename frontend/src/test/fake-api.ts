@@ -3,10 +3,30 @@ import type { ElementSummary } from "@/lib/api/types";
 import e11 from "./fixtures/elements-1.1.json";
 import e20 from "./fixtures/elements-2.0.json";
 import versions from "./fixtures/versions.json";
+import d11DE from "./fixtures/details/1.1-DE.json";
+import d11IDSC02 from "./fixtures/details/1.1-ID.SC-02.json";
+import d11PRAT01 from "./fixtures/details/1.1-PR.AT-01.json";
+import d11RCCO02 from "./fixtures/details/1.1-RC.CO-02.json";
+import d20GV from "./fixtures/details/2.0-GV.json";
+import d20GVSC from "./fixtures/details/2.0-GV.SC.json";
+import d20GVSC03 from "./fixtures/details/2.0-GV.SC-03.json";
+import d20IDIM03 from "./fixtures/details/2.0-ID.IM-03.json";
 
 export const ELEMENTS_2_0 = e20 as ElementSummary[];
 export const ELEMENTS_1_1 = e11 as ElementSummary[];
 export const ALL = [...ELEMENTS_1_1, ...ELEMENTS_2_0];
+
+/** Real responses recorded from GET /catalog/elements/{version}/{id} (see fixtures/details). */
+export const DETAILS: Record<string, unknown> = {
+  "1.1/DE": d11DE,
+  "1.1/ID.SC-02": d11IDSC02,
+  "1.1/PR.AT-01": d11PRAT01,
+  "1.1/RC.CO-02": d11RCCO02,
+  "2.0/GV": d20GV,
+  "2.0/GV.SC": d20GVSC,
+  "2.0/GV.SC-03": d20GVSC03,
+  "2.0/ID.IM-03": d20IDIM03,
+};
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -32,10 +52,13 @@ export interface FakeApi {
   /** Delay (ms) applied to requests whose URL contains the given text. */
   delay: Record<string, number>;
   fail: { current: boolean };
+  /** URL fragments that answer 500 (proxy-style failure) or 200 with an unexpected body. */
+  failDetail: string[];
+  malformed: string[];
 }
 
 export function installFakeApi(): FakeApi {
-  const api: FakeApi = { calls: [], delay: {}, fail: { current: false } };
+  const api: FakeApi = { calls: [], delay: {}, fail: { current: false }, failDetail: [], malformed: [] };
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: RequestInfo | URL) => {
@@ -52,11 +75,17 @@ export function installFakeApi(): FakeApi {
       }
       const m = /^\/catalog\/elements\/([^/]+)\/([^/]+)$/.exec(path);
       if (m) {
+        if (api.failDetail.some((f) => url.href.includes(f))) {
+          return new Response("Internal Server Error", { status: 500 });
+        }
+        if (api.malformed.some((f) => url.href.includes(f))) return json(200, { foo: "bar" });
         const id = decodeURIComponent(m[2]).toUpperCase();
         const el = ALL.find(
           (e) => e.version === m[1] && (e.element_id === id || e.original_id.toUpperCase() === id),
         );
         if (!el) return notFound(`${m[2]} not found in CSF ${m[1]}`);
+        const recorded = DETAILS[`${el.version}/${el.element_id}`];
+        if (recorded) return json(200, recorded);
         return json(200, {
           ...el,
           parent: ALL.find((e) => e.version === el.version && e.element_id === el.parent_id) ?? null,

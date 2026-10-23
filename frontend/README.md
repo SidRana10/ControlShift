@@ -45,7 +45,7 @@ server starts (`next build` for `next start`), so rebuild after changing it.
 - `src/components/ui/` shadcn primitives, restyled to the tokens
 - `src/components/layout/` application shell, sidebar navigation
 - `src/components/shared/` reusable pieces (VersionChip, SourceTag/DerivedTag, Notice, StateBlock, BrandMark)
-- `src/features/explorer/` Control Explorer: provider (URL state), navigator (tree, search, filters), version toggle, record pane
+- `src/features/explorer/` Control Explorer: provider (URL state), navigator (tree, search, filters), version toggle, record pane (identity, provenance, crosswalk, children, references)
 - `src/features/health/` sidebar API status
 - `src/lib/explorer/` pure logic (URL parsing, hierarchy, search helpers), request cache, `useLoader`; `src/test/` test setup and fixtures
 - `src/lib/api/` typed client, response types (backend snake_case), `useApi` hook

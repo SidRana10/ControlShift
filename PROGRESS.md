@@ -635,9 +635,20 @@ Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customi
 - **Verification:** ESLint, `next typegen` + `tsc`, and production build pass, including from a clean `npm ci`; browser checks at 1440/1280/1024/390px (no horizontal overflow, no hydration errors, collapse/mobile navigation/focus/404/error states, proxy behaviour); no external LLM calls. No automated frontend tests yet.
 - **Known advisory (development-only):** `npm audit` reports 9 high entries from one `braces` advisory (GHSA-vfj7-8cjw-p6xm, no patched release); `npm audit --omit=dev` reports 0. Not remediated; see `frontend/README.md`.
 
-### Phase 6B.2 - Control Explorer navigator  (NEXT)
-- [ ] Hierarchical navigator, search and filters, record detail with provenance and `CrosswalkEntry`, per the design spec.
-- [ ] Compare Frameworks (needs a crosswalk-listing endpoint) and Ask ControlShift experiences afterwards.
+### Phase 6B.2 - Control Explorer navigator, search and filters  ✅
+- Hierarchical navigator (Function > Category > Subcategory, official NIST function order) built from `GET /catalog/elements`; WAI-ARIA tree with keyboard support; CSF 2.0 / 1.1 radio-group version toggle; debounced deterministic search (server-side substring, highlighted flat results, exact-ID first, stale-response guard); level/function/category filters with removable chips and a pinned "outside the current results" indicator; URL state (`v`, `level`, `fn`, `cat`, `q`) with canonical record URLs, push/replace history and Back/Forward; single-pane mobile browsing with scroll and focus restoration.
+
+### Phase 6B.3 - Control Explorer record inspection and crosswalk  ✅
+- **Record view** from `GET /catalog/elements/{version}/{id}`: breadcrumbs, printed ID plus normalized ID when different, official name and verbatim description (serif), nullable fields handled honestly (null subcategory names, null CSF 1.1 function descriptions), parent/child navigation, informative references.
+- **Provenance:** NIST source line (version, printed/PDF page) always visible; "Source details" disclosure with file, section path, document metadata, SHA-256 and chunk ID; wide-desktop (1640px+) facts rail. No invented source links.
+- **Crosswalk:** every official workbook row is its own entry (row number, official CSF 2.0 -> 1.1 direction in forward and reverse lookups, printed and normalized IDs, workbook description and comment, ingest `mapping_type` labelled Derived); one-to-many rows are never merged (ID.IM-03: 7 rows); targets open the other framework's record with a way back; `strength` is not shown.
+- **Ambiguity and derived labels:** GV.SC-03 shows rows 25 (-> ID.SC-2) and 26 (no reference, "Conceptually new in 2.0") with a notice generated from the returned rows ("Multiple crosswalk entries require interpretation"); the `crosswalk.summary` label opens the API note and is always marked Derived. Elements with no workbook reference (e.g. CSF 1.1 RC.CO-02) get a neutral "No crosswalk reference" notice, never "removed".
+- **Responsive:** facts rail at 1640px+, inline provenance below, stacked crosswalk entries and separate navigator/record screens on mobile, 44px touch targets, no horizontal overflow; deep links use a static shell fallback.
+- **Verification:** 61 frontend tests (Vitest + Testing Library, recorded real Catalog API data), ESLint, `next typegen` + `tsc` and production build pass; browser-verified against the live Catalog API at 1920/1440/1024/390px; no LLM calls. `npm audit --omit=dev`: 0 (development-only `braces` advisory unchanged).
+- **Known limitations:** facts-rail anchors do not track scroll position; search is substring only (`GV.SC-3` does not match `GV.SC-03` in CSF 2.0); no side-by-side comparison.
+
+### Next
+- [ ] Compare Frameworks (needs a crosswalk-listing endpoint) and Ask ControlShift experiences.
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes

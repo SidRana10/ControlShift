@@ -25,6 +25,15 @@ export interface VersionHint {
   ctx: ExplorerContext;
 }
 
+/** Set when a crosswalk link is followed, so the destination can offer a way back. */
+export interface CrosswalkReturn {
+  fromHref: string;
+  fromLabel: string;
+  row: number;
+  /** "{version}/{element_id}" of the record that was opened. */
+  toKey: string;
+}
+
 interface ExplorerState {
   loc: ExplorerLocation;
   /** Framework version being browsed (the path version for records; default when invalid). */
@@ -46,6 +55,8 @@ interface ExplorerState {
   /** Href of the browse view with the current context (for "Back to results"). */
   backHref: string;
   versionHint: VersionHint | null;
+  crosswalkReturn: CrosswalkReturn | null;
+  followCrosswalk: (ret: CrosswalkReturn) => void;
   requestRecordFocus: () => void;
   consumeRecordFocus: () => boolean;
   replaceWithCanonical: (elementId: string) => void;
@@ -96,6 +107,7 @@ export function ExplorerProvider({ children }: { children: React.ReactNode }) {
   );
 
   const [versionHint, setHint] = useState<VersionHint | null>(null);
+  const [crosswalkReturn, setCrosswalkReturn] = useState<CrosswalkReturn | null>(null);
   const focusRecord = useRef(false);
 
   const navigateContext = useCallback(
@@ -190,6 +202,8 @@ export function ExplorerProvider({ children }: { children: React.ReactNode }) {
     hrefFor: (el) => recordHref(version, el.element_id, ctx),
     backHref: listHref(version, ctx),
     versionHint,
+    crosswalkReturn,
+    followCrosswalk: setCrosswalkReturn,
     requestRecordFocus: () => {
       focusRecord.current = true;
     },

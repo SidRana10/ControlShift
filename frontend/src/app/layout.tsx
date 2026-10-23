@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
+import { ShellFallback } from "@/components/shared/shell-fallback";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SIDEBAR_STORAGE_KEY } from "@/lib/sidebar-preference";
 import "./globals.css";
@@ -51,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full">
         <TooltipProvider delay={300}>
           {/* Routes with runtime params (/explorer/[version]/[id]) read the pathname at request time. */}
-          <Suspense fallback={<div className="h-dvh bg-canvas" aria-busy="true" />}>
+          <Suspense fallback={<ShellFallback />}>
             <AppShell>{children}</AppShell>
           </Suspense>
         </TooltipProvider>

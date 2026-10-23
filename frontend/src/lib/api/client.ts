@@ -49,7 +49,17 @@ const guards = {
   versions: (b: unknown): b is VersionList => isObject(b) && Array.isArray(b.versions),
   elements: (b: unknown): b is ElementList => isObject(b) && Array.isArray(b.elements),
   element: (b: unknown): b is ElementDetail =>
-    isObject(b) && typeof b.element_id === "string" && isObject(b.crosswalk),
+    isObject(b) &&
+    typeof b.element_id === "string" &&
+    typeof b.original_id === "string" &&
+    Array.isArray(b.children) &&
+    Array.isArray(b.informative_references) &&
+    isObject(b.provenance) &&
+    isObject(b.provenance.chunk) &&
+    isObject(b.provenance.source_document) &&
+    isObject(b.crosswalk) &&
+    Array.isArray(b.crosswalk.entries) &&
+    isObject(b.crosswalk.summary),
 };
 
 async function get<T>(
