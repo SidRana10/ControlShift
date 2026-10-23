@@ -607,7 +607,7 @@ Remaining work: run the live subset; human review of gold labels, answers and ju
 - **Known limitations retained:** six questions only (no accuracy claim); AI-curated, unreviewed gold labels (B01 expects only row 22); generator and judge share Groq; judge blind spot for retrieval-induced false completeness; citation-support definition (claim-level vs per-citation precision) unresolved; free-tier 8,000 tokens/minute limits; Gemini 503s; ControlShift is not production-deployed.
 - Superseded open items: live `/ask` recheck, answer-faithfulness evaluation (done exploratorily), held-out retrieval question set (still open, not needed for Phase 6).
 
-## Phase 6 — Frontend  (IN PROGRESS: backend catalog API done; no frontend code yet)
+## Phase 6 — Frontend  (IN PROGRESS: catalog API and app shell done; Control Explorer next)
 Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customized shadcn/ui, with a same-origin proxy to the FastAPI service (so no CORS middleware). Planned experiences: Control Explorer (first), Compare Frameworks, Ask ControlShift. Authoritative structured data is shown independently of LLM generation.
 
 ### Phase 6A - Backend discovery and read-only Catalog API  ✅
@@ -623,9 +623,21 @@ Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customi
 - **Deferred:** the summary logic in `catalog.py` mirrors the "mapped and new" detection in `evidence/assemble.py` rather than sharing a helper (a shared extraction would touch evidence code); a `/crosswalk` listing route; pagination.
 - **Verification:** 24 new tests in `tests/test_catalog_api.py`; full suite 540 passed, 2 skipped; Ruff clean; no external provider calls.
 
-### Phase 6B - Frontend design and Control Explorer  (NEXT)
-- [ ] High-fidelity Next.js frontend design (light-first enterprise UI, persistent desktop sidebar, responsive mobile layouts), then Control Explorer implementation.
-- [ ] Compare Frameworks and Ask ControlShift experiences afterwards.
+### Phase 6A.3-6A.4 - Frontend design specification  ✅
+- `docs/frontend-design-spec.md` is the approved implementation reference (tokens, shell, Explorer, `CrosswalkEntry`, responsive rules, accessibility, states). Implementation adjustments recorded in it: `fg-3` is `#676C75` (4.53-5.28:1 on all surfaces), the sidebar collapse toggle sits at the bottom of the sidebar, and nav labels are 13px.
+
+### Phase 6B.1 - Next.js foundation and application shell  ✅
+- **Foundation (`frontend/`):** Next.js 16.4.2 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, ESLint, selectively customized shadcn/ui (Base UI) and Lucide; npm with a committed lockfile; no state, auth, analytics or animation libraries.
+- **Design system:** approved tokens as CSS variables mapped to Tailwind (colours, type scale, radii, overlay shadow); IBM Plex Sans, IBM Plex Mono and Source Serif 4 via `next/font` (all three confirmed loading in a browser); focus-visible and reduced-motion handling.
+- **Shell:** 232px/56px collapsible sidebar (preference in localStorage, applied before first paint via an inline script so there is no width flash), 56px header, 56px rail at 900-1199px, 52px mobile top bar with an accessible navigation sheet; skip link and landmarks; sidebar status driven by the real `/health` response.
+- **Routes:** `/` Overview, `/explorer` (framework summaries from the live API plus loading/error/empty states), `/ask` and `/compare` (honest placeholders, no mock data, no LLM requests), custom not-found page.
+- **API integration:** typed client for `/health` and the three Catalog endpoints (backend snake_case, error envelope, unreachable/unexpected handling); same-origin Next.js rewrites under `/api/backend/*` limited to those four read-only GET endpoints (`CONTROLSHIFT_API_URL`, default `http://127.0.0.1:8000`); `/ask` and `/compare` are not proxied; backend unchanged, no CORS.
+- **Verification:** ESLint, `next typegen` + `tsc`, and production build pass, including from a clean `npm ci`; browser checks at 1440/1280/1024/390px (no horizontal overflow, no hydration errors, collapse/mobile navigation/focus/404/error states, proxy behaviour); no external LLM calls. No automated frontend tests yet.
+- **Known advisory (development-only):** `npm audit` reports 9 high entries from one `braces` advisory (GHSA-vfj7-8cjw-p6xm, no patched release); `npm audit --omit=dev` reports 0. Not remediated; see `frontend/README.md`.
+
+### Phase 6B.2 - Control Explorer navigator  (NEXT)
+- [ ] Hierarchical navigator, search and filters, record detail with provenance and `CrosswalkEntry`, per the design spec.
+- [ ] Compare Frameworks (needs a crosswalk-listing endpoint) and Ask ControlShift experiences afterwards.
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes

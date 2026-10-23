@@ -90,7 +90,7 @@ On screens below 900px, `source-lg` becomes 17/26; other tokens are unchanged.
 | `border-strong` | `#CFCFC7` | Input borders |
 | `text-1` | `#17191C` | Primary text |
 | `text-2` | `#474C55` | Secondary text |
-| `text-3` | `#6E737C` | Metadata (about 4.8:1 on white) |
+| `text-3` | `#676C75` | Metadata (5.28:1 on white, 4.87 on canvas, 4.66 on surface-sunken, 4.53 on surface-hover) |
 | `text-4` | `#9EA2A8` | Placeholders and disabled only; never used for information |
 
 **Interactive**
@@ -184,13 +184,13 @@ Transitions: 120ms on color/background only; 160ms for expand/collapse height. B
 **Sidebar** (`surface-sunken`, 1px right border):
 - Width 232px expanded, 56px collapsed.
 - Brand row 56px: a 20px mark (two offset squares, one teal and one violet, joined by one stroke), followed by the wordmark "ControlShift" (Sans 600, 15px).
-- Navigation items, in this order: Overview, Ask ControlShift, Control Explorer, Compare Frameworks. Each is 32px tall with 6px radius, a 16px icon and a 14px/500 label, 8px horizontal inset.
+- Navigation items, in this order: Overview, Ask ControlShift, Control Explorer, Compare Frameworks. Each is 32px tall with 6px radius, a 16px icon and a 13px/500 label (`ui-sm`; 14px truncates "Compare Frameworks" beside its tag at 232px), 8px horizontal inset.
 - Compare Frameworks carries a `caption` tag "Soon" until implemented, and opens a truthful placeholder page. It is not rendered as disabled.
 - **Footer status** is driven by `GET /health` and shows only fields that endpoint returns:
   - A status dot plus "API online" when the request succeeds, or "API unreachable" in `error` when it fails.
   - "LLM not configured" when `llm.configured` is false.
   - Activating it opens a popover with `database.chunks`, `database.elements`, `database.crosswalk_rows`, `retrieval.mode` and, when configured, `llm.provider` and `llm.model`. Never display secrets (the endpoint returns none).
-- **Collapse:** a chevron button in the brand row toggles expanded/collapsed on desktop. The choice is remembered per browser. Collapsed items show tooltips. A keyboard shortcut for this is a deferred enhancement (section 17).
+- **Collapse:** a toggle at the bottom of the sidebar (a chevron cannot share the brand row with the 56px rail) toggles expanded/collapsed at 1200px and wider. The choice is remembered per browser and is applied before first paint (an inline script sets `data-sidebar` on `<html>`), so the sidebar never shows the wrong width on load. Collapsed items show tooltips. Nav link accessible names always come from their visible text (labels are visually hidden, not removed, in the rail), so a status tag such as "Soon" stays part of the name. A keyboard shortcut for this is a deferred enhancement (section 17).
 
 **Page header:** 56px tall, `surface`, bottom hairline. Left: page title (`title`). Right: page-scoped controls (on Explorer, the version toggle). No subtitle paragraph.
 

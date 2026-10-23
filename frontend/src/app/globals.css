@@ -1,0 +1,237 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * ControlShift design tokens ("Two inks on paper"), from docs/frontend-design-spec.md section 3.
+ * Raw tokens live on :root; @theme maps them to Tailwind utilities. Components must use these
+ * utilities, not raw palette colors or ad-hoc hex values.
+ */
+:root {
+  /* neutrals */
+  --cs-canvas: #f6f6f3;
+  --cs-surface: #ffffff;
+  --cs-surface-sunken: #f1f1ed;
+  --cs-surface-hover: #eeeee9;
+  --cs-surface-pressed: #e7e7e1;
+  --cs-border: #e3e3dd;
+  --cs-border-strong: #cfcfc7;
+  --cs-fg-1: #17191c;
+  --cs-fg-2: #474c55;
+  --cs-fg-3: #676c75;
+  --cs-fg-4: #9ea2a8;
+  /* interactive (spec token "accent"; named cobalt here because shadcn owns "accent") */
+  --cs-cobalt: #2456d3;
+  --cs-cobalt-soft: #edf2fd;
+  --cs-ink: #17191c;
+  /* version inks: identity only */
+  --cs-v20: #0f766e;
+  --cs-v20-soft: #e8f4f2;
+  --cs-v20-border: #b5dcd6;
+  --cs-v11: #6b46c1;
+  --cs-v11-soft: #f2eefb;
+  --cs-v11-border: #d6ccf1;
+  /* semantic */
+  --cs-ambiguous: #a15c07;
+  --cs-ambiguous-soft: #fdf6ea;
+  --cs-error: #b42318;
+  --cs-error-soft: #fef3f2;
+  --cs-neutral-notice: #474c55;
+  --cs-neutral-notice-soft: #f1f1ed;
+  --cs-derived: #5b616b;
+  --cs-derived-border: #b9bcc2;
+  --cs-highlight: #fff1c2;
+  --cs-skeleton: #ecece7;
+
+  --cs-shadow-overlay: 0 8px 24px rgba(23, 25, 28, 0.1), 0 0 0 1px #e3e3dd;
+
+  /* shadcn semantic variables, pointed at the tokens above */
+  --background: var(--cs-surface);
+  --foreground: var(--cs-fg-1);
+  --card: var(--cs-surface);
+  --card-foreground: var(--cs-fg-1);
+  --popover: var(--cs-surface);
+  --popover-foreground: var(--cs-fg-1);
+  --primary: var(--cs-ink);
+  --primary-foreground: #ffffff;
+  --secondary: var(--cs-surface-sunken);
+  --secondary-foreground: var(--cs-fg-1);
+  --muted: var(--cs-surface-hover);
+  --muted-foreground: var(--cs-fg-3);
+  --accent: var(--cs-surface-hover);
+  --accent-foreground: var(--cs-fg-1);
+  --destructive: var(--cs-error);
+  --border: var(--cs-border);
+  --input: var(--cs-border-strong);
+  --ring: var(--cs-cobalt);
+  --radius: 8px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-canvas: var(--cs-canvas);
+  --color-surface: var(--cs-surface);
+  --color-surface-sunken: var(--cs-surface-sunken);
+  --color-surface-hover: var(--cs-surface-hover);
+  --color-surface-pressed: var(--cs-surface-pressed);
+  --color-border-strong: var(--cs-border-strong);
+  --color-fg-1: var(--cs-fg-1);
+  --color-fg-2: var(--cs-fg-2);
+  --color-fg-3: var(--cs-fg-3);
+  --color-fg-4: var(--cs-fg-4);
+  --color-cobalt: var(--cs-cobalt);
+  --color-cobalt-soft: var(--cs-cobalt-soft);
+  --color-ink: var(--cs-ink);
+  --color-v20: var(--cs-v20);
+  --color-v20-soft: var(--cs-v20-soft);
+  --color-v20-border: var(--cs-v20-border);
+  --color-v11: var(--cs-v11);
+  --color-v11-soft: var(--cs-v11-soft);
+  --color-v11-border: var(--cs-v11-border);
+  --color-ambiguous: var(--cs-ambiguous);
+  --color-ambiguous-soft: var(--cs-ambiguous-soft);
+  --color-error: var(--cs-error);
+  --color-error-soft: var(--cs-error-soft);
+  --color-neutral-notice: var(--cs-neutral-notice);
+  --color-neutral-notice-soft: var(--cs-neutral-notice-soft);
+  --color-derived: var(--cs-derived);
+  --color-derived-border: var(--cs-derived-border);
+  --color-highlight: var(--cs-highlight);
+  --color-skeleton: var(--cs-skeleton);
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-serif: var(--font-source-serif), Georgia, serif;
+
+  /* type scale (spec 3.2): size / line-height */
+  --text-label: 11px;
+  --text-label--line-height: 16px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-ui-sm: 13px;
+  --text-ui-sm--line-height: 20px;
+  --text-ui: 14px;
+  --text-ui--line-height: 20px;
+  --text-body: 14px;
+  --text-body--line-height: 22px;
+  --text-title-sm: 15px;
+  --text-title-sm--line-height: 22px;
+  --text-title: 18px;
+  --text-title--line-height: 26px;
+  --text-name-lg: 22px;
+  --text-name-lg--line-height: 28px;
+  --text-id: 12px;
+  --text-id--line-height: 16px;
+  --text-id-lg: 22px;
+  --text-id-lg--line-height: 28px;
+  --text-source: 15px;
+  --text-source--line-height: 24px;
+  --text-source-lg: 18px;
+  --text-source-lg--line-height: 28px;
+
+  /* radius scale: sm 4, md 6, lg 8, xl 12 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --shadow-overlay: var(--cs-shadow-overlay);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas text-fg-1 text-ui;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* One focus treatment everywhere: 2px cobalt outline, 2px offset, keyboard focus only. */
+  :focus-visible {
+    outline: 2px solid var(--cs-cobalt);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--cs-cobalt-soft);
+  }
+}
+
+/*
+ * Docked sidebar states, driven by <html data-sidebar="collapsed"> (set before first paint by the
+ * inline script in layout.tsx) so server HTML and first paint already match the stored preference.
+ * The sidebar is a 56px rail below 1200px; at 1200px+ it is 232px unless the user collapsed it.
+ */
+.sidebar-dock {
+  width: 56px;
+}
+/* Rail labels that are removed from view entirely (their control has its own accessible name). */
+.rail-hide {
+  display: none;
+}
+/* Nav labels stay in the accessibility tree while visually hidden, so link names never change. */
+.rail-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* Collapse-toggle glyph: "close" only while the sidebar can be collapsed; otherwise "open". */
+.toggle-close {
+  display: none;
+}
+@media (min-width: 1200px) {
+  html:not([data-sidebar="collapsed"]) .sidebar-dock {
+    width: 232px;
+  }
+  html:not([data-sidebar="collapsed"]) .rail-hide {
+    display: revert;
+  }
+  html:not([data-sidebar="collapsed"]) .rail-sr {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    clip-path: none;
+  }
+  html:not([data-sidebar="collapsed"]) .toggle-close {
+    display: block;
+  }
+  html:not([data-sidebar="collapsed"]) .toggle-open {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
