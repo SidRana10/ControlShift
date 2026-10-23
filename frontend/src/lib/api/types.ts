@@ -112,6 +112,25 @@ export interface ElementDetail extends ElementSummary {
   crosswalk: Crosswalk;
 }
 
+export interface MappingTypeCounts {
+  mapped: number;
+  new_in_2_0: number;
+  unmapped: number;
+}
+
+/** GET /crosswalk: one page of official workbook rows, in workbook order. */
+export interface CrosswalkList {
+  direction: string;
+  /** Rows matching every filter. */
+  total: number;
+  count: number;
+  limit: number;
+  offset: number;
+  /** Rows matching all filters except `type`. */
+  type_counts: MappingTypeCounts;
+  entries: CrosswalkEntry[];
+}
+
 export interface HealthResponse {
   status: "ok";
   database: { chunks: number; elements: number; crosswalk_rows: number };

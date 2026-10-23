@@ -166,6 +166,45 @@ class KnowledgeStore:
         sql = "SELECT * FROM element" + (" WHERE " + " AND ".join(where) if where else "")
         return _rows(self.conn.execute(sql + " ORDER BY version, element_id", args))
 
+    def list_crosswalk(self, *, focal: str | None = None, reference: str | None = None,
+                       mapping_type: str | None = None, q: str | None = None,
+                       limit: int = 250, offset: int = 0) -> tuple[int, dict[str, int], list[dict]]:
+        """Official workbook rows ordered by excel_row: (total matching, per-type counts ignoring
+        `mapping_type`, the requested page). `focal` / `reference` are exact element IDs (either
+        spelling). `q` is a case-insensitive substring over both IDs, both descriptions and the
+        comment (LIKE wildcards escaped); an all-digit `q` also matches that workbook row."""
+        where, args = [], []
+        if focal:
+            where.append("focal_element_id=?")
+            args.append(normalize_control_id(focal.upper()))
+        if reference:
+            where.append("reference_element_id=?")
+            args.append(normalize_control_id(reference.upper()))
+        if q:
+            pat = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+            cols = ("focal_element_id", "focal_original_id", "reference_element_id",
+                    "reference_original_id", "focal_description", "reference_description", "comments")
+            clause = " OR ".join(f"COALESCE({c}, '') LIKE ? ESCAPE '\\'" for c in cols)
+            args_q = [pat] * len(cols)
+            if q.isascii() and q.isdigit():
+                clause += " OR excel_row=?"
+                args_q.append(int(q))
+            where.append(f"({clause})")
+            args += args_q
+        base = " WHERE " + " AND ".join(where) if where else ""
+        counts = {t: 0 for t in ("mapped", "new_in_2_0", "unmapped")}
+        for t, n in self.conn.execute(
+                f"SELECT mapping_type, COUNT(*) FROM crosswalk_mapping{base} GROUP BY 1", args):
+            counts[t] = n
+        if mapping_type:
+            base += (" AND" if where else " WHERE") + " mapping_type=?"
+            args = args + [mapping_type]
+        total = self.conn.execute(f"SELECT COUNT(*) FROM crosswalk_mapping{base}", args).fetchone()[0]
+        rows = _rows(self.conn.execute(
+            f"SELECT * FROM crosswalk_mapping{base} ORDER BY excel_row LIMIT ? OFFSET ?",
+            args + [limit, offset]))
+        return total, counts, rows
+
     def list_children(self, element_id: str, version: str) -> list[dict]:
         """Direct children (category -> subcategories, function -> categories)."""
         return _rows(self.conn.execute(

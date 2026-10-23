@@ -26,19 +26,20 @@ a retryable error.
 
 ## API proxy
 
-The browser calls only same-origin `/api/backend/*` paths. `next.config.ts` rewrites exactly four
+The browser calls only same-origin `/api/backend/*` paths. `next.config.ts` rewrites exactly five
 read-only endpoints to FastAPI (`CONTROLSHIFT_API_URL`, default `http://127.0.0.1:8000`):
 
 | Browser path | FastAPI |
 |---|---|
 | `/api/backend/health` | `GET /health` |
+| `/api/backend/crosswalk` | `GET /crosswalk` |
 | `/api/backend/catalog/versions` | `GET /catalog/versions` |
 | `/api/backend/catalog/elements` | `GET /catalog/elements` |
 | `/api/backend/catalog/elements/{version}/{element_id}` | `GET /catalog/elements/{version}/{element_id}` |
 
 `POST /api/backend/ask` is a route handler (`src/app/api/backend/ask/route.ts`), not a rewrite: it accepts only
 `question` (1-2000 characters) and optional `version`, forwards them to `POST /ask`, applies a 100s upstream timeout and answers
-failures in the API's error envelope. `/compare` is not proxied. No CORS is needed. The variable is read when the Next.js
+failures in the API's error envelope. The LLM-backed `POST /compare` is not proxied (the Compare page uses `GET /crosswalk`). No CORS is needed. The variable is read when the Next.js
 server starts (`next build` for `next start`), so rebuild after changing it.
 
 ## Layout

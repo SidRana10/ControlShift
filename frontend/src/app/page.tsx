@@ -8,16 +8,16 @@ export const metadata: Metadata = { title: "Overview" };
 
 const STATUS: Record<string, { tag: string; text: string }> = {
   "/ask": {
-    tag: "In development",
+    tag: "AI-assisted",
     text: "Ask questions about CSF 1.1, CSF 2.0 and the crosswalk, answered from retrieved NIST evidence with citations.",
   },
   "/explorer": {
-    tag: "In development",
-    text: "Browse and search the official records. Framework version summaries are live; the navigator and record view are being built.",
+    tag: "Official records",
+    text: "Browse and search the official CSF 1.1 and CSF 2.0 records, with provenance and the crosswalk rows for each.",
   },
   "/compare": {
-    tag: "Soon",
-    text: "Inspect how CSF 1.1 relates to CSF 2.0 across the official transition crosswalk.",
+    tag: "Official crosswalk",
+    text: "Browse the official transition workbook rows and inspect a CSF 2.0 element beside the CSF 1.1 element it references.",
   },
 };
 

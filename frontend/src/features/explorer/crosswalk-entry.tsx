@@ -56,7 +56,7 @@ function Ident({
 }
 
 /** Horizontal (wide) or vertical (narrow) link between the two ends of an official row. */
-function Connector({ mapped }: { mapped: boolean }) {
+export function Connector({ mapped }: { mapped: boolean }) {
   return (
     <span
       aria-hidden="true"

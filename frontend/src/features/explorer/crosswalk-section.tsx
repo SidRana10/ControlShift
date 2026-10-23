@@ -17,7 +17,7 @@ function jumpTo(row: number) {
 }
 
 /** Derived summary chip: dashed, always labelled Derived; the API's own note opens on demand. */
-function DerivedSummary({ summary }: { summary: Crosswalk["summary"] }) {
+export function DerivedSummary({ summary }: { summary: Crosswalk["summary"] }) {
   return (
     <Popover>
       <PopoverTrigger

@@ -656,8 +656,16 @@ Approved stack: Next.js, React, TypeScript, Tailwind CSS and selectively customi
 - **Responsive:** side-by-side answer and evidence at 1360px+, stacked below, 44px touch targets on narrow screens, no horizontal overflow at 1920/1360/1280/1024/768/390px.
 - **Verification:** 114 frontend tests (53 new, recorded real pipeline responses), ESLint, `tsc` and production build pass; browser-verified against the real NIST retrieval data (BM25) with a scripted fake LLM; no external LLM/provider calls. Real model output and hybrid/rerank retrieval were not exercised in the UI.
 
+### Phase 6B.5 - Compare Frameworks and crosswalk API  ✅
+- **New read-only `GET /crosswalk`** (`api/crosswalk.py`, `KnowledgeStore.list_crosswalk`): the official workbook rows in workbook order, reusing the Catalog's `CrosswalkEntry` model. Filters: `focal` (CSF 2.0), `reference` (CSF 1.1; either ID spelling), `type` (ingest label), `q` (IDs, descriptions, comments; digits also match the row number), `limit`/`offset`. Returns `total`, `count` and `type_counts` (counts ignoring the `type` filter). Parameterized read-only SQL, existing 422 envelope; rows with no reference carry explicit nulls. `POST /compare`, `/ask`, retrieval, generation and the Catalog API are unchanged.
+- **Compare workspace (`/compare`):** searchable, filterable relationship index (exact-ID matches first, counts are workbook rows, not controls); inspector that shows the CSF 2.0 and CSF 1.1 official records side by side (stacked below 1480px) with provenance and Control Explorer links; all workbook rows for the inspected element listed separately with the selected row marked; forward and reverse (CSF 1.1) lookups; shareable URLs (`focal` / `ref`, `row`, `q`, `type`) with push/replace history and safe parsing; single-screen mobile flow with Back to results.
+- **Official vs derived:** official workbook fields (row, sheet, file, direction, comment, NIST descriptions) are kept apart from ControlShift-derived ingest labels and summary classification, which are always tagged Derived. Ambiguity notice ("Multiple crosswalk entries require interpretation", GV.SC-03 rows 25 and 26) is generated from the returned rows; a row without a reference shows "No reference element" with its comment, and an unreferenced CSF 1.1 element shows the neutral "No crosswalk reference" (never "removed").
+- **Navigation:** "Soon" tag removed; Overview destination labels updated to match the implemented features.
+- **Verification:** 17 new backend tests (full suite passes, Ruff clean); 142 frontend tests pass; ESLint, `tsc` and production build pass; browser-verified against the real local API and database at 1600/1440/1024/390px with no horizontal overflow and no provider credentials or LLM calls.
+- **Known limitations:** no index scroll restoration on mobile Back; no arrow-key navigation in the index; a deep link without `row` selects the first row without highlighting it in the index; workbook rows carry no level, so none is shown.
+
 ### Next
-- [ ] Compare Frameworks (needs a crosswalk-listing endpoint).
+- [ ] Final integration, polish and deployment readiness.
 
 ## Phase 7 — Hardening
 - [ ] CI-style test run, lint, README with real benchmark results, reproducibility notes

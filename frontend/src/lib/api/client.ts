@@ -2,6 +2,8 @@ import { parseAskResponse } from "@/lib/ask/parse";
 import type { AskRequestBody, AskResult } from "@/lib/ask/types";
 import type {
   ApiErrorEnvelope,
+  CrosswalkList,
+  MappingType,
   ElementDetail,
   ElementLevel,
   ElementList,
@@ -49,6 +51,19 @@ const isObject = (v: unknown): v is Record<string, unknown> =>
 const guards = {
   health: (b: unknown): b is HealthResponse =>
     isObject(b) && b.status === "ok" && isObject(b.database) && isObject(b.llm),
+  crosswalk: (b: unknown): b is CrosswalkList =>
+    isObject(b) &&
+    typeof b.total === "number" &&
+    Array.isArray(b.entries) &&
+    isObject(b.type_counts) &&
+    b.entries.every(
+      (e: unknown) =>
+        isObject(e) &&
+        typeof e.excel_row === "number" &&
+        typeof e.focal_element_id === "string" &&
+        typeof e.focal_original_id === "string" &&
+        typeof e.mapping_type === "string",
+    ),
   versions: (b: unknown): b is VersionList => isObject(b) && Array.isArray(b.versions),
   elements: (b: unknown): b is ElementList => isObject(b) && Array.isArray(b.elements),
   element: (b: unknown): b is ElementDetail =>
@@ -130,6 +145,23 @@ export function listElements(params: ListElementsParams = {}, signal?: AbortSign
   }
   const suffix = qs.size ? `?${qs}` : "";
   return get(`/catalog/elements${suffix}`, guards.elements, signal);
+}
+
+export interface CrosswalkParams {
+  focal?: string;
+  reference?: string;
+  type?: MappingType;
+  q?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export function listCrosswalk(params: CrosswalkParams = {}, signal?: AbortSignal) {
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") qs.set(key, String(value));
+  }
+  return get(`/crosswalk${qs.size ? `?${qs}` : ""}`, guards.crosswalk, signal);
 }
 
 export const getElement = (version: FrameworkVersion, elementId: string, signal?: AbortSignal) =>

@@ -21,7 +21,6 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Compare Frameworks",
     title: "Compare Frameworks",
     icon: GitCompareArrows,
-    tag: "Soon",
   },
 ];
 

@@ -1,4 +1,4 @@
-"""FastAPI app: GET /health, POST /ask, POST /compare, read-only GET /catalog/*."""
+"""FastAPI app: GET /health, POST /ask, POST /compare, read-only GET /catalog/* and GET /crosswalk."""
 from __future__ import annotations
 
 import asyncio
@@ -15,6 +15,7 @@ from ..generation.config import Settings
 from ..generation.provider import ProviderError, ProviderTimeout
 from ..store.queries import NotFoundError
 from .catalog import router as catalog_router
+from .crosswalk import router as crosswalk_router
 from .schemas import AnswerResponse, AskRequest, CompareRequest, ErrorResponse, HealthResponse
 from .services import Services, build_services
 
@@ -68,6 +69,7 @@ def create_app(services_factory: Callable[[], Services] = build_services,
                               evidence=bundle.to_dict() if include_evidence else None, **body)
 
     app.include_router(catalog_router)
+    app.include_router(crosswalk_router)
 
     @app.get("/health", response_model=HealthResponse)
     async def health(request: Request):

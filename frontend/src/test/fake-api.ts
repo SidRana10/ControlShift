@@ -1,9 +1,12 @@
 import { vi } from "vitest";
-import type { ElementSummary } from "@/lib/api/types";
+import type { CrosswalkList, ElementSummary } from "@/lib/api/types";
 import e11 from "./fixtures/elements-1.1.json";
 import e20 from "./fixtures/elements-2.0.json";
 import versions from "./fixtures/versions.json";
 import d11DE from "./fixtures/details/1.1-DE.json";
+import d11IDBE02 from "./fixtures/details/1.1-ID.BE-02.json";
+import d20GVOC01 from "./fixtures/details/2.0-GV.OC-01.json";
+import crosswalkAll from "./fixtures/crosswalk-all.json";
 import d11IDSC02 from "./fixtures/details/1.1-ID.SC-02.json";
 import d11PRAT01 from "./fixtures/details/1.1-PR.AT-01.json";
 import d11RCCO02 from "./fixtures/details/1.1-RC.CO-02.json";
@@ -20,6 +23,8 @@ export const ALL = [...ELEMENTS_1_1, ...ELEMENTS_2_0];
 export const DETAILS: Record<string, unknown> = {
   "1.1/DE": d11DE,
   "1.1/ID.SC-02": d11IDSC02,
+  "1.1/ID.BE-02": d11IDBE02,
+  "2.0/GV.OC-01": d20GVOC01,
   "1.1/PR.AT-01": d11PRAT01,
   "1.1/RC.CO-02": d11RCCO02,
   "2.0/GV": d20GV,
@@ -27,6 +32,26 @@ export const DETAILS: Record<string, unknown> = {
   "2.0/GV.SC-03": d20GVSC03,
   "2.0/ID.IM-03": d20IDIM03,
 };
+
+/** Recorded GET /crosswalk (all 205 rows); filters below mirror KnowledgeStore.list_crosswalk. */
+export const CROSSWALK_ROWS = (crosswalkAll as unknown as CrosswalkList).entries;
+
+export function queryCrosswalk(p: URLSearchParams): CrosswalkList {
+  const norm = (x: string) => x.toUpperCase().replace(/-(\d)$/, "-0$1");
+  const q = p.get("q")?.toLowerCase();
+  const base = CROSSWALK_ROWS.filter(
+    (r) =>
+      (!p.get("focal") || r.focal_element_id === norm(p.get("focal")!)) &&
+      (!p.get("reference") || r.reference_element_id === norm(p.get("reference")!)) &&
+      (!q ||
+        [r.focal_element_id, r.focal_original_id, r.reference_element_id, r.reference_original_id, r.focal_description, r.reference_description, r.comments].some((f) => f?.toLowerCase().includes(q)) ||
+        String(r.excel_row) === q),
+  );
+  const counts = { mapped: 0, new_in_2_0: 0, unmapped: 0 };
+  for (const r of base) counts[r.mapping_type]++;
+  const rows = base.filter((r) => !p.get("type") || r.mapping_type === p.get("type"));
+  return { direction: "CSF 2.0 (focal) -> CSF 1.1 (reference)", total: rows.length, count: rows.length, limit: 250, offset: 0, type_counts: counts, entries: rows };
+}
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -68,6 +93,11 @@ export function installFakeApi(): FakeApi {
       if (wait) await new Promise((r) => setTimeout(r, wait));
       if (api.fail.current) throw new TypeError("network down");
       const path = url.pathname.replace("/api/backend", "");
+      if (path === "/crosswalk") {
+        if (api.failDetail.some((f) => url.href.includes(f))) return new Response("Internal Server Error", { status: 500 });
+        if (api.malformed.some((f) => url.href.includes(f))) return json(200, { foo: "bar" });
+        return json(200, queryCrosswalk(url.searchParams));
+      }
       if (path === "/catalog/versions") return json(200, versions);
       if (path === "/catalog/elements") {
         const els = queryElements(url.searchParams);
