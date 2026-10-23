@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -49,7 +50,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="h-full">
         <TooltipProvider delay={300}>
-          <AppShell>{children}</AppShell>
+          {/* Routes with runtime params (/explorer/[version]/[id]) read the pathname at request time. */}
+          <Suspense fallback={<div className="h-dvh bg-canvas" aria-busy="true" />}>
+            <AppShell>{children}</AppShell>
+          </Suspense>
         </TooltipProvider>
       </body>
     </html>

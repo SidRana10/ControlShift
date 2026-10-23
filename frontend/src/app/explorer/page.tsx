@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ExplorerIntro } from "@/features/explorer/explorer-intro";
 
 export const metadata: Metadata = { title: "Control Explorer" };
 
+// Rendered by ExplorerWorkspace in the layout (orientation panel when no record is open).
 export default function ExplorerPage() {
-  return <ExplorerIntro />;
+  return null;
 }

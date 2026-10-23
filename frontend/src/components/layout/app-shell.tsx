@@ -13,6 +13,7 @@ import { SidebarStatus } from "@/features/health/sidebar-status";
 import { titleFor } from "@/lib/navigation";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useSidebarCollapsed } from "@/lib/use-sidebar-collapsed";
+import { HEADER_ACTIONS_ID } from "./header-actions";
 import { SidebarNav } from "./sidebar-nav";
 
 function Brand({ docked }: { docked: boolean }) {
@@ -109,7 +110,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Menu aria-hidden="true" className="size-[18px]" strokeWidth={1.5} />
             </Button>
-            <h1 className="truncate text-title font-semibold text-fg-1">{titleFor(pathname)}</h1>
+            <h1 className="min-w-0 truncate text-title font-semibold text-fg-1">{titleFor(pathname)}</h1>
+            <div id={HEADER_ACTIONS_ID} className="ml-auto flex shrink-0 items-center pr-2 min-[900px]:pr-0" />
           </header>
           <main id="main" tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto outline-none">
             {children}

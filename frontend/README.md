@@ -17,7 +17,7 @@ cp .env.example .env.local              # optional: only needed if the API is no
 npm run dev                             # http://localhost:3000
 ```
 
-Production check: `npm run build && npm run start`. Other checks: `npm run lint` and `npm run typecheck`
+Production check: `npm run build && npm run start`. Other checks: `npm run lint`, `npm test` (Vitest + Testing Library; component tests use recorded Catalog API data and an in-memory router, no backend needed) and `npm run typecheck`
 (`typecheck` first runs `next typegen`, so it works on a fresh clone; the generated `.next/` types and
 `next-env.d.ts` are git-ignored).
 
@@ -45,7 +45,9 @@ server starts (`next build` for `next start`), so rebuild after changing it.
 - `src/components/ui/` shadcn primitives, restyled to the tokens
 - `src/components/layout/` application shell, sidebar navigation
 - `src/components/shared/` reusable pieces (VersionChip, SourceTag/DerivedTag, Notice, StateBlock, BrandMark)
-- `src/features/` health status and the Explorer introduction
+- `src/features/explorer/` Control Explorer: provider (URL state), navigator (tree, search, filters), version toggle, record pane
+- `src/features/health/` sidebar API status
+- `src/lib/explorer/` pure logic (URL parsing, hierarchy, search helpers), request cache, `useLoader`; `src/test/` test setup and fixtures
 - `src/lib/api/` typed client, response types (backend snake_case), `useApi` hook
 
 ## Known dependency advisory
